@@ -1,6 +1,6 @@
 # TSBK07-Raytracer
 This is a project made in the course TSBK07 at Linköping University.
 
-Run to build:
+Run to build: \n
 cmake -S . -B build
 cmake --build build

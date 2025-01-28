@@ -60,6 +60,8 @@ int main() {
 
     // ----------------------------------------------------------------------------------------
 
+    unsigned int timeLoc = glGetUniformLocation(shaderProgram, "time");
+
     // JONATANS EXTRA FINA TESTKOD
     unsigned int VBO, VAO;
     glGenVertexArrays(1, &VAO);
@@ -81,6 +83,9 @@ int main() {
     // Rendering loop
     while (!glfwWindowShouldClose(window))
     {
+        float currentFrame = glfwGetTime();
+        glUniform1f(timeLoc, currentFrame);
+
         // Clear the screen
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

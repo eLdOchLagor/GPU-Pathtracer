@@ -14,10 +14,13 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 include_directories(include)
 
 # Automatically gather all source files under src/
-file(GLOB_RECURSE SRC_FILES src/*.cpp)
+file(GLOB_RECURSE SRC_FILES src/*.cpp include/*.h include/*.hpp)
+
+file(GLOB SHADER_FILES shaders/*)
+set_source_files_properties(${SHADER_FILES} PROPERTIES HEADER_FILE_ONLY ON)
 
 # Create the executable
-add_executable(Raytracer ${SRC_FILES})
+add_executable(Raytracer ${SRC_FILES} ${SHADER_FILES})
 
 # Include GLFW and GLAD
 add_subdirectory(external/glfw)

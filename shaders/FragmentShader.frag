@@ -105,11 +105,15 @@ void main() {
 
     float hit = sphereIntersectionTest(direction);
 
+	// Normal calculations for sphere
+	vec3 hitPoint = cameraPosition + hit * direction;
+	vec3 normal = normalize(hitPoint - sphereCenter);
+
 	// Background color
-	FragColor = vec4(0, 0, 0, 1);
+	FragColor = vec4(0.2, 0.2, 0.2, 1);
 
 	if (hit > 0.0) {
-		FragColor = vec4(1, 0, 0, 1);
+		FragColor = vec4(-normal.z, 0, 0, 1);
 	}
 
 }

@@ -99,11 +99,11 @@ void main() {
 
     // Coordinates in imagePlane
     float u = coord.x / screenWidth * imagePlaneWidth - imagePlaneWidth/2.0;
-    float v = -((1.0 - coord.y / screenHeight) * imagePlaneHeight - imagePlaneHeight/2.0);
+    float v = (coord.y / screenHeight - 1.0) * imagePlaneHeight + imagePlaneHeight/2.0;
 
     vec3 direction = normalize(forward + u * right + v * up);
 
-    float hit = triangleIntersectionTest(direction);
+    float hit = sphereIntersectionTest(direction);
 
 	// Background color
 	FragColor = vec4(0, 0, 0, 1);

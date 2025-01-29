@@ -15,8 +15,54 @@ uniform int screenHeight;
 
 in vec3 pos;
 
-vec3 sphereCenter = vec3(0.0, 0.0, 1.0);
+vec3 sphereCenter = vec3(0.0, 1.0, 1.0);
 float sphereRadius = 0.5;
+
+vec3 vertex1 = vec3(-0.5,-0.5,0.5);
+vec3 vertex2 = vec3(0.5,-0.5,0.5);
+vec3 vertex3 = vec3(0.0,0.5,1.0);
+vec3 normal = vec3(0.0,0.0,-1.0);
+
+
+float triangleIntersectionTest(vec3 dir) {
+
+		vec3 d = normalize(dir);
+		vec3 s = cameraPosition;
+
+		// If negative, then the surface is visible for the ray
+		
+		if (dot(d, normal) < 0.0)
+		{
+
+			vec3 c1 = vertex2 - vertex1;
+			vec3 c2 = vertex3 - vertex1;
+
+			vec3 P = cross(d, c2);
+			float det = dot(c1, P);
+			//if (det < 1e-8 && det > -1e-8) {
+			//	return -1.0;
+			//}
+			vec3 T = s - vertex1;
+			float u = dot(T, P) / det;
+			if (u < 0 || u > 1) {
+				return -1.0;
+			}
+
+			vec3 Q = cross(T, c1);
+			float v = dot(d, Q) / det;
+			if (v < 0 || v > 1-u) {
+				return -1.0;
+			}
+			float t = dot(c2, Q) / det;
+			if (t < 0) {
+				return -1.0;
+			}
+			return t;
+			
+
+		}
+		return -1.0;
+	}
 
 float sphereIntersectionTest(vec3 dir) {
 		float c1 = dot(dir, dir);
@@ -53,11 +99,11 @@ void main() {
 
     // Coordinates in imagePlane
     float u = coord.x / screenWidth * imagePlaneWidth - imagePlaneWidth/2.0;
-    float v = (1.0 - coord.y / screenHeight) * imagePlaneHeight - imagePlaneHeight/2.0;
+    float v = -((1.0 - coord.y / screenHeight) * imagePlaneHeight - imagePlaneHeight/2.0);
 
     vec3 direction = normalize(forward + u * right + v * up);
 
-    float hit = sphereIntersectionTest(direction);
+    float hit = triangleIntersectionTest(direction);
 
 	// Background color
 	FragColor = vec4(0, 0, 0, 1);

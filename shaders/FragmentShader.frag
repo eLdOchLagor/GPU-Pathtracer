@@ -37,7 +37,9 @@ float noise(vec2 st) {
 }
 
 float multiOctave(vec2 st){
-    st.x += time * 10.0f;
+    st.x += cos(time) * 10.0f;
+    st.y += sin(time) * 10.0f;
+
     float frequency = 0.5f;
     float amplitude = 1.0f;
 

@@ -37,9 +37,10 @@ float noise(vec2 st) {
 }
 
 float multiOctave(vec2 st){
-    st.x += cos(time) * 10.0f;
-    st.y += sin(time) * 10.0f;
+    st.x += time * 10.0f;
+    
 
+    //st.xy = vec2(cos(time) + sin(time), cos(time) - sin(time);
     float frequency = 0.5f;
     float amplitude = 1.0f;
 
@@ -56,6 +57,22 @@ float multiOctave(vec2 st){
 
 void main() {
     float perlin = multiOctave(pos.xy*10.0f);
+    //perlin = clamp(perlin, 0.25, 1);
+    FragColor = vec4(220.0/255.0, 220.0/255.0,220.0/255.0,1.0);
 
-    FragColor = vec4(perlin, perlin, perlin, 1.0);
+    if(perlin < 0.72){
+    FragColor = vec4(130.0/255.0, 130.0/255.0,130.0/255.0,1.0);
+
+    }
+
+    if(perlin < 0.64){
+        FragColor = vec4(123.0/255.0, 187.0/255.0,160.0/255.0,1.0);
+    }
+    if(perlin < 0.52){
+        
+        FragColor = vec4(222.0/255.0,205.0/255.0,180.0/255.0,1.0);
+    }
+    if(perlin < 0.45){
+        FragColor = vec4(71.0/255.0, 164.0/255.0, 204.0/255.0, 1.0);
+    }
 }

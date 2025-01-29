@@ -1,12 +1,12 @@
-#version 330 core
+#version 460 core
 
 struct Sphere{
 	vec3 spherePOS;
 	float sphereRadius;
 };
 
-layout(std140, binding = 0) uniform SphereBuffer {
-    Sphere spheres[9];  // Limited by UBO size (adjust as needed)
+layout(std430, binding = 0) buffer SphereBuffer {
+    Sphere spheres[10];  // Limited by UBO size (adjust as needed)
 };
 
 out vec4 FragColor;

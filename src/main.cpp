@@ -33,9 +33,12 @@ float verts[] = {
 };
 
 int main() {
-    const int MAX_SPHERES = 9;
+    const int MAX_SPHERES = 10;
     Sphere spheres[MAX_SPHERES];
     glfwInit();
+    float previousTime = 0;
+    float deltaTime = 0;
+
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -94,20 +97,20 @@ int main() {
     unsigned int screenWidthLoc = glGetUniformLocation(shaderProgram, "screenWidth");
     unsigned int screenHeightLoc = glGetUniformLocation(shaderProgram, "screenHeight");
 
-    // JONATANS EXTRA FINA TESTKOD
+    
     unsigned int VBO, VAO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-    //ubos instead of SSBO since were at an earlier version of opengl
-    GLuint ubo;
-    glGenBuffers(1, &ubo);
-    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-    glBufferData(GL_UNIFORM_BUFFER, MAX_SPHERES * sizeof(Sphere), NULL, GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo);  // Bind to binding = 0 (matches shader)
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    //ubos instead of SSBO since were at an earlier version of opengl // JONATANS EXTRA FINA TESTKOD
+    GLuint SSBO;
+    glGenBuffers(1, &SSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, MAX_SPHERES * sizeof(Sphere), spheres, GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, SSBO);  // Bind to binding = 0 (matches shader)
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
 
@@ -126,7 +129,9 @@ int main() {
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - previousTime;
 
+        std::clog  << "\rFPS: " << 1 / deltaTime;
         // Pass Uniforms
         glUniform1f(timeLoc, currentFrame);
 
@@ -149,9 +154,9 @@ int main() {
            
         }
 
-        glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, MAX_SPHERES * sizeof(Sphere), spheres);
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO);
+        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, MAX_SPHERES * sizeof(Sphere), spheres);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
         // Clear the screen
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -167,6 +172,7 @@ int main() {
 
         // Poll for events
         glfwPollEvents();
+        previousTime = currentFrame;
     }
 
     glfwTerminate();

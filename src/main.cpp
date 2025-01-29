@@ -3,10 +3,16 @@
 #include <iostream>
 #include "Shader.h"
 #include "Camera.h"
+#include "Scene.h"
 
 #include "glm.hpp"
 #include "gtc/matrix_transform.hpp"
 #include "gtc/type_ptr.hpp"
+
+struct Sphere {
+    glm::vec3 position;
+    float radius;
+};
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
@@ -27,6 +33,8 @@ float verts[] = {
 };
 
 int main() {
+    const int MAX_SPHERES = 9;
+    Sphere spheres[MAX_SPHERES];
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -93,6 +101,14 @@ int main() {
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
+    //ubos instead of SSBO since were at an earlier version of opengl
+    GLuint ubo;
+    glGenBuffers(1, &ubo);
+    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+    glBufferData(GL_UNIFORM_BUFFER, MAX_SPHERES * sizeof(Sphere), NULL, GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo);  // Bind to binding = 0 (matches shader)
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
     glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -114,6 +130,9 @@ int main() {
         // Pass Uniforms
         glUniform1f(timeLoc, currentFrame);
 
+    
+        
+
         // Camera Uniforms
         glUniform3fv(positionLoc, 1, &mainCamera.GetPosition()[0]);
         glUniform3fv(forwardLoc, 1, &mainCamera.GetForward()[0]);
@@ -124,9 +143,20 @@ int main() {
         glUniform1i(screenWidthLoc, screenWidth);
         glUniform1i(screenHeightLoc, screenHeight);
 
+        for (int i = 0; i < MAX_SPHERES; i++) {
+            spheres[i].position = 0.5f*glm::vec3(sin(currentFrame + (5+i)), cos(currentFrame +(5+ i)), 1.0f);
+            spheres[i].radius = 0.5f;
+           
+        }
+
+        glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, MAX_SPHERES * sizeof(Sphere), spheres);
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
         // Clear the screen
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        
 
         // Use the shader program
         glUseProgram(shaderProgram);

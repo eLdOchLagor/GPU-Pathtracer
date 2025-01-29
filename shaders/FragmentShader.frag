@@ -1,5 +1,14 @@
 #version 330 core
 
+struct Sphere{
+	vec3 spherePOS;
+	float sphereRadius;
+};
+
+layout(std140, binding = 0) uniform SphereBuffer {
+    Sphere spheres[9];  // Limited by UBO size (adjust as needed)
+};
+
 out vec4 FragColor;
 
 uniform float time;
@@ -64,10 +73,10 @@ float triangleIntersectionTest(vec3 dir) {
 		return -1.0;
 	}
 
-float sphereIntersectionTest(vec3 dir) {
+float sphereIntersectionTest(vec3 dir, Sphere targetSphere) {
 		float c1 = dot(dir, dir);
-		float c2 = 2.0 * dot(dir, cameraPosition - sphereCenter);
-		float c3 = dot(cameraPosition - sphereCenter, cameraPosition - sphereCenter) - sphereRadius * sphereRadius;
+		float c2 = 2.0 * dot(dir, cameraPosition - targetSphere.spherePOS);
+		float c3 = dot(cameraPosition - targetSphere.spherePOS, cameraPosition - targetSphere.spherePOS) - targetSphere.sphereRadius * targetSphere.sphereRadius;
 
 		float arg = c2 * c2 - 4.0 * c1 * c3;
 
@@ -103,17 +112,22 @@ void main() {
 
     vec3 direction = normalize(forward + u * right + v * up);
 
-    float hit = sphereIntersectionTest(direction);
+    //float hit = sphereIntersectionTest(direction);
 
-	// Normal calculations for sphere
-	vec3 hitPoint = cameraPosition + hit * direction;
-	vec3 normal = normalize(hitPoint - sphereCenter);
+	
 
 	// Background color
 	FragColor = vec4(0.2, 0.2, 0.2, 1);
 
-	if (hit > 0.0) {
-		FragColor = vec4(-normal.z, 0, 0, 1);
+	
+	for(int i = 0; i < spheres.length(); i++){
+		float hit = sphereIntersectionTest(direction, spheres[i]);
+		if (hit > 0.0) {
+		// Normal calculations for sphere
+			vec3 hitPoint = cameraPosition + hit * direction;
+			vec3 normal = normalize(hitPoint - sphereCenter);
+			FragColor = vec4(-normal.z, 0, 0, 1);
+		}
 	}
 
 }

@@ -8,6 +8,8 @@
 #include "gtc/matrix_transform.hpp"
 #include "gtc/type_ptr.hpp"
 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+
 int screenWidth = 800;
 int screenHeight = 600;
 
@@ -98,7 +100,11 @@ int main() {
 
     glBindVertexArray(0);
 
+
     glViewport(0, 0, screenWidth, screenHeight);
+
+    // Updates glViewport when window is resized
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     // Rendering loop
     while (!glfwWindowShouldClose(window))
@@ -135,4 +141,9 @@ int main() {
 
     glfwTerminate();
     return 0;
+}
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
 }

@@ -11,7 +11,7 @@
 int screenWidth = 800;
 int screenHeight = 600;
 
-Camera mainCamera = Camera(glm::fvec3(0.0f), glm::fvec3(0.0f, 0.0f, 1.0f), glm::fvec3(0.0f, 1.0f, 0.0f), 80.0f, screenWidth, screenHeight);
+Camera mainCamera = Camera(glm::fvec3(0.0f, 0.0f, -1.0f), glm::fvec3(0.0f, 0.0f, 1.0f), glm::fvec3(0.0f, 1.0f, 0.0f), 80.0f, screenWidth, screenHeight);
 
 float verts[] = {
     //bottom left Triangle

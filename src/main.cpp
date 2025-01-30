@@ -14,6 +14,14 @@ struct Sphere {
     float radius;
 };
 
+struct Triangle {
+    glm::vec4 vertex1;
+    glm::vec4 vertex2;
+    glm::vec4 vertex3;
+    glm::vec4 normal;
+    glm::vec4 color;
+};
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 int screenWidth = 800;
@@ -32,9 +40,191 @@ float verts[] = {
     -1.0f, 1.0f, 0.0f
 };
 
+void getRoom(Triangle triangles[]) {
+    glm::vec3 e1 = glm::vec4(0.0f);
+    glm::vec3 e2 = glm::vec4(0.0f);
+    int i = 0;
+    //floor
+        //triangle front
+        triangles[i].vertex1 = glm::vec4(0.0f, -5.0f, -3.0f, 0.0f);
+        triangles[i].vertex2 = glm::vec4(6.0f, -5.0f, 0.0f, 0.0f);
+        triangles[i].vertex3 = glm::vec4(-6.0f, -5.0f, 0.0f, 0.0f);
+        triangles[i].normal = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+        triangles[i].color = glm::vec4(38.0f / 255, 156.0f / 255, 169.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        i++;
+        //triangle mid right
+        triangles[i].vertex1 = glm::vec4(6.0f, -5.0f, 0.0f,0.0f);
+        triangles[i].vertex2 = glm::vec4(6.0f, -5.0f, 10.0f,0.0f);
+        triangles[i].vertex3 = glm::vec4(-6.0f, -5.0f, 10.0f,0.0f);
+        triangles[i].normal = glm::vec4(0.0f,1.0f,0.0f,0.0f);
+        triangles[i].color = glm::vec4(38.0f / 255, 156.0f / 255, 169.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        i++;
+        //triangle mid left
+        triangles[i].vertex1 = glm::vec4(6.0f, -5.0f, 0.0f, 0.0f);
+        triangles[i].vertex2 = glm::vec4(-6.0f, -5.0f, 10.0f, 0.0f);
+        triangles[i].vertex3 = glm::vec4(-6.0f, -5.0f, 0.0f, 0.0f);
+        triangles[i].normal = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+        triangles[i].color = glm::vec4(38.0f / 255, 156.0f / 255, 169.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        i++;
+        //triangle back
+        triangles[i].vertex1 = glm::vec4(0.0f, -5.0f, 13.0f, 0.0f);
+        triangles[i].vertex2 = glm::vec4(-6.0f, -5.0f, 10.0f, 0.0f);
+        triangles[i].vertex3 = glm::vec4(6.0f, -5.0f, 10.0f, 0.0f);
+        triangles[i].normal = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+        triangles[i].color = glm::vec4(38.0f / 255, 156.0f / 255, 169.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        i++;
+    //backroom walls
+        //leftwall back
+        triangles[i].vertex1 = glm::vec4(-6.0f, -5.0f, 10.0f, 0.0f);
+        triangles[i].vertex2 = glm::vec4(0.0f, -5.0f, 13.0f, 0.0f);
+        triangles[i].vertex3 = glm::vec4(0.0f, 5.0f, 13.0f, 0.0f);
+        e1 = triangles[i].vertex2 - triangles[i].vertex1;
+        e2 = triangles[i].vertex3 - triangles[i].vertex2;
+        triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)),0.0f);
+        triangles[i].color = glm::vec4(234.0f/255, 215.0f/255, 165.0f/255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        i++;
+        //leftwall front
+        triangles[i].vertex1 = glm::vec4(-6.0f, -5.0f, 10.0f, 0.0f);
+        triangles[i].vertex2 = glm::vec4(0.0f, 5.0f, 13.0f, 0.0f);
+        triangles[i].vertex3 = glm::vec4(-6.0f, 5.0f, 10.0f, 0.0f);
+        e1 = triangles[i].vertex2 - triangles[i].vertex1;
+        e2 = triangles[i].vertex3 - triangles[i].vertex2;
+        triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0f);
+        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        i++;
+    //backroom walls
+        //leftwall back
+        triangles[i].vertex1 = glm::vec4(6.0f, -5.0f, 10.0f, 0.0f);
+        triangles[i].vertex2 = glm::vec4(0.0f, 5.0f, 13.0f, 0.0f);
+        triangles[i].vertex3 = glm::vec4(0.0f, -5.0f, 13.0f, 0.0f);      
+        e1 = triangles[i].vertex2 - triangles[i].vertex1;
+        e2 = triangles[i].vertex3 - triangles[i].vertex2;
+        triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0f);
+        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        i++;
+        //leftwall front
+        triangles[i].vertex1 = glm::vec4(6.0f, -5.0f, 10.0f, 0.0f);
+        triangles[i].vertex2 = glm::vec4(6.0f, 5.0f, 10.0f, 0.0f);
+        triangles[i].vertex3 = glm::vec4(0.0f, 5.0f, 13.0f, 0.0f);
+        e1 = triangles[i].vertex2 - triangles[i].vertex1;
+        e2 = triangles[i].vertex3 - triangles[i].vertex2;
+        triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0f);
+        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        i++;
+    //right walls 
+        //bottom wall
+        triangles[i].vertex1 = glm::vec4(6.0f, -5.0f, 0.0f, 0.0f);
+        triangles[i].vertex2 = glm::vec4(6.0f, 5.0f, 0.0f, 0.0f);
+        triangles[i].vertex3 = glm::vec4(6.0f, -5.0f, 10.0f,0.0f);
+        triangles[i].normal = glm::vec4(-1.0f,0.0f,0.0f,0.0f);
+        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        i++;
+        //top wall
+        triangles[i].vertex1 = glm::vec4(6.0f, -5.0f, 10.0f, 0.0f);
+        triangles[i].vertex2 = glm::vec4(6.0f, 5.0f, 0.0f, 0.0f);
+        triangles[i].vertex3 = glm::vec4(6.0f, 5.0f, 10.0f, 0.0f);
+        triangles[i].normal = glm::vec4(-1.0f, 0.0f, 0.0f, 0.0f);
+        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        i++;
+
+    //left walls 
+        //bottom wall
+        triangles[i].vertex1 = glm::vec4(-6.0f, -5.0f, 0.0f, 0.0f);
+        triangles[i].vertex2 = glm::vec4(-6.0f, -5.0f, 10.0f, 0.0f);
+        triangles[i].vertex3 = glm::vec4(-6.0f, 5.0f, 0.0f, 0.0f);
+        triangles[i].normal = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
+        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        i++;
+        //top wall
+        triangles[i].vertex1 = glm::vec4(-6.0f, -5.0f, 10.0f, 0.0f);
+        triangles[i].vertex2 = glm::vec4(-6.0f, 5.0f, 10.0f, 0.0f);
+        triangles[i].vertex3 = glm::vec4(-6.0f, 5.0f, 0.0f, 0.0f);
+        triangles[i].normal = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
+        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        i++;
+    //frontroom walls
+        //left bottom
+        triangles[i].vertex1 = glm::vec4(0.0f, -5.0f, -3.0f, 0.0f);
+        triangles[i].vertex2 = glm::vec4(-6.0f, -5.0f, 0.0f, 0.0f);
+        triangles[i].vertex3 = glm::vec4(0.0f, 5.0f, -3.0f, 0.0f);
+        e1 = triangles[i].vertex2 - triangles[i].vertex1;
+        e2 = triangles[i].vertex3 - triangles[i].vertex2;
+        triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0f);
+        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        i++;
+        //left top
+        triangles[i].vertex1 = glm::vec4(-6.0f, -5.0f, 0.0f, 0.0f);
+        triangles[i].vertex2 = glm::vec4(-6.0f, 5.0f, 0.0f, 0.0f);
+        triangles[i].vertex3 = glm::vec4(0.0f, 5.0f, -3.0f, 0.0f);
+        e1 = triangles[i].vertex2 - triangles[i].vertex1;
+        e2 = triangles[i].vertex3 - triangles[i].vertex2;
+        triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0f);
+        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        i++;
+    //frontroom walls
+        //right bottom
+        triangles[i].vertex1 = glm::vec4(0.0f, -5.0f, -3.0f, 0.0f);
+        triangles[i].vertex2 = glm::vec4(0.0f, 5.0f, -3.0f, 0.0f);
+        triangles[i].vertex3 = glm::vec4(6.0f, -5.0f, 0.0f, 0.0f);
+        e1 = triangles[i].vertex2 - triangles[i].vertex1;
+        e2 = triangles[i].vertex3 - triangles[i].vertex2;
+        triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0f);
+        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        i++;
+        //right top
+        triangles[i].vertex1 = glm::vec4(0.0f, 5.0f, -3.0f, 0.0f);
+        triangles[i].vertex2 = glm::vec4(-6.0f, 5.0f, 0.0f, 0.0f);
+        triangles[i].vertex3 = glm::vec4(-6.0f, -5.0f, 0.0f, 0.0f);
+        e1 = triangles[i].vertex2 - triangles[i].vertex1;
+        e2 = triangles[i].vertex3 - triangles[i].vertex2;
+        triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0f);
+        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        i++;
+    //roof
+        //triangle front
+        triangles[i].vertex1 = glm::vec4(0.0f, 5.0f, -3.0f, 0.0f);
+        triangles[i].vertex2 = glm::vec4(-6.0f, 5.0f, 0.0f, 0.0f);
+        triangles[i].vertex3 = glm::vec4(6.0f, 5.0f, 0.0f, 0.0f);
+        triangles[i].normal = glm::vec4(0.0f, -1.0f, 0.0f, 0.0f);
+        triangles[i].color = glm::vec4(163.0f / 255, 211.0f / 255, 214.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        i++;
+        //triangle mid right
+        triangles[i].vertex1 = glm::vec4(6.0f, 5.0f, 0.0f, 0.0f);
+        triangles[i].vertex2 = glm::vec4(-6.0f, 5.0f, 10.0f, 0.0f);
+        triangles[i].vertex3 = glm::vec4(6.0f, 5.0f, 10.0f, 0.0f);
+        triangles[i].normal = glm::vec4(0.0f, -1.0f, 0.0f, 0.0f);
+        triangles[i].color = glm::vec4(163.0f / 255, 211.0f / 255, 214.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        i++;
+        //triangle mid left
+        triangles[i].vertex1 = glm::vec4(6.0f, 5.0f, 0.0f, 0.0f);
+        triangles[i].vertex2 = glm::vec4(-6.0f, 5.0f, 0.0f, 0.0f);
+        triangles[i].vertex3 = glm::vec4(-6.0f, 5.0f, 10.0f, 0.0f);
+        triangles[i].normal = glm::vec4(0.0f, -1.0f, 0.0f, 0.0f);
+        triangles[i].color = glm::vec4(163.0f / 255, 211.0f / 255, 214.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        i++;
+        //triangle back
+        triangles[i].vertex1 = glm::vec4(-6.0f, 5.0f, 10.0f, 0.0f);
+        triangles[i].vertex2 = glm::vec4(0.0f, 5.0f, 13.0f, 0.0f);
+        triangles[i].vertex3 = glm::vec4(6.0f, 5.0f, 10.0f, 0.0f);
+        triangles[i].normal = glm::vec4(0.0f, -1.0f, 0.0f, 0.0f);
+        triangles[i].color = glm::vec4(163.0f / 255, 211.0f / 255, 214.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        
+        
+
+}
+
 int main() {
-    const int MAX_SPHERES = 10;
+    const int MAX_SPHERES = 1;
+    const int MAX_TRIANGLES = 0;
+    const int MAX_TRIANGLES_FOR_ROOM = 24;
     Sphere spheres[MAX_SPHERES];
+    Triangle triangles[MAX_TRIANGLES + MAX_TRIANGLES_FOR_ROOM];
+    getRoom(triangles);
+    /*triangles[MAX_TRIANGLES_FOR_ROOM].vertex1 = glm::vec4(-0.5f, -0.5f, 0.5f, 0.0f);
+    triangles[MAX_TRIANGLES_FOR_ROOM].vertex2 = glm::vec4(0.5f, -0.5f, 0.5f,0.0f);
+    triangles[MAX_TRIANGLES_FOR_ROOM].vertex3 = glm::vec4(0.0f, 0.5f, 0.5f, 0.0f);
+    triangles[MAX_TRIANGLES_FOR_ROOM].normal = glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);*/
+
     glfwInit();
     float previousTime = 0;
     float deltaTime = 0;
@@ -105,11 +295,20 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
     //ubos instead of SSBO since were at an earlier version of opengl // JONATANS EXTRA FINA TESTKOD
-    GLuint SSBO;
-    glGenBuffers(1, &SSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO);
+    GLuint SSBO_Spheres, SSBO_Triangles;
+
+    // Allocate SSBO for spheres
+    glGenBuffers(1, &SSBO_Spheres);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Spheres);
     glBufferData(GL_SHADER_STORAGE_BUFFER, MAX_SPHERES * sizeof(Sphere), spheres, GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, SSBO);  // Bind to binding = 0 (matches shader)
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, SSBO_Spheres);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    // Allocate SSBO for triangles
+    glGenBuffers(1, &SSBO_Triangles);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Triangles);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, (MAX_TRIANGLES + MAX_TRIANGLES_FOR_ROOM) * sizeof(Triangle), triangles, GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, SSBO_Triangles);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
@@ -153,10 +352,18 @@ int main() {
             spheres[i].radius = 0.5f;
            
         }
+        
 
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO);
+        // Update spheres SSBO
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Spheres);
         glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, MAX_SPHERES * sizeof(Sphere), spheres);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+        // Update triangles SSBO (offset must be 0, because it's a separate buffer)
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Triangles);
+        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, MAX_TRIANGLES * sizeof(Triangle), triangles);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
         // Clear the screen
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

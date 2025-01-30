@@ -49,7 +49,7 @@ struct Light
 	vec3 radiance;
 };
 
-Light AreaLight = Light(vec3(-2, 4.99, 8), vec3(2, 4.99, 8), vec3(2, 4.99, 11), vec3(-2, 4.99, 11), vec3(0.0, 1.0, 0.0), vec3(1.0, 1.0, 1.0));
+Light AreaLight = Light(vec3(-2, 4.99, 8), vec3(2, 4.99, 8), vec3(2, 4.99, 11), vec3(-2, 4.99, 11), vec3(0.0, -1.0, 0.0), vec3(10.0, 10.0, 10.0));
 // --------------------------------------------------------------------------------------------------
 
 // Random number generator --------------------------------------------------------------------------
@@ -149,7 +149,7 @@ vec3 calculateDirectIllumination(vec3 dir, vec3 hitPoint, vec3 normal, vec3 surf
 	vec3 di = y - hitPoint;
 
 	float cosx = dot(normal, normalize(di));
-	float cosy = dot(AreaLight.normal, normalize(di));
+	float cosy = dot(-AreaLight.normal, normalize(di));
 
 	// Make sure that surfaces facing away from the lightsource dont give negative values, these values give wrong result
 	cosx = max(0.0, cosx);
@@ -158,7 +158,7 @@ vec3 calculateDirectIllumination(vec3 dir, vec3 hitPoint, vec3 normal, vec3 surf
 	float scalar_radiance = (cosx * cosy) / (length(di) * length(di));
 	float A = length(e1) * length(e2);
 
-	radiance = vec3(10.0 * scalar_radiance * A/M_PI) * surfaceColor;
+	radiance = vec3(AreaLight.radiance * scalar_radiance * A/M_PI) * surfaceColor;
 
 	return radiance;
 }

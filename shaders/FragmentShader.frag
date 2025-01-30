@@ -1,5 +1,7 @@
 #version 460 core
 
+#define M_PI 3.1415926535897932384626433832795
+
 struct Sphere{
 	vec3 spherePOS;
 	float sphereRadius;
@@ -36,9 +38,36 @@ uniform int screenHeight;
 
 in vec3 pos;
 
+// Temporarily hardcoded light --------------------------------------------------------------------
+struct Light
+{
+	vec3 vertex1;
+	vec3 vertex2;
+	vec3 vertex3;
+	vec3 vertex4;
+	vec3 normal;
+	vec3 radiance;
+};
 
+Light AreaLight = Light(vec3(-2, 4.99, 8), vec3(2, 4.99, 8), vec3(2, 4.99, 11), vec3(-2, 4.99, 11), vec3(0.0, 1.0, 0.0), vec3(1.0, 1.0, 1.0));
+// --------------------------------------------------------------------------------------------------
 
+// Random number generator --------------------------------------------------------------------------
+uint seed;
 
+// PCG Hash Taken from https://www.shadertoy.com/view/ctj3Wc
+uint PCGHash()
+{
+    seed = seed * 747796405u + 2891336453u;
+    uint state = seed;
+    uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
+    return (word >> 22u) ^ word;
+}
+
+float RandomFloat(uint inputSeed){
+	return (PCGHash() / float(0xFFFFFFFFU));
+}
+// ----------------------------------------------------------------------------------------------------
 
 float triangleIntersectionTest(vec3 dir, Triangle targetTriangle) {
 
@@ -109,9 +138,38 @@ float sphereIntersectionTest(vec3 dir, Sphere targetSphere) {
 		return -1.0;
 }
 
+vec3 calculateDirectIllumination(vec3 dir, vec3 hitPoint, vec3 normal, vec3 surfaceColor){
+	vec3 radiance = vec3(0.0, 0.0, 0.0);
+
+	vec3 e1 = AreaLight.vertex2 - AreaLight.vertex1;
+	vec3 e2 = AreaLight.vertex4 - AreaLight.vertex1;
+
+	float s = RandomFloat(seed);
+	float t = RandomFloat(seed);
+
+	vec3 y = AreaLight.vertex1 + s * e1 + t * e2;
+	vec3 di = y - hitPoint;
+
+	float cosx = dot(normal, normalize(di));
+	float cosy = dot(AreaLight.normal, normalize(di));
+
+	// Make sure that surfaces facing away from the lightsource dont give negative values, these values give wrong result
+	cosx = max(0.0, cosx);
+	cosy = max(0.0, cosy);
+
+	float scalar_radiance = (cosx * cosy) / (length(di) * length(di));
+	float A = length(e1) * length(e2);
+
+	radiance = vec3(10.0 * scalar_radiance * A/M_PI) * surfaceColor;
+
+	return radiance;
+}
+
+
 void main() {
-   
     vec4 coord = gl_FragCoord;
+
+	seed = uint(coord.y * screenWidth + coord.x);
 
     // Coordinates in imagePlane
     float u = -(coord.x / screenWidth * imagePlaneWidth - imagePlaneWidth/2.0);
@@ -136,7 +194,11 @@ void main() {
 		float hitTriangle = triangleIntersectionTest(direction, triangles[q]);
 		if(hitTriangle > 0.0){
 			vec3 normal = triangles[q].triangleNormal;
-			FragColor = vec4(triangles[q].triangleColor,1);
+			vec3 hitPoint = cameraPosition + hitTriangle * direction;
+
+			vec3 directIllumination = calculateDirectIllumination(direction, hitPoint, normal, triangles[q].triangleColor);
+
+			FragColor = vec4(directIllumination,1);
 		}
 	}
 

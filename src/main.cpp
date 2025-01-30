@@ -348,7 +348,7 @@ int main() {
         glUniform1i(screenHeightLoc, screenHeight);
 
         for (int i = 0; i < MAX_SPHERES; i++) {
-            spheres[i].position = 0.5f*glm::vec3(sin(currentFrame + (5+i)), cos(currentFrame +(5+ i)), 1.0f);
+            spheres[i].position = 0.5f*glm::vec3(sin(currentFrame + (5+i)), cos(currentFrame +(5+ i)), 10.0f);
             spheres[i].radius = 0.5f;
            
         }

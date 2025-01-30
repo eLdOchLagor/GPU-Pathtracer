@@ -84,9 +84,7 @@ float triangleIntersectionTest(vec3 dir, Triangle targetTriangle) {
 
 			vec3 P = cross(d, c2);
 			float det = dot(c1, P);
-			//if (det < 1e-8 && det > -1e-8) {
-			//	return -1.0;
-			//}
+			
 			vec3 T = s - targetTriangle.vertex1;
 			float u = dot(T, P) / det;
 			if (u < 0 || u > 1) {
@@ -181,26 +179,36 @@ void main() {
 	FragColor = vec4(0.2, 0.2, 0.2, 1);
 
 	//Intersection tests for spheres, then triangles.
+	float closestTimeSphere = -1.0;
+	float closestTimeTriangle = -1.0;
+	Sphere closestSphere;
+	Triangle closestTriangle;
+	
 	for(int i = 0; i < spheres.length(); i++){
-		float hitSphere = sphereIntersectionTest(direction, spheres[i]);
-		if (hitSphere > 0.0) {
-		// Normal calculations for sphere
-			vec3 hitPoint = cameraPosition + hitSphere * direction;
-			vec3 normal = normalize(hitPoint - spheres[i].spherePOS);
-			FragColor = vec4(-normal.z, 0, 0, 1);
+		float time = sphereIntersectionTest(direction, spheres[i]);
+		if ((time < closestTimeSphere || closestTimeSphere < 0.0) && time > 0.0) {
+			closestTimeSphere = time;
+			closestSphere = spheres[i];
+			vec3 t = cameraPosition + time * direction;
+			vec3 normal = normalize(t - spheres[i].spherePOS);
+
+			vec3 directIllumination = calculateDirectIllumination(direction, t, normal, vec3(1.0,0.0,0.0));
+			FragColor = vec4(closestTimeSphere);
 		}
 	}
 	for(int q = 0; q < triangles.length(); q++){
-		float hitTriangle = triangleIntersectionTest(direction, triangles[q]);
-		if(hitTriangle > 0.0){
+		float time = triangleIntersectionTest(direction, triangles[q]);
+		if((time < closestTimeTriangle || closestTimeTriangle < 0.0) && time > 0.0 && time < closestTimeSphere){
+			closestTimeTriangle = time;
+			closestTriangle = triangles[q];
 			vec3 normal = triangles[q].triangleNormal;
-			vec3 hitPoint = cameraPosition + hitTriangle * direction;
-
-			vec3 directIllumination = calculateDirectIllumination(direction, hitPoint, normal, triangles[q].triangleColor);
-
-			FragColor = vec4(directIllumination,1);
+			vec3 t = cameraPosition + time * direction;
+			
+			vec3 directIllumination = calculateDirectIllumination(direction, t, normal, triangles[q].triangleColor);
+			FragColor = vec4(closestTimeSphere,1);		
 		}
 	}
+	
 
 }
 

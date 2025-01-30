@@ -185,24 +185,24 @@ void main() {
 	Triangle closestTriangle;
 	
 	for(int i = 0; i < spheres.length(); i++){
-		float distance = sphereIntersectionTest(direction, spheres[i]);
-		if ((distance < closestTimeSphere || closestTimeSphere < 0.0) && distance > 0.0) {
-			closestTimeSphere = distance;
+		float distance_1 = sphereIntersectionTest(direction, spheres[i]);
+		if ((distance_1 < closestTimeSphere || closestTimeSphere < 0.0) && distance_1 > 0.0) {
+			closestTimeSphere = distance_1;
 			closestSphere = spheres[i];
-			vec3 t = cameraPosition + distance * direction;
+			vec3 t = cameraPosition + distance_1 * direction;
 			vec3 normal = normalize(t - spheres[i].spherePOS);
 
 			vec3 directIllumination = calculateDirectIllumination(direction, t, normal, vec3(1.0,0.0,0.0));
-			FragColor = vec4(closestTimeSphere);
+			FragColor = vec4(directIllumination,1.0);
 		}
 	}
 	for(int q = 0; q < triangles.length(); q++){
-		float distance = triangleIntersectionTest(direction, triangles[q]);
-		if((distance < closestTimeTriangle || closestTimeTriangle < 0.0) && distance > 0.0 && distance < closestTimeSphere){
-			closestTimeTriangle = distance;
+		float distance_2 = triangleIntersectionTest(direction, triangles[q]);
+		if((distance_2 < closestTimeTriangle || closestTimeTriangle < 0.0 ) && distance_2 > 0.0 && (closestTimeSphere > distance_2 || closestTimeSphere < 0.0)){
+			closestTimeTriangle = distance_2;
 			closestTriangle = triangles[q];
 			vec3 normal = triangles[q].triangleNormal;
-			vec3 t = cameraPosition + distance * direction;
+			vec3 t = cameraPosition + distance_2 * direction;
 			
 			vec3 directIllumination = calculateDirectIllumination(direction, t, normal, triangles[q].triangleColor);
 			FragColor = vec4(directIllumination,1.0);		

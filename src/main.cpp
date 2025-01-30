@@ -41,8 +41,8 @@ float verts[] = {
 };
 
 void getRoom(Triangle triangles[]) {
-    glm::vec3 e1 = glm::vec4(0.0f);
-    glm::vec3 e2 = glm::vec4(0.0f);
+    glm::vec3 e1 = glm::vec3(0.0f);
+    glm::vec3 e2 = glm::vec3(0.0f);
     int i = 0;
     //floor
         //triangle front
@@ -208,9 +208,6 @@ void getRoom(Triangle triangles[]) {
         triangles[i].vertex3 = glm::vec4(6.0f, 5.0f, 10.0f, 0.0f);
         triangles[i].normal = glm::vec4(0.0f, -1.0f, 0.0f, 0.0f);
         triangles[i].color = glm::vec4(163.0f / 255, 211.0f / 255, 214.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
-        
-        
-
 }
 
 int main() {
@@ -348,7 +345,7 @@ int main() {
         glUniform1i(screenHeightLoc, screenHeight);
 
         for (int i = 0; i < MAX_SPHERES; i++) {
-            spheres[i].position = 0.5f*glm::vec3(sin(currentFrame + (5+i)), cos(currentFrame +(5+ i)), 10.0f);
+            spheres[i].position = glm::vec3(0.0f,0.0f, 10.0f);
             spheres[i].radius = 0.5f;
            
         }

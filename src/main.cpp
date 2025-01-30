@@ -324,12 +324,12 @@ int main() {
     // Rendering loop
     while (!glfwWindowShouldClose(window))
     {
-        float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - previousTime;
+        float currentTime = glfwGetTime();
+        deltaTime = currentTime - previousTime;
 
         std::clog  << "\rFPS: " << 1 / deltaTime;
         // Pass Uniforms
-        glUniform1f(timeLoc, currentFrame);
+        glUniform1f(timeLoc, currentTime);
 
     
         
@@ -345,7 +345,7 @@ int main() {
         glUniform1i(screenHeightLoc, screenHeight);
 
         for (int i = 0; i < MAX_SPHERES; i++) {
-            spheres[i].position = glm::vec3(0.0f,0.0f, 10.0f);
+            spheres[i].position = glm::vec3(0.0f,0.0f, 5.0f + 3.0f * sin(currentTime)) + 4.0f * glm::vec3(cos(currentTime),sin(currentTime),0);
             spheres[i].radius = 0.5f;
            
         }
@@ -376,7 +376,7 @@ int main() {
 
         // Poll for events
         glfwPollEvents();
-        previousTime = currentFrame;
+        previousTime = currentTime;
     }
 
     glfwTerminate();

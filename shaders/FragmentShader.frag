@@ -16,7 +16,7 @@ struct Triangle{
 };
 
 layout(std430, binding = 0) buffer SphereBuffer {
-    Sphere spheres[10];  
+    Sphere spheres[1];  
 };
 
 layout(std430, binding = 1) buffer TriangleBuffer {
@@ -185,11 +185,11 @@ void main() {
 	Triangle closestTriangle;
 	
 	for(int i = 0; i < spheres.length(); i++){
-		float time = sphereIntersectionTest(direction, spheres[i]);
-		if ((time < closestTimeSphere || closestTimeSphere < 0.0) && time > 0.0) {
-			closestTimeSphere = time;
+		float distance = sphereIntersectionTest(direction, spheres[i]);
+		if ((distance < closestTimeSphere || closestTimeSphere < 0.0) && distance > 0.0) {
+			closestTimeSphere = distance;
 			closestSphere = spheres[i];
-			vec3 t = cameraPosition + time * direction;
+			vec3 t = cameraPosition + distance * direction;
 			vec3 normal = normalize(t - spheres[i].spherePOS);
 
 			vec3 directIllumination = calculateDirectIllumination(direction, t, normal, vec3(1.0,0.0,0.0));
@@ -197,15 +197,15 @@ void main() {
 		}
 	}
 	for(int q = 0; q < triangles.length(); q++){
-		float time = triangleIntersectionTest(direction, triangles[q]);
-		if((time < closestTimeTriangle || closestTimeTriangle < 0.0) && time > 0.0 && time < closestTimeSphere){
-			closestTimeTriangle = time;
+		float distance = triangleIntersectionTest(direction, triangles[q]);
+		if((distance < closestTimeTriangle || closestTimeTriangle < 0.0) && distance > 0.0 && distance < closestTimeSphere){
+			closestTimeTriangle = distance;
 			closestTriangle = triangles[q];
 			vec3 normal = triangles[q].triangleNormal;
-			vec3 t = cameraPosition + time * direction;
+			vec3 t = cameraPosition + distance * direction;
 			
 			vec3 directIllumination = calculateDirectIllumination(direction, t, normal, triangles[q].triangleColor);
-			FragColor = vec4(closestTimeSphere,1);		
+			FragColor = vec4(directIllumination,1.0);		
 		}
 	}
 	

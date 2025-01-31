@@ -1,6 +1,21 @@
 #version 460 core
 
 #define M_PI 3.1415926535897932384626433832795
+struct Primitive{
+	vec3 vertex1;
+	vec3 vertex2;
+	vec3 vertex3;
+	vec3 color;
+	vec3 normal;
+	int ID; // 0 == Triangle, 1 == Sphere
+	float bounceOdds; //Odds that the ray would bounce off of the surface.
+};
+
+struct Ray{
+	vec3 direction;
+	vec3 startPoint;
+	vec3 endPoint;
+};
 
 struct Sphere{
 	vec3 spherePOS;
@@ -20,7 +35,11 @@ layout(std430, binding = 0) buffer SphereBuffer {
 };
 
 layout(std430, binding = 1) buffer TriangleBuffer {
-    Triangle triangles[24];  
+    Triangle triangles[29];  
+};
+
+layout(std430, binding = 2) buffer PrimitiveBuffer{
+	Primitive primitives[100];
 };
 
 out vec4 FragColor;
@@ -126,6 +145,7 @@ float sphereIntersectionTest(vec3 dir, Sphere targetSphere) {
 			else if (t1 > 0) {
 				t = t1;
 			}
+	
 			else if (t2 > 0) {
 				t = t2;
 			}
@@ -134,6 +154,18 @@ float sphereIntersectionTest(vec3 dir, Sphere targetSphere) {
 		}
 		
 		return -1.0;
+}
+
+vec2 intersectionTest(Ray currentRay){
+	for(int i = 0; i < primitives.length(); i++){
+		if(primitives[i].ID == 0){
+			
+		}
+		else if(primitives[i].ID == 1){
+			
+		}
+	}
+	return vec2(1.0,1.0);
 }
 
 vec3 calculateDirectIllumination(vec3 dir, vec3 hitPoint, vec3 normal, vec3 surfaceColor){

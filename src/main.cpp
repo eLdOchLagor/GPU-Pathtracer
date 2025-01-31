@@ -212,7 +212,7 @@ void getRoom(Triangle triangles[]) {
 
 int main() {
     const int MAX_SPHERES = 1;
-    const int MAX_TRIANGLES = 0;
+    const int MAX_TRIANGLES = 5;
     const int MAX_TRIANGLES_FOR_ROOM = 24;
     Sphere spheres[MAX_SPHERES];
     Triangle triangles[MAX_TRIANGLES + MAX_TRIANGLES_FOR_ROOM];
@@ -349,6 +349,13 @@ int main() {
             spheres[i].radius = 0.5f;
            
         }
+        for (int i = MAX_TRIANGLES_FOR_ROOM; i < MAX_TRIANGLES + MAX_TRIANGLES_FOR_ROOM; i++) {
+            triangles[i].vertex1 = glm::vec4(-1.0f,-1.0f,0.0f,0.0f) + glm::vec4(3*sin(currentTime + 5 * (i - 24)), 3*cos(currentTime + 5 * (i - 24)), 10.0f, 0.0f);
+            triangles[i].vertex2 = glm::vec4(1.0f, -1.0f, 0.0f, 0.0f) + glm::vec4(3*sin(currentTime+5*(i-24)), 3*cos(currentTime + 5 * (i - 24)), 10.0f, 0.0f);
+            triangles[i].vertex3 = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f) + glm::vec4(3*sin(currentTime + 5 * (i - 24)),3* cos(currentTime + 5 * (i - 24)), 10.0f, 0.0f);
+            triangles[i].normal = glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
+            triangles[i].color = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
+        }
         
 
         // Update spheres SSBO
@@ -358,7 +365,7 @@ int main() {
 
         // Update triangles SSBO (offset must be 0, because it's a separate buffer)
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Triangles);
-        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, MAX_TRIANGLES * sizeof(Triangle), triangles);
+        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, (MAX_TRIANGLES + MAX_TRIANGLES_FOR_ROOM) * sizeof(Triangle), triangles);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
         // Clear the screen

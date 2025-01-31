@@ -5,9 +5,6 @@
 #include "Camera.h"
 #include "Scene.h"
 
-#include "glm.hpp"
-#include "gtc/matrix_transform.hpp"
-#include "gtc/type_ptr.hpp"
 
 #define MAIN
 

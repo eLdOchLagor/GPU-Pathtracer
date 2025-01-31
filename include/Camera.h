@@ -2,9 +2,7 @@
 
 #include "VectorUtils4.h"
 
-#include "glm.hpp"
-#include "gtc/matrix_transform.hpp"
-#include "gtc/type_ptr.hpp"
+
 
 class Camera
 {
@@ -16,7 +14,7 @@ public:
 		_aspectRatio = (float)width / height;
 		_right = normalize(cross(_forward, up));
 		_trueUp = cross(_right, _forward);
-		_imagePlaneHeight = 2 * glm::tan(glm::radians(fov) / 2.0f);
+		_imagePlaneHeight = 2 * tan(M_PI*fov/180.0f / 2.0f);
 		_imagePlaneWidth = _imagePlaneHeight * _aspectRatio;
 	};
 

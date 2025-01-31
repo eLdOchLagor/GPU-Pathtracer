@@ -9,19 +9,20 @@
 #include "gtc/matrix_transform.hpp"
 #include "gtc/type_ptr.hpp"
 
+#define MAIN
+
 #include "VectorUtils4.h"
 
 
 struct Primitive {
-    glm::vec3 vertex1;
-    glm::vec3 vertex2;
-    glm::vec3 vertex3;
-    glm::vec3 color;
-    glm::vec3 normal;
+    vec3 vertex1;
+    vec3 vertex2;
+    vec3 vertex3;
+    vec3 color;
+    vec3 normal;
     int ID; // 0 == Triangle, 1 == Sphere
     float bounceOdds; //Odds that the ray would bounce off of the surface.
 };
-
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -29,7 +30,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 int screenWidth = 800;
 int screenHeight = 600;
 
-Camera mainCamera = Camera(glm::fvec3(0.0f, 0.0f, -1.0f), glm::fvec3(0.0f, 0.0f, 1.0f), glm::fvec3(0.0f, 1.0f, 0.0f), 80.0f, screenWidth, screenHeight);
+Camera mainCamera = Camera(vec3(0.0f, 0.0f, -1.0f), vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f), 80.0f, screenWidth, screenHeight);
 
 float verts[] = {
     //bottom left Triangle
@@ -43,211 +44,211 @@ float verts[] = {
 };
 
 void getRoom(Primitive triangles[]) {
-    glm::vec3 e1 = glm::vec3(0.0f);
-    glm::vec3 e2 = glm::vec3(0.0f);
+    vec3 e1 = vec3(0.0f);
+    vec3 e2 = vec3(0.0f);
     int i = 0;
     //floor
         //triangle front
-        triangles[i].vertex1 = glm::vec4(0.0f, -5.0f, -3.0f, 0.0f);
-        triangles[i].vertex2 = glm::vec4(6.0f, -5.0f, 0.0f, 0.0f);
-        triangles[i].vertex3 = glm::vec4(-6.0f, -5.0f, 0.0f, 0.0f);
-        triangles[i].normal = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
-        triangles[i].color = glm::vec4(38.0f / 255, 156.0f / 255, 169.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].vertex1 = vec3(0.0f, -5.0f, -3.0f);
+        triangles[i].vertex2 = vec3(6.0f, -5.0f, 0.0f);
+        triangles[i].vertex3 = vec3(-6.0f, -5.0f, 0.0f);
+        triangles[i].normal = vec3(0.0f, 1.0f, 0.0f);
+        triangles[i].color = vec3(38.0f / 255, 156.0f / 255, 169.0f / 255) + (4.f * i / 255.f);
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
         //triangle mid right
-        triangles[i].vertex1 = glm::vec4(6.0f, -5.0f, 0.0f,0.0f);
-        triangles[i].vertex2 = glm::vec4(6.0f, -5.0f, 10.0f,0.0f);
-        triangles[i].vertex3 = glm::vec4(-6.0f, -5.0f, 10.0f,0.0f);
-        triangles[i].normal = glm::vec4(0.0f,1.0f,0.0f,0.0f);
-        triangles[i].color = glm::vec4(38.0f / 255, 156.0f / 255, 169.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].vertex1 = vec3(6.0f, -5.0f, 0.0f);
+        triangles[i].vertex2 = vec3(6.0f, -5.0f, 10.0f);
+        triangles[i].vertex3 = vec3(-6.0f, -5.0f, 10.0f);
+        triangles[i].normal = vec3(0.0f,1.0f,0.0f);
+        triangles[i].color = vec3(38.0f / 255, 156.0f / 255, 169.0f / 255) + (4.f * i / 255.f);
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
         //triangle mid left
-        triangles[i].vertex1 = glm::vec4(6.0f, -5.0f, 0.0f, 0.0f);
-        triangles[i].vertex2 = glm::vec4(-6.0f, -5.0f, 10.0f, 0.0f);
-        triangles[i].vertex3 = glm::vec4(-6.0f, -5.0f, 0.0f, 0.0f);
-        triangles[i].normal = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
-        triangles[i].color = glm::vec4(38.0f / 255, 156.0f / 255, 169.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].vertex1 = vec3(6.0f, -5.0f, 0.0f);
+        triangles[i].vertex2 = vec3(-6.0f, -5.0f, 10.0f);
+        triangles[i].vertex3 = vec3(-6.0f, -5.0f, 0.0f);
+        triangles[i].normal = vec3(0.0f, 1.0f, 0.0f);
+        triangles[i].color = vec3(38.0f / 255, 156.0f / 255, 169.0f / 255) + (4.f * i / 255.f);
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
         //triangle back
-        triangles[i].vertex1 = glm::vec4(0.0f, -5.0f, 13.0f, 0.0f);
-        triangles[i].vertex2 = glm::vec4(-6.0f, -5.0f, 10.0f, 0.0f);
-        triangles[i].vertex3 = glm::vec4(6.0f, -5.0f, 10.0f, 0.0f);
-        triangles[i].normal = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
-        triangles[i].color = glm::vec4(38.0f / 255, 156.0f / 255, 169.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].vertex1 = vec3(0.0f, -5.0f, 13.0f);
+        triangles[i].vertex2 = vec3(-6.0f, -5.0f, 10.0f);
+        triangles[i].vertex3 = vec3(6.0f, -5.0f, 10.0f);
+        triangles[i].normal = vec3(0.0f, 1.0f, 0.0f);
+        triangles[i].color = vec3(38.0f / 255, 156.0f / 255, 169.0f / 255) + (4.f * i / 255.f);
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
     //backroom walls
         //leftwall back
-        triangles[i].vertex1 = glm::vec4(-6.0f, -5.0f, 10.0f, 0.0f);
-        triangles[i].vertex2 = glm::vec4(0.0f, -5.0f, 13.0f, 0.0f);
-        triangles[i].vertex3 = glm::vec4(0.0f, 5.0f, 13.0f, 0.0f);
+        triangles[i].vertex1 = vec3(-6.0f, -5.0f, 10.0f);
+        triangles[i].vertex2 = vec3(0.0f, -5.0f, 13.0f);
+        triangles[i].vertex3 = vec3(0.0f, 5.0f, 13.0f);
         e1 = triangles[i].vertex2 - triangles[i].vertex1;
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
-        triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)),0.0f);
-        triangles[i].color = glm::vec4(234.0f/255, 215.0f/255, 165.0f/255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].normal = vec3(normalize(cross(e2, e1)));
+        triangles[i].color = vec3(234.0f/255, 215.0f/255, 165.0f/255) + (4.f * i / 255.f);
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
         //leftwall front
-        triangles[i].vertex1 = glm::vec4(-6.0f, -5.0f, 10.0f, 0.0f);
-        triangles[i].vertex2 = glm::vec4(0.0f, 5.0f, 13.0f, 0.0f);
-        triangles[i].vertex3 = glm::vec4(-6.0f, 5.0f, 10.0f, 0.0f);
+        triangles[i].vertex1 = vec3(-6.0f, -5.0f, 10.0f);
+        triangles[i].vertex2 = vec3(0.0f, 5.0f, 13.0f);
+        triangles[i].vertex3 = vec3(-6.0f, 5.0f, 10.0f);
         e1 = triangles[i].vertex2 - triangles[i].vertex1;
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
-        triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0f);
-        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].normal = vec3(normalize(cross(e2, e1)));
+        triangles[i].color = vec3(234.0f / 255, 215.0f / 255, 165.0f / 255) + (4.f * i / 255.f);
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
     //backroom walls
         //leftwall back
-        triangles[i].vertex1 = glm::vec4(6.0f, -5.0f, 10.0f, 0.0f);
-        triangles[i].vertex2 = glm::vec4(0.0f, 5.0f, 13.0f, 0.0f);
-        triangles[i].vertex3 = glm::vec4(0.0f, -5.0f, 13.0f, 0.0f);      
+        triangles[i].vertex1 = vec3(6.0f, -5.0f, 10.0f);
+        triangles[i].vertex2 = vec3(0.0f, 5.0f, 13.0f);
+        triangles[i].vertex3 = vec3(0.0f, -5.0f, 13.0f);      
         e1 = triangles[i].vertex2 - triangles[i].vertex1;
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
-        triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0f);
-        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].normal = vec3(normalize(cross(e2, e1)));
+        triangles[i].color = vec3(234.0f / 255, 215.0f / 255, 165.0f / 255) + (4.f * i / 255.f);
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
         //leftwall front
-        triangles[i].vertex1 = glm::vec4(6.0f, -5.0f, 10.0f, 0.0f);
-        triangles[i].vertex2 = glm::vec4(6.0f, 5.0f, 10.0f, 0.0f);
-        triangles[i].vertex3 = glm::vec4(0.0f, 5.0f, 13.0f, 0.0f);
+        triangles[i].vertex1 = vec3(6.0f, -5.0f, 10.0f);
+        triangles[i].vertex2 = vec3(6.0f, 5.0f, 10.0f);
+        triangles[i].vertex3 = vec3(0.0f, 5.0f, 13.0f);
         e1 = triangles[i].vertex2 - triangles[i].vertex1;
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
-        triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0f);
-        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].normal = vec3(normalize(cross(e2, e1)));
+        triangles[i].color = vec3(234.0f / 255, 215.0f / 255, 165.0f / 255) + (4.f * i / 255.f);
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
     //right walls 
         //bottom wall
-        triangles[i].vertex1 = glm::vec4(6.0f, -5.0f, 0.0f, 0.0f);
-        triangles[i].vertex2 = glm::vec4(6.0f, 5.0f, 0.0f, 0.0f);
-        triangles[i].vertex3 = glm::vec4(6.0f, -5.0f, 10.0f,0.0f);
-        triangles[i].normal = glm::vec4(-1.0f,0.0f,0.0f,0.0f);
-        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].vertex1 = vec3(6.0f, -5.0f, 0.0f);
+        triangles[i].vertex2 = vec3(6.0f, 5.0f, 0.0f);
+        triangles[i].vertex3 = vec3(6.0f, -5.0f, 10.0f);
+        triangles[i].normal = vec3(-1.0f,0.0f,0.0f);
+        triangles[i].color = vec3(234.0f / 255, 215.0f / 255, 165.0f / 255) + (4.f * i / 255.f);
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
         //top wall
-        triangles[i].vertex1 = glm::vec4(6.0f, -5.0f, 10.0f, 0.0f);
-        triangles[i].vertex2 = glm::vec4(6.0f, 5.0f, 0.0f, 0.0f);
-        triangles[i].vertex3 = glm::vec4(6.0f, 5.0f, 10.0f, 0.0f);
-        triangles[i].normal = glm::vec4(-1.0f, 0.0f, 0.0f, 0.0f);
-        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].vertex1 = vec3(6.0f, -5.0f, 10.0f);
+        triangles[i].vertex2 = vec3(6.0f, 5.0f, 0.0f);
+        triangles[i].vertex3 = vec3(6.0f, 5.0f, 10.0f);
+        triangles[i].normal = vec3(-1.0f, 0.0f, 0.0f);
+        triangles[i].color = vec3(234.0f / 255, 215.0f / 255, 165.0f / 255) + (4.f * i / 255.f);
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
 
     //left walls 
         //bottom wall
-        triangles[i].vertex1 = glm::vec4(-6.0f, -5.0f, 0.0f, 0.0f);
-        triangles[i].vertex2 = glm::vec4(-6.0f, -5.0f, 10.0f, 0.0f);
-        triangles[i].vertex3 = glm::vec4(-6.0f, 5.0f, 0.0f, 0.0f);
-        triangles[i].normal = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
-        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].vertex1 = vec3(-6.0f, -5.0f, 0.0f);
+        triangles[i].vertex2 = vec3(-6.0f, -5.0f, 10.0f);
+        triangles[i].vertex3 = vec3(-6.0f, 5.0f, 0.0f);
+        triangles[i].normal = vec3(1.0f, 0.0f, 0.0f);
+        triangles[i].color = vec3(234.0f / 255, 215.0f / 255, 165.0f / 255) + (4.f * i / 255.f);
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
         //top wall
-        triangles[i].vertex1 = glm::vec4(-6.0f, -5.0f, 10.0f, 0.0f);
-        triangles[i].vertex2 = glm::vec4(-6.0f, 5.0f, 10.0f, 0.0f);
-        triangles[i].vertex3 = glm::vec4(-6.0f, 5.0f, 0.0f, 0.0f);
-        triangles[i].normal = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
-        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].vertex1 = vec3(-6.0f, -5.0f, 10.0f);
+        triangles[i].vertex2 = vec3(-6.0f, 5.0f, 10.0f);
+        triangles[i].vertex3 = vec3(-6.0f, 5.0f, 0.0f);
+        triangles[i].normal = vec3(1.0f, 0.0f, 0.0f);
+        triangles[i].color = vec3(234.0f / 255, 215.0f / 255, 165.0f / 255) + (4.f * i / 255.f);
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
     //frontroom walls
         //left bottom
-        triangles[i].vertex1 = glm::vec4(0.0f, -5.0f, -3.0f, 0.0f);
-        triangles[i].vertex2 = glm::vec4(-6.0f, -5.0f, 0.0f, 0.0f);
-        triangles[i].vertex3 = glm::vec4(0.0f, 5.0f, -3.0f, 0.0f);
+        triangles[i].vertex1 = vec3(0.0f, -5.0f, -3.0f);
+        triangles[i].vertex2 = vec3(-6.0f, -5.0f, 0.0f);
+        triangles[i].vertex3 = vec3(0.0f, 5.0f, -3.0f);
         e1 = triangles[i].vertex2 - triangles[i].vertex1;
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
-        triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0f);
-        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].normal = vec3(normalize(cross(e2, e1)));
+        triangles[i].color = vec3(234.0f / 255, 215.0f / 255, 165.0f / 255) + (4.f * i / 255.f);
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
         //left top
-        triangles[i].vertex1 = glm::vec4(-6.0f, -5.0f, 0.0f, 0.0f);
-        triangles[i].vertex2 = glm::vec4(-6.0f, 5.0f, 0.0f, 0.0f);
-        triangles[i].vertex3 = glm::vec4(0.0f, 5.0f, -3.0f, 0.0f);
+        triangles[i].vertex1 = vec3(-6.0f, -5.0f, 0.0f);
+        triangles[i].vertex2 = vec3(-6.0f, 5.0f, 0.0f);
+        triangles[i].vertex3 = vec3(0.0f, 5.0f, -3.0f);
         e1 = triangles[i].vertex2 - triangles[i].vertex1;
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
-        triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0f);
-        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].normal = vec3(normalize(cross(e2, e1)));
+        triangles[i].color = vec3(234.0f / 255, 215.0f / 255, 165.0f / 255) + (4.f * i / 255.f);
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
     //frontroom walls
         //right bottom
-        triangles[i].vertex1 = glm::vec4(0.0f, -5.0f, -3.0f, 0.0f);
-        triangles[i].vertex2 = glm::vec4(0.0f, 5.0f, -3.0f, 0.0f);
-        triangles[i].vertex3 = glm::vec4(6.0f, -5.0f, 0.0f, 0.0f);
+        triangles[i].vertex1 = vec3(0.0f, -5.0f, -3.0f);
+        triangles[i].vertex2 = vec3(0.0f, 5.0f, -3.0f);
+        triangles[i].vertex3 = vec3(6.0f, -5.0f, 0.0f);
         e1 = triangles[i].vertex2 - triangles[i].vertex1;
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
-        triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0f);
-        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].normal = vec3(normalize(cross(e2, e1)));
+        triangles[i].color = vec3(234.0f / 255, 215.0f / 255, 165.0f / 255) + (4.f * i / 255.f);
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
         //right top
-        triangles[i].vertex1 = glm::vec4(0.0f, 5.0f, -3.0f, 0.0f);
-        triangles[i].vertex2 = glm::vec4(-6.0f, 5.0f, 0.0f, 0.0f);
-        triangles[i].vertex3 = glm::vec4(-6.0f, -5.0f, 0.0f, 0.0f);
+        triangles[i].vertex1 = vec3(0.0f, 5.0f, -3.0f);
+        triangles[i].vertex2 = vec3(-6.0f, 5.0f, 0.0f);
+        triangles[i].vertex3 = vec3(-6.0f, -5.0f, 0.0f);
         e1 = triangles[i].vertex2 - triangles[i].vertex1;
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
-        triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0f);
-        triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].normal = vec3(normalize(cross(e2, e1)));
+        triangles[i].color = vec3(234.0f / 255, 215.0f / 255, 165.0f / 255) + (4.f * i / 255.f);
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
     //roof
         //triangle front
-        triangles[i].vertex1 = glm::vec4(0.0f, 5.0f, -3.0f, 0.0f);
-        triangles[i].vertex2 = glm::vec4(-6.0f, 5.0f, 0.0f, 0.0f);
-        triangles[i].vertex3 = glm::vec4(6.0f, 5.0f, 0.0f, 0.0f);
-        triangles[i].normal = glm::vec4(0.0f, -1.0f, 0.0f, 0.0f);
-        triangles[i].color = glm::vec4(163.0f / 255, 211.0f / 255, 214.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].vertex1 = vec3(0.0f, 5.0f, -3.0f);
+        triangles[i].vertex2 = vec3(-6.0f, 5.0f, 0.0f);
+        triangles[i].vertex3 = vec3(6.0f, 5.0f, 0.0f);
+        triangles[i].normal = vec3(0.0f, -1.0f, 0.0f);
+        triangles[i].color = vec3(163.0f / 255, 211.0f / 255, 214.0f / 255) + (4.f * i / 255.f);
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
         //triangle mid right
-        triangles[i].vertex1 = glm::vec4(6.0f, 5.0f, 0.0f, 0.0f);
-        triangles[i].vertex2 = glm::vec4(-6.0f, 5.0f, 10.0f, 0.0f);
-        triangles[i].vertex3 = glm::vec4(6.0f, 5.0f, 10.0f, 0.0f);
-        triangles[i].normal = glm::vec4(0.0f, -1.0f, 0.0f, 0.0f);
-        triangles[i].color = glm::vec4(163.0f / 255, 211.0f / 255, 214.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].vertex1 = vec3(6.0f, 5.0f, 0.0f);
+        triangles[i].vertex2 = vec3(-6.0f, 5.0f, 10.0f);
+        triangles[i].vertex3 = vec3(6.0f, 5.0f, 10.0f);
+        triangles[i].normal = vec3(0.0f, -1.0f, 0.0f);
+        triangles[i].color = vec3(163.0f / 255, 211.0f / 255, 214.0f / 255) + (4.f * i / 255.f);
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
         //triangle mid left
-        triangles[i].vertex1 = glm::vec4(6.0f, 5.0f, 0.0f, 0.0f);
-        triangles[i].vertex2 = glm::vec4(-6.0f, 5.0f, 0.0f, 0.0f);
-        triangles[i].vertex3 = glm::vec4(-6.0f, 5.0f, 10.0f, 0.0f);
-        triangles[i].normal = glm::vec4(0.0f, -1.0f, 0.0f, 0.0f);
-        triangles[i].color = glm::vec4(163.0f / 255, 211.0f / 255, 214.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].vertex1 = vec3(6.0f, 5.0f, 0.0f);
+        triangles[i].vertex2 = vec3(-6.0f, 5.0f, 0.0f);
+        triangles[i].vertex3 = vec3(-6.0f, 5.0f, 10.0f);
+        triangles[i].normal = vec3(0.0f, -1.0f, 0.0f);
+        triangles[i].color = vec3(163.0f / 255, 211.0f / 255, 214.0f / 255) + (4.f * i / 255.f);
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
         //triangle back
-        triangles[i].vertex1 = glm::vec4(-6.0f, 5.0f, 10.0f, 0.0f);
-        triangles[i].vertex2 = glm::vec4(0.0f, 5.0f, 13.0f, 0.0f);
-        triangles[i].vertex3 = glm::vec4(6.0f, 5.0f, 10.0f, 0.0f);
-        triangles[i].normal = glm::vec4(0.0f, -1.0f, 0.0f, 0.0f);
-        triangles[i].color = glm::vec4(163.0f / 255, 211.0f / 255, 214.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].vertex1 = vec3(-6.0f, 5.0f, 10.0f);
+        triangles[i].vertex2 = vec3(0.0f, 5.0f, 13.0f);
+        triangles[i].vertex3 = vec3(6.0f, 5.0f, 10.0f);
+        triangles[i].normal = vec3(0.0f, -1.0f, 0.0f);
+        triangles[i].color = vec3(163.0f / 255, 211.0f / 255, 214.0f / 255) + (4.f * i / 255.f);
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
 }
@@ -258,10 +259,10 @@ int main() {
 
     Primitive primitives[MAX_PRIMITVES];
     getRoom(primitives);
-    /*triangles[MAX_TRIANGLES_FOR_ROOM].vertex1 = glm::vec4(-0.5f, -0.5f, 0.5f, 0.0f);
-    triangles[MAX_TRIANGLES_FOR_ROOM].vertex2 = glm::vec4(0.5f, -0.5f, 0.5f,0.0f);
-    triangles[MAX_TRIANGLES_FOR_ROOM].vertex3 = glm::vec4(0.0f, 0.5f, 0.5f, 0.0f);
-    triangles[MAX_TRIANGLES_FOR_ROOM].normal = glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);*/
+    /*triangles[MAX_TRIANGLES_FOR_ROOM].vertex1 = vec3(-0.5f, -0.5f, 0.5f);
+    triangles[MAX_TRIANGLES_FOR_ROOM].vertex2 = vec3(0.5f, -0.5f, 0.5f,0.0f);
+    triangles[MAX_TRIANGLES_FOR_ROOM].vertex3 = vec3(0.0f, 0.5f, 0.5f);
+    triangles[MAX_TRIANGLES_FOR_ROOM].normal = vec3(0.0f, 0.0f, -1.0f);*/
 
     glfwInit();
     float previousTime = 0;
@@ -313,18 +314,6 @@ int main() {
 
     unsigned int timeLoc = glGetUniformLocation(shaderProgram, "time");
 
-    // Camera Uniforms
-    unsigned int positionLoc = glGetUniformLocation(shaderProgram, "cameraPosition");
-    unsigned int forwardLoc = glGetUniformLocation(shaderProgram, "forward");
-    unsigned int rightLoc = glGetUniformLocation(shaderProgram, "right");
-    unsigned int upLoc = glGetUniformLocation(shaderProgram, "up");
-
-    unsigned int imagePlaneWidthLoc = glGetUniformLocation(shaderProgram, "imagePlaneWidth");
-    unsigned int imagePlaneHeightLoc = glGetUniformLocation(shaderProgram, "imagePlaneHeight");
-
-    unsigned int screenWidthLoc = glGetUniformLocation(shaderProgram, "screenWidth");
-    unsigned int screenHeightLoc = glGetUniformLocation(shaderProgram, "screenHeight");
-
     
     unsigned int VBO, VAO;
     glGenVertexArrays(1, &VAO);
@@ -369,20 +358,16 @@ int main() {
         glUniform1f(timeLoc, currentTime);
 
     
-        
+        uploadUniformVec3ToShader(shaderProgram, "cameraPosition", mainCamera.GetPosition());
+        uploadUniformVec3ToShader(shaderProgram, "forward", mainCamera.GetForward());
+        uploadUniformVec3ToShader(shaderProgram, "right", mainCamera.GetRight());
+        uploadUniformVec3ToShader(shaderProgram, "up", mainCamera.GetUp());
 
-        // Camera Uniforms
-        glUniform3fv(positionLoc, 1, &mainCamera.GetPosition()[0]);
-        glUniform3fv(forwardLoc, 1, &mainCamera.GetForward()[0]);
-        glUniform3fv(rightLoc, 1, &mainCamera.GetRight()[0]);
-        glUniform3fv(upLoc, 1, &mainCamera.GetUp()[0]);
-        glUniform1f(imagePlaneHeightLoc, mainCamera.GetImagePlaneHeight());
-        glUniform1f(imagePlaneWidthLoc, mainCamera.GetImagePlaneWidth());
-        glUniform1i(screenWidthLoc, screenWidth);
-        glUniform1i(screenHeightLoc, screenHeight);
+        uploadUniformFloatToShader(shaderProgram, "imagePlaneHeight", mainCamera.GetImagePlaneHeight());
+        uploadUniformFloatToShader(shaderProgram, "imagePlaneWidth", mainCamera.GetImagePlaneWidth());
 
-        
-        
+        uploadUniformIntToShader(shaderProgram, "screenWidth", screenWidth);
+        uploadUniformIntToShader(shaderProgram, "screenHeight", screenHeight);
 
         
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Primitives);

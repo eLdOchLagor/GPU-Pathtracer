@@ -13,9 +13,6 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 # Include directories
 include_directories(include)
 
-# Include glm directories
-include_directories(external/glm)
-
 # Automatically gather all source files under src/
 file(GLOB_RECURSE SRC_FILES src/*.cpp include/*.h include/*.hpp external/glm/*.hpp)
 

@@ -168,6 +168,15 @@ vec2 intersectionTest(Ray currentRay){
 			closestIndex = i;
 		}
 	}
+
+	// If hit object is sphere, calculate and assign normal
+	if (primitives[closestIndex].ID == 1 && closestDistance > 0.0) {
+		vec3 t = currentRay.startPoint + closestDistance * currentRay.direction;
+		vec3 normal = normalize(t - primitives[closestIndex].vertex1);
+
+		primitives[closestIndex].normal = normal;
+	}
+
 	return vec2(closestDistance, closestIndex);
 }
 
@@ -247,7 +256,11 @@ void main() {
 	
 	
 	vec2 hit = intersectionTest(ray);
-	FragColor = vec4(primitives[int(hit.y)].color,1.0);
+	vec3 t = ray.startPoint + hit.x * ray.direction;
+
+	vec3 directIllumination = calculateDirectIllumination(ray.direction, t, primitives[int(hit.y)].normal, primitives[int(hit.y)].color);
+
+	FragColor = vec4(directIllumination,1.0);
 
 }
 

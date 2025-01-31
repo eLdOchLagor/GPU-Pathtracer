@@ -88,14 +88,14 @@ float RandomFloat(uint inputSeed){
 }
 // ----------------------------------------------------------------------------------------------------
 
-float triangleIntersectionTest(vec3 dir, Triangle targetTriangle) {
+float triangleIntersectionTest(Ray currentRay, Primitive targetTriangle) {
 
-		vec3 d = normalize(dir);
-		vec3 s = cameraPosition;
+		vec3 d = normalize(currentRay.direction);
+		vec3 s = currentRay.startPoint;
 
 		// If negative, then the surface is visible for the ray
 		
-		if (dot(d, targetTriangle.triangleNormal) < 0.0)
+		if (dot(d, targetTriangle.normal) < 0.0)
 		{
 			
 			vec3 c1 = targetTriangle.vertex2 - targetTriangle.vertex1;
@@ -126,10 +126,10 @@ float triangleIntersectionTest(vec3 dir, Triangle targetTriangle) {
 		return -1.0;
 	}
 
-float sphereIntersectionTest(vec3 dir, Sphere targetSphere) {
-		float c1 = dot(dir, dir);
-		float c2 = 2.0 * dot(dir, cameraPosition - targetSphere.spherePOS);
-		float c3 = dot(cameraPosition - targetSphere.spherePOS, cameraPosition - targetSphere.spherePOS) - targetSphere.sphereRadius * targetSphere.sphereRadius;
+float sphereIntersectionTest(Ray currentRay, Primitive targetSphere) {
+		float c1 = dot(currentRay.direction,currentRay.direction);
+		float c2 = 2.0 * dot(currentRay.direction, currentRay.startPoint - targetSphere.vertex1);
+		float c3 = dot(currentRay.startPoint - targetSphere.vertex1, currentRay.startPoint - targetSphere.vertex1) - targetSphere.vertex2.x * targetSphere.vertex2.x;
 
 		float arg = c2 * c2 - 4.0 * c1 * c3;
 
@@ -156,16 +156,24 @@ float sphereIntersectionTest(vec3 dir, Sphere targetSphere) {
 		return -1.0;
 }
 
+//Returns the closest distance hit. First value of returned vec2 is the distance, second value is the index of the object int the primitives array.
 vec2 intersectionTest(Ray currentRay){
+	float closestDistance = -1.0;
+	int closestIndex = -1;
 	for(int i = 0; i < primitives.length(); i++){
+		float t = -1.0;
 		if(primitives[i].ID == 0){
-			
+			t = triangleIntersectionTest(currentRay , primitives[i]);
 		}
 		else if(primitives[i].ID == 1){
-			
+			 t = sphereIntersectionTest(currentRay, primitives[i]);
+		}
+		if((t < closestDistance || closestDistance < 0.0) && t > 0.0){
+			closestDistance = t;
+			closestDistance = i;
 		}
 	}
-	return vec2(1.0,1.0);
+	return vec2(closestDistance, closestIndex);
 }
 
 vec3 calculateDirectIllumination(vec3 dir, vec3 hitPoint, vec3 normal, vec3 surfaceColor){
@@ -216,7 +224,7 @@ void main() {
 	Sphere closestSphere;
 	Triangle closestTriangle;
 	
-	for(int i = 0; i < spheres.length(); i++){
+	/*for(int i = 0; i < spheres.length(); i++){
 		float distance_1 = sphereIntersectionTest(direction, spheres[i]);
 		if ((distance_1 < closestTimeSphere || closestTimeSphere < 0.0) && distance_1 > 0.0) {
 			closestTimeSphere = distance_1;
@@ -239,8 +247,12 @@ void main() {
 			vec3 directIllumination = calculateDirectIllumination(direction, t, normal, triangles[q].triangleColor);
 			FragColor = vec4(directIllumination,1.0);		
 		}
-	}
+	}*/
+	Ray ray = Ray(direction, cameraPosition, vec3(0));
 	
+	
+	vec2 hit = intersectionTest(ray);
+	FragColor = vec4(primitives[int(hit.y)].color,1.0);
 
 }
 

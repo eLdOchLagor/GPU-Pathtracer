@@ -21,6 +21,16 @@ struct Triangle {
     glm::vec4 normal;
     glm::vec4 color;
 };
+struct Primitive {
+    glm::vec4 vertex1;
+    glm::vec4 vertex2;
+    glm::vec4 vertex3;
+    glm::vec4 color;
+    glm::vec4 normal;
+    int ID; // 0 == Triangle, 1 == Sphere
+    float bounceOdds; //Odds that the ray would bounce off of the surface.
+};
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
@@ -40,7 +50,7 @@ float verts[] = {
     -1.0f, 1.0f, 0.0f
 };
 
-void getRoom(Triangle triangles[]) {
+void getRoom(Primitive triangles[]) {
     glm::vec3 e1 = glm::vec3(0.0f);
     glm::vec3 e2 = glm::vec3(0.0f);
     int i = 0;
@@ -51,6 +61,8 @@ void getRoom(Triangle triangles[]) {
         triangles[i].vertex3 = glm::vec4(-6.0f, -5.0f, 0.0f, 0.0f);
         triangles[i].normal = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
         triangles[i].color = glm::vec4(38.0f / 255, 156.0f / 255, 169.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].ID = 0;
+        triangles[i].bounceOdds = 1.0f;
         i++;
         //triangle mid right
         triangles[i].vertex1 = glm::vec4(6.0f, -5.0f, 0.0f,0.0f);
@@ -58,6 +70,8 @@ void getRoom(Triangle triangles[]) {
         triangles[i].vertex3 = glm::vec4(-6.0f, -5.0f, 10.0f,0.0f);
         triangles[i].normal = glm::vec4(0.0f,1.0f,0.0f,0.0f);
         triangles[i].color = glm::vec4(38.0f / 255, 156.0f / 255, 169.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].ID = 0;
+        triangles[i].bounceOdds = 1.0f;
         i++;
         //triangle mid left
         triangles[i].vertex1 = glm::vec4(6.0f, -5.0f, 0.0f, 0.0f);
@@ -65,6 +79,8 @@ void getRoom(Triangle triangles[]) {
         triangles[i].vertex3 = glm::vec4(-6.0f, -5.0f, 0.0f, 0.0f);
         triangles[i].normal = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
         triangles[i].color = glm::vec4(38.0f / 255, 156.0f / 255, 169.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].ID = 0;
+        triangles[i].bounceOdds = 1.0f;
         i++;
         //triangle back
         triangles[i].vertex1 = glm::vec4(0.0f, -5.0f, 13.0f, 0.0f);
@@ -72,6 +88,8 @@ void getRoom(Triangle triangles[]) {
         triangles[i].vertex3 = glm::vec4(6.0f, -5.0f, 10.0f, 0.0f);
         triangles[i].normal = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
         triangles[i].color = glm::vec4(38.0f / 255, 156.0f / 255, 169.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].ID = 0;
+        triangles[i].bounceOdds = 1.0f;
         i++;
     //backroom walls
         //leftwall back
@@ -82,6 +100,8 @@ void getRoom(Triangle triangles[]) {
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
         triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)),0.0f);
         triangles[i].color = glm::vec4(234.0f/255, 215.0f/255, 165.0f/255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].ID = 0;
+        triangles[i].bounceOdds = 1.0f;
         i++;
         //leftwall front
         triangles[i].vertex1 = glm::vec4(-6.0f, -5.0f, 10.0f, 0.0f);
@@ -91,6 +111,8 @@ void getRoom(Triangle triangles[]) {
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
         triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0f);
         triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].ID = 0;
+        triangles[i].bounceOdds = 1.0f;
         i++;
     //backroom walls
         //leftwall back
@@ -101,6 +123,8 @@ void getRoom(Triangle triangles[]) {
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
         triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0f);
         triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].ID = 0;
+        triangles[i].bounceOdds = 1.0f;
         i++;
         //leftwall front
         triangles[i].vertex1 = glm::vec4(6.0f, -5.0f, 10.0f, 0.0f);
@@ -110,6 +134,8 @@ void getRoom(Triangle triangles[]) {
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
         triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0f);
         triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].ID = 0;
+        triangles[i].bounceOdds = 1.0f;
         i++;
     //right walls 
         //bottom wall
@@ -118,6 +144,8 @@ void getRoom(Triangle triangles[]) {
         triangles[i].vertex3 = glm::vec4(6.0f, -5.0f, 10.0f,0.0f);
         triangles[i].normal = glm::vec4(-1.0f,0.0f,0.0f,0.0f);
         triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].ID = 0;
+        triangles[i].bounceOdds = 1.0f;
         i++;
         //top wall
         triangles[i].vertex1 = glm::vec4(6.0f, -5.0f, 10.0f, 0.0f);
@@ -125,6 +153,8 @@ void getRoom(Triangle triangles[]) {
         triangles[i].vertex3 = glm::vec4(6.0f, 5.0f, 10.0f, 0.0f);
         triangles[i].normal = glm::vec4(-1.0f, 0.0f, 0.0f, 0.0f);
         triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].ID = 0;
+        triangles[i].bounceOdds = 1.0f;
         i++;
 
     //left walls 
@@ -134,6 +164,8 @@ void getRoom(Triangle triangles[]) {
         triangles[i].vertex3 = glm::vec4(-6.0f, 5.0f, 0.0f, 0.0f);
         triangles[i].normal = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
         triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].ID = 0;
+        triangles[i].bounceOdds = 1.0f;
         i++;
         //top wall
         triangles[i].vertex1 = glm::vec4(-6.0f, -5.0f, 10.0f, 0.0f);
@@ -141,6 +173,8 @@ void getRoom(Triangle triangles[]) {
         triangles[i].vertex3 = glm::vec4(-6.0f, 5.0f, 0.0f, 0.0f);
         triangles[i].normal = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
         triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].ID = 0;
+        triangles[i].bounceOdds = 1.0f;
         i++;
     //frontroom walls
         //left bottom
@@ -151,6 +185,8 @@ void getRoom(Triangle triangles[]) {
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
         triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0f);
         triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].ID = 0;
+        triangles[i].bounceOdds = 1.0f;
         i++;
         //left top
         triangles[i].vertex1 = glm::vec4(-6.0f, -5.0f, 0.0f, 0.0f);
@@ -160,6 +196,8 @@ void getRoom(Triangle triangles[]) {
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
         triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0f);
         triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].ID = 0;
+        triangles[i].bounceOdds = 1.0f;
         i++;
     //frontroom walls
         //right bottom
@@ -170,6 +208,8 @@ void getRoom(Triangle triangles[]) {
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
         triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0f);
         triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].ID = 0;
+        triangles[i].bounceOdds = 1.0f;
         i++;
         //right top
         triangles[i].vertex1 = glm::vec4(0.0f, 5.0f, -3.0f, 0.0f);
@@ -179,6 +219,8 @@ void getRoom(Triangle triangles[]) {
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
         triangles[i].normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0f);
         triangles[i].color = glm::vec4(234.0f / 255, 215.0f / 255, 165.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].ID = 0;
+        triangles[i].bounceOdds = 1.0f;
         i++;
     //roof
         //triangle front
@@ -187,6 +229,8 @@ void getRoom(Triangle triangles[]) {
         triangles[i].vertex3 = glm::vec4(6.0f, 5.0f, 0.0f, 0.0f);
         triangles[i].normal = glm::vec4(0.0f, -1.0f, 0.0f, 0.0f);
         triangles[i].color = glm::vec4(163.0f / 255, 211.0f / 255, 214.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].ID = 0;
+        triangles[i].bounceOdds = 1.0f;
         i++;
         //triangle mid right
         triangles[i].vertex1 = glm::vec4(6.0f, 5.0f, 0.0f, 0.0f);
@@ -194,6 +238,8 @@ void getRoom(Triangle triangles[]) {
         triangles[i].vertex3 = glm::vec4(6.0f, 5.0f, 10.0f, 0.0f);
         triangles[i].normal = glm::vec4(0.0f, -1.0f, 0.0f, 0.0f);
         triangles[i].color = glm::vec4(163.0f / 255, 211.0f / 255, 214.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].ID = 0;
+        triangles[i].bounceOdds = 1.0f;
         i++;
         //triangle mid left
         triangles[i].vertex1 = glm::vec4(6.0f, 5.0f, 0.0f, 0.0f);
@@ -201,6 +247,8 @@ void getRoom(Triangle triangles[]) {
         triangles[i].vertex3 = glm::vec4(-6.0f, 5.0f, 10.0f, 0.0f);
         triangles[i].normal = glm::vec4(0.0f, -1.0f, 0.0f, 0.0f);
         triangles[i].color = glm::vec4(163.0f / 255, 211.0f / 255, 214.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].ID = 0;
+        triangles[i].bounceOdds = 1.0f;
         i++;
         //triangle back
         triangles[i].vertex1 = glm::vec4(-6.0f, 5.0f, 10.0f, 0.0f);
@@ -208,15 +256,19 @@ void getRoom(Triangle triangles[]) {
         triangles[i].vertex3 = glm::vec4(6.0f, 5.0f, 10.0f, 0.0f);
         triangles[i].normal = glm::vec4(0.0f, -1.0f, 0.0f, 0.0f);
         triangles[i].color = glm::vec4(163.0f / 255, 211.0f / 255, 214.0f / 255, 0.0f) + glm::vec1(4.f * i / 255.f);
+        triangles[i].ID = 0;
+        triangles[i].bounceOdds = 1.0f;
 }
 
 int main() {
     const int MAX_SPHERES = 1;
     const int MAX_TRIANGLES = 5;
     const int MAX_TRIANGLES_FOR_ROOM = 24;
+    const int MAX_PRIMITVES = 24;
     Sphere spheres[MAX_SPHERES];
     Triangle triangles[MAX_TRIANGLES + MAX_TRIANGLES_FOR_ROOM];
-    getRoom(triangles);
+    Primitive primitives[MAX_PRIMITVES];
+    getRoom(primitives);
     /*triangles[MAX_TRIANGLES_FOR_ROOM].vertex1 = glm::vec4(-0.5f, -0.5f, 0.5f, 0.0f);
     triangles[MAX_TRIANGLES_FOR_ROOM].vertex2 = glm::vec4(0.5f, -0.5f, 0.5f,0.0f);
     triangles[MAX_TRIANGLES_FOR_ROOM].vertex3 = glm::vec4(0.0f, 0.5f, 0.5f, 0.0f);
@@ -292,7 +344,7 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
     //ubos instead of SSBO since were at an earlier version of opengl // JONATANS EXTRA FINA TESTKOD
-    GLuint SSBO_Spheres, SSBO_Triangles;
+    GLuint SSBO_Spheres, SSBO_Triangles, SSBO_Primitives;
 
     // Allocate SSBO for spheres
     glGenBuffers(1, &SSBO_Spheres);
@@ -306,6 +358,12 @@ int main() {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Triangles);
     glBufferData(GL_SHADER_STORAGE_BUFFER, (MAX_TRIANGLES + MAX_TRIANGLES_FOR_ROOM) * sizeof(Triangle), triangles, GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, SSBO_Triangles);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    
+    glGenBuffers(1, &SSBO_Primitives);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Primitives);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, (MAX_PRIMITVES) * sizeof(Primitive), primitives, GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, SSBO_Primitives);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
@@ -366,6 +424,10 @@ int main() {
         // Update triangles SSBO (offset must be 0, because it's a separate buffer)
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Triangles);
         glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, (MAX_TRIANGLES + MAX_TRIANGLES_FOR_ROOM) * sizeof(Triangle), triangles);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Primitives);
+        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, (MAX_PRIMITVES) * sizeof(Primitive), primitives);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
         // Clear the screen

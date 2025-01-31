@@ -1,15 +1,6 @@
 #version 460 core
 
 #define M_PI 3.1415926535897932384626433832795
-struct Primitive{
-	vec3 vertex1;
-	vec3 vertex2;
-	vec3 vertex3;
-	vec3 color;
-	vec3 normal;
-	int ID; // 0 == Triangle, 1 == Sphere
-	float bounceOdds; //Odds that the ray would bounce off of the surface.
-};
 
 struct Ray{
 	vec3 direction;
@@ -30,17 +21,21 @@ struct Triangle{
 	vec3 triangleColor;
 };
 
-layout(std430, binding = 0) buffer SphereBuffer {
-    Sphere spheres[1];  
+struct Primitive{
+	vec3 vertex1;
+	vec3 vertex2;
+	vec3 vertex3;
+	vec3 color;
+	vec3 normal;
+	int ID; // 0 == Triangle, 1 == Sphere
+	float bounceOdds; //Odds that the ray would bounce off of the surface.
 };
 
-layout(std430, binding = 1) buffer TriangleBuffer {
-    Triangle triangles[29];  
-};
-
-layout(std430, binding = 2) buffer PrimitiveBuffer{
+layout(std430, binding = 0) buffer PrimitiveBuffer{
 	Primitive primitives[100];
 };
+
+
 
 out vec4 FragColor;
 
@@ -170,7 +165,7 @@ vec2 intersectionTest(Ray currentRay){
 		}
 		if((t < closestDistance || closestDistance < 0.0) && t > 0.0){
 			closestDistance = t;
-			closestDistance = i;
+			closestIndex = i;
 		}
 	}
 	return vec2(closestDistance, closestIndex);

@@ -9,27 +9,19 @@
 #include "gtc/matrix_transform.hpp"
 #include "gtc/type_ptr.hpp"
 
-struct Sphere {
-    glm::vec3 position;
-    float radius;
-};
+#include "VectorUtils4.h"
 
-struct Triangle {
-    glm::vec4 vertex1;
-    glm::vec4 vertex2;
-    glm::vec4 vertex3;
-    glm::vec4 normal;
-    glm::vec4 color;
-};
+
 struct Primitive {
-    glm::vec4 vertex1;
-    glm::vec4 vertex2;
-    glm::vec4 vertex3;
-    glm::vec4 color;
-    glm::vec4 normal;
+    glm::vec3 vertex1;
+    glm::vec3 vertex2;
+    glm::vec3 vertex3;
+    glm::vec3 color;
+    glm::vec3 normal;
     int ID; // 0 == Triangle, 1 == Sphere
     float bounceOdds; //Odds that the ray would bounce off of the surface.
 };
+
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -261,12 +253,9 @@ void getRoom(Primitive triangles[]) {
 }
 
 int main() {
-    const int MAX_SPHERES = 1;
-    const int MAX_TRIANGLES = 5;
-    const int MAX_TRIANGLES_FOR_ROOM = 24;
-    const int MAX_PRIMITVES = 24;
-    Sphere spheres[MAX_SPHERES];
-    Triangle triangles[MAX_TRIANGLES + MAX_TRIANGLES_FOR_ROOM];
+    
+    const int MAX_PRIMITVES = 100;
+
     Primitive primitives[MAX_PRIMITVES];
     getRoom(primitives);
     /*triangles[MAX_TRIANGLES_FOR_ROOM].vertex1 = glm::vec4(-0.5f, -0.5f, 0.5f, 0.0f);
@@ -344,26 +333,16 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
     //ubos instead of SSBO since were at an earlier version of opengl // JONATANS EXTRA FINA TESTKOD
-    GLuint SSBO_Spheres, SSBO_Triangles, SSBO_Primitives;
+    GLuint SSBO_Primitives;
 
     // Allocate SSBO for spheres
-    glGenBuffers(1, &SSBO_Spheres);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Spheres);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, MAX_SPHERES * sizeof(Sphere), spheres, GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, SSBO_Spheres);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-    // Allocate SSBO for triangles
-    glGenBuffers(1, &SSBO_Triangles);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Triangles);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, (MAX_TRIANGLES + MAX_TRIANGLES_FOR_ROOM) * sizeof(Triangle), triangles, GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, SSBO_Triangles);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    
+    std::cout << "Size: " << sizeof(Primitive) << " Bytes \n";
+
     glGenBuffers(1, &SSBO_Primitives);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Primitives);
     glBufferData(GL_SHADER_STORAGE_BUFFER, (MAX_PRIMITVES) * sizeof(Primitive), primitives, GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, SSBO_Primitives);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, SSBO_Primitives);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
@@ -402,30 +381,10 @@ int main() {
         glUniform1i(screenWidthLoc, screenWidth);
         glUniform1i(screenHeightLoc, screenHeight);
 
-        for (int i = 0; i < MAX_SPHERES; i++) {
-            spheres[i].position = glm::vec3(0.0f,0.0f, 5.0f + 3.0f * sin(currentTime)) + 4.0f * glm::vec3(cos(currentTime),sin(currentTime),0);
-            spheres[i].radius = 0.5f;
-           
-        }
-        for (int i = MAX_TRIANGLES_FOR_ROOM; i < MAX_TRIANGLES + MAX_TRIANGLES_FOR_ROOM; i++) {
-            triangles[i].vertex1 = glm::vec4(-1.0f,-1.0f,0.0f,0.0f) + glm::vec4(3*sin(currentTime + 5 * (i - 24)), 3*cos(currentTime + 5 * (i - 24)), 10.0f, 0.0f);
-            triangles[i].vertex2 = glm::vec4(1.0f, -1.0f, 0.0f, 0.0f) + glm::vec4(3*sin(currentTime+5*(i-24)), 3*cos(currentTime + 5 * (i - 24)), 10.0f, 0.0f);
-            triangles[i].vertex3 = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f) + glm::vec4(3*sin(currentTime + 5 * (i - 24)),3* cos(currentTime + 5 * (i - 24)), 10.0f, 0.0f);
-            triangles[i].normal = glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
-            triangles[i].color = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
-        }
+        
         
 
-        // Update spheres SSBO
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Spheres);
-        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, MAX_SPHERES * sizeof(Sphere), spheres);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-        // Update triangles SSBO (offset must be 0, because it's a separate buffer)
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Triangles);
-        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, (MAX_TRIANGLES + MAX_TRIANGLES_FOR_ROOM) * sizeof(Triangle), triangles);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
+        
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Primitives);
         glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, (MAX_PRIMITVES) * sizeof(Primitive), primitives);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);

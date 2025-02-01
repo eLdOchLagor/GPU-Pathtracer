@@ -51,7 +51,7 @@ void getRoom(Primitive triangles[]) {
         triangles[i].vertex2 = vec3(6.0f, -5.0f, 0.0f);
         triangles[i].vertex3 = vec3(-6.0f, -5.0f, 0.0f);
         triangles[i].normal = vec3(0.0f, 1.0f, 0.0f);
-        triangles[i].color = vec3(1.0, 0.0, 0.0) + (4.f * i / 255.f);
+        triangles[i].color = vec3(79, 163, 146) / 255.0f;
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
@@ -60,7 +60,7 @@ void getRoom(Primitive triangles[]) {
         triangles[i].vertex2 = vec3(6.0f, -5.0f, 10.0f);
         triangles[i].vertex3 = vec3(-6.0f, -5.0f, 10.0f);
         triangles[i].normal = vec3(0.0f,1.0f,0.0f);
-        triangles[i].color = vec3(0.0, 1.0, 0.0) + (4.f * i / 255.f);
+        triangles[i].color = vec3(79, 163, 146) / 255.0f;
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
@@ -69,7 +69,7 @@ void getRoom(Primitive triangles[]) {
         triangles[i].vertex2 = vec3(-6.0f, -5.0f, 10.0f);
         triangles[i].vertex3 = vec3(-6.0f, -5.0f, 0.0f);
         triangles[i].normal = vec3(0.0f, 1.0f, 0.0f);
-        triangles[i].color = vec3(0.0, 0.0, 1.0) + (4.f * i / 255.f);
+        triangles[i].color = vec3(79, 163, 146) / 255.0f;
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
@@ -78,7 +78,7 @@ void getRoom(Primitive triangles[]) {
         triangles[i].vertex2 = vec3(-6.0f, -5.0f, 10.0f);
         triangles[i].vertex3 = vec3(6.0f, -5.0f, 10.0f);
         triangles[i].normal = vec3(0.0f, 1.0f, 0.0f);
-        triangles[i].color = vec3(1.0, 0.0, 0.0) + (4.f * i / 255.f);
+        triangles[i].color = vec3(79, 163, 146) / 255.0f;
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
@@ -90,7 +90,7 @@ void getRoom(Primitive triangles[]) {
         e1 = triangles[i].vertex2 - triangles[i].vertex1;
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
         triangles[i].normal = vec3(normalize(cross(e2, e1)));
-        triangles[i].color = vec3(1.0, 1.0, 0.0) + (4.f * i / 255.f);
+        triangles[i].color = vec3(224, 204, 177) / 255.0f;
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 0.0f;
         i++;
@@ -101,7 +101,7 @@ void getRoom(Primitive triangles[]) {
         e1 = triangles[i].vertex2 - triangles[i].vertex1;
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
         triangles[i].normal = vec3(normalize(cross(e2, e1)));
-        triangles[i].color = vec3(1.0, 1.0, 0.0) + (4.f * i / 255.f);
+        triangles[i].color = vec3(224, 204, 177) / 255.0f;
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 0.0f;
         i++;
@@ -113,7 +113,7 @@ void getRoom(Primitive triangles[]) {
         e1 = triangles[i].vertex2 - triangles[i].vertex1;
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
         triangles[i].normal = vec3(normalize(cross(e2, e1)));
-        triangles[i].color = vec3(0.0, 1.0, 1.0) + (4.f * i / 255.f);
+        triangles[i].color = vec3(224, 204, 177) / 255.0f;
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
@@ -124,7 +124,7 @@ void getRoom(Primitive triangles[]) {
         e1 = triangles[i].vertex2 - triangles[i].vertex1;
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
         triangles[i].normal = vec3(normalize(cross(e2, e1)));
-        triangles[i].color = vec3(0.0, 1.0, 1.0) + (4.f * i / 255.f);
+        triangles[i].color = vec3(224, 204, 177) / 255.0f;
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
@@ -134,7 +134,7 @@ void getRoom(Primitive triangles[]) {
         triangles[i].vertex2 = vec3(6.0f, 5.0f, 0.0f);
         triangles[i].vertex3 = vec3(6.0f, -5.0f, 10.0f);
         triangles[i].normal = vec3(-1.0f,0.0f,0.0f);
-        triangles[i].color = vec3(0.0, 0.5, 1.0) + (4.f * i / 255.f);
+        triangles[i].color = vec3(86, 77, 120) / 255.0f;
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
@@ -143,7 +143,7 @@ void getRoom(Primitive triangles[]) {
         triangles[i].vertex2 = vec3(6.0f, 5.0f, 0.0f);
         triangles[i].vertex3 = vec3(6.0f, 5.0f, 10.0f);
         triangles[i].normal = vec3(-1.0f, 0.0f, 0.0f);
-        triangles[i].color = vec3(0.0, 0.5, 1.0) + (4.f * i / 255.f);
+        triangles[i].color = vec3(86, 77, 120) / 255.0f;
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
@@ -154,7 +154,7 @@ void getRoom(Primitive triangles[]) {
         triangles[i].vertex2 = vec3(-6.0f, -5.0f, 10.0f);
         triangles[i].vertex3 = vec3(-6.0f, 5.0f, 0.0f);
         triangles[i].normal = vec3(1.0f, 0.0f, 0.0f);
-        triangles[i].color = vec3(1.0, 0.0, 0.0) + (4.f * i / 255.f);
+        triangles[i].color = vec3(15, 173, 207) / 255.0f;
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
@@ -163,7 +163,7 @@ void getRoom(Primitive triangles[]) {
         triangles[i].vertex2 = vec3(-6.0f, 5.0f, 10.0f);
         triangles[i].vertex3 = vec3(-6.0f, 5.0f, 0.0f);
         triangles[i].normal = vec3(1.0f, 0.0f, 0.0f);
-        triangles[i].color = vec3(1.0, 0.0, 0.0) + (4.f * i / 255.f);
+        triangles[i].color = vec3(15, 173, 207) / 255.0f;
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
@@ -175,7 +175,7 @@ void getRoom(Primitive triangles[]) {
         e1 = triangles[i].vertex2 - triangles[i].vertex1;
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
         triangles[i].normal = vec3(normalize(cross(e2, e1)));
-        triangles[i].color = vec3(1.0, 0.0, 0.0) + (4.f * i / 255.f);
+        triangles[i].color = vec3(255, 99, 131) / 255.0f;
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
@@ -186,7 +186,7 @@ void getRoom(Primitive triangles[]) {
         e1 = triangles[i].vertex2 - triangles[i].vertex1;
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
         triangles[i].normal = vec3(normalize(cross(e2, e1)));
-        triangles[i].color = vec3(1.0, 0.0, 0.0) + (4.f * i / 255.f);
+        triangles[i].color = vec3(255, 99, 131) / 255.0f;
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
@@ -198,9 +198,9 @@ void getRoom(Primitive triangles[]) {
         e1 = triangles[i].vertex2 - triangles[i].vertex1;
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
         triangles[i].normal = vec3(normalize(cross(e2, e1)));
-        triangles[i].color = vec3(1.0, 1.0, 0.0) + (4.f * i / 255.f);
+        triangles[i].color = vec3(255, 99, 131) / 255.0f;
         triangles[i].ID = 0;
-        triangles[i].bounceOdds = 1.0f;
+        triangles[i].bounceOdds = 0.0f;
         i++;
         //right top
         triangles[i].vertex1 = vec3(6.0f, -5.0f, 0.0f);
@@ -209,9 +209,9 @@ void getRoom(Primitive triangles[]) {
         e1 = triangles[i].vertex2 - triangles[i].vertex1;
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
         triangles[i].normal = vec3(normalize(cross(e2, e1)));
-        triangles[i].color = vec3(1.0, 0.0, 0.0) + (4.f * i / 255.f);
+        triangles[i].color = vec3(255, 99, 131) / 255.0f;
         triangles[i].ID = 0;
-        triangles[i].bounceOdds = 1.0f;
+        triangles[i].bounceOdds = 0.0f;
         i++;
     //roof
         //triangle front
@@ -219,7 +219,7 @@ void getRoom(Primitive triangles[]) {
         triangles[i].vertex2 = vec3(-6.0f, 5.0f, 0.0f);
         triangles[i].vertex3 = vec3(6.0f, 5.0f, 0.0f);
         triangles[i].normal = vec3(0.0f, -1.0f, 0.0f);
-        triangles[i].color = vec3(1.0, 0.0, 0.0) + (4.f * i / 255.f);
+        triangles[i].color = vec3(243,186,42) / 255.0f;
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
@@ -228,7 +228,7 @@ void getRoom(Primitive triangles[]) {
         triangles[i].vertex2 = vec3(-6.0f, 5.0f, 10.0f);
         triangles[i].vertex3 = vec3(6.0f, 5.0f, 10.0f);
         triangles[i].normal = vec3(0.0f, -1.0f, 0.0f);
-        triangles[i].color = vec3(0.0, 0.0, 1.0) + (4.f * i / 255.f);
+        triangles[i].color = vec3(243, 186, 42) / 255.0f;
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
@@ -237,7 +237,7 @@ void getRoom(Primitive triangles[]) {
         triangles[i].vertex2 = vec3(-6.0f, 5.0f, 0.0f);
         triangles[i].vertex3 = vec3(-6.0f, 5.0f, 10.0f);
         triangles[i].normal = vec3(0.0f, -1.0f, 0.0f);
-        triangles[i].color = vec3(0.0, 1.0, 0.0) + (4.f * i / 255.f);
+        triangles[i].color = vec3(243, 186, 42) / 255.0f;
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
         i++;
@@ -246,14 +246,16 @@ void getRoom(Primitive triangles[]) {
         triangles[i].vertex2 = vec3(0.0f, 5.0f, 13.0f);
         triangles[i].vertex3 = vec3(6.0f, 5.0f, 10.0f);
         triangles[i].normal = vec3(0.0f, -1.0f, 0.0f);
-        triangles[i].color = vec3(1.0, 0.0, 0.0) + (4.f * i / 255.f);
+        triangles[i].color = vec3(243, 186, 42) / 255.0f;
         triangles[i].ID = 0;
         triangles[i].bounceOdds = 1.0f;
+
+        
 }
 
 int main() {
     
-    const int MAX_PRIMITVES = 100;
+    const int MAX_PRIMITVES = 25;
 
     Primitive primitives[MAX_PRIMITVES];
     getRoom(primitives);
@@ -355,6 +357,13 @@ int main() {
         // Pass Uniforms
         glUniform1f(timeLoc, currentTime);
 
+        for (int i = 24; i < MAX_PRIMITVES; i++) {
+            primitives[i].ID = 1;
+            primitives[i].color = vec3(1.0f, 1.0f, 0.0f);
+            primitives[i].vertex1 = vec3(0.0f, 0.0f, 11.0f);
+            primitives[i].vertex2 = vec3(2.0f, 0.0f, 0.0f);
+            primitives[i].bounceOdds = 1.0f;
+        }
     
         uploadUniformVec3ToShader(shaderProgram, "cameraPosition", mainCamera.GetPosition());
         uploadUniformVec3ToShader(shaderProgram, "forward", mainCamera.GetForward());

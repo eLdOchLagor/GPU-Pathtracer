@@ -32,11 +32,11 @@ struct Primitive{
 };
 
 layout(std430, binding = 0) buffer PrimitiveBuffer{
-	Primitive primitives[24];
+	Primitive primitives[25];
 };
 
 int maxBounces = 5;
-int samples = 25;
+int samples = 35;
 
 out vec4 FragColor;
 
@@ -172,12 +172,12 @@ vec2 intersectionTest(Ray currentRay){
 	}
 
 	// If hit object is sphere, calculate and assign normal
-	if (primitives[closestIndex].ID == 1 && closestDistance > 0.0) {
+	/*if (primitives[closestIndex].ID == 1 && closestDistance > 0.0) {
 		vec3 t = currentRay.startPoint + closestDistance * currentRay.direction;
 		vec3 normal = normalize(t - primitives[closestIndex].vertex1);
 
 		primitives[closestIndex].normal = normal;
-	}
+	}*/
 
 	return vec2(closestDistance, closestIndex);
 }
@@ -275,7 +275,17 @@ void main() {
 		}
 
 		else if (hitSurface.bounceOdds == 1.0) { // Add check if (surface is diffuse)
-			vec3 directIllumination = calculateDirectIllumination(ray.direction, endPoint, hitSurface.normal, hitSurface.color);
+			//if sphere, get normal.
+			vec3 directIllumination = vec3(0);
+			if(hitSurface.ID == 1){
+
+				vec3 sphereNormal = normalize(ray.startPoint - hitSurface.vertex1);
+				directIllumination = calculateDirectIllumination(ray.direction, endPoint, sphereNormal, hitSurface.color);
+			}
+			//else do as normal.
+			else{
+				directIllumination = calculateDirectIllumination(ray.direction, endPoint, hitSurface.normal, hitSurface.color);
+			}
 			accumulatedColor += importance * directIllumination;
 			
 			importance *= hitSurface.color;

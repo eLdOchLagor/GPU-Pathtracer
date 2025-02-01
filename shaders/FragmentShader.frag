@@ -1,4 +1,4 @@
-#version 460 core
+﻿#version 460 core
 
 #define M_PI 3.1415926535897932384626433832795
 
@@ -32,7 +32,7 @@ struct Primitive{
 };
 
 layout(std430, binding = 0) buffer PrimitiveBuffer{
-	Primitive primitives[100];
+	Primitive primitives[24];
 };
 
 int maxBounces = 5;
@@ -71,6 +71,7 @@ Light AreaLight = Light(vec3(-2, 4.99, 8), vec3(2, 4.99, 8), vec3(2, 4.99, 11), 
 uint seed;
 
 // PCG Hash Taken from https://www.shadertoy.com/view/ctj3Wc
+// Märker nu att man kan se ett repeterande m�nster, kanske ska kolla alternativ, l�s kommentarer i l�nken ovan f�r mer info
 uint PCGHash()
 {
     seed = seed * 747796405u + 2891336453u;
@@ -286,7 +287,7 @@ void main() {
 			float randAzimuth = 2.0 * M_PI * randomValue2;
 			float rr = randAzimuth / hitSurface.bounceOdds;
 
-			if (rr <= 2 * M_PI) { // Russian roulette determines to reflect
+			if (rr <= 2 * M_PI || i != maxBounces - 1) { // Russian roulette determines to reflect
 				ray = diffuseReflection(ray, hitSurface, randAzimuth, randInclination);
 			}
 			else { // Terminate ray path
@@ -298,7 +299,8 @@ void main() {
 	}
 	
 	// Output final color
-    FragColor = vec4(accumulatedColor/samples, 1.0);
-	//FragColor = vec4(randomNumberx, randomNumbery, 0, 1);
+	vec3 GammaCorrected = pow(accumulatedColor/samples, vec3(1.0 / 2.2));
+    FragColor = vec4(GammaCorrected, 1.0);
+	
 }
 

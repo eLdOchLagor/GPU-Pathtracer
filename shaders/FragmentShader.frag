@@ -35,7 +35,7 @@ layout(std430, binding = 0) buffer PrimitiveBuffer{
 	Primitive primitives[100];
 };
 
-
+int maxBounces = 2;
 
 out vec4 FragColor;
 
@@ -207,6 +207,32 @@ vec3 calculateDirectIllumination(vec3 dir, vec3 hitPoint, vec3 normal, vec3 surf
 	return radiance;
 }
 
+Ray perfectReflection(Ray r, Primitive hitSurface) {
+	vec3 d_o = normalize(r.direction) - 2.0 * dot(normalize(r.direction), hitSurface.normal) * hitSurface.normal;
+	vec3 startPoint = r.endPoint;
+	Ray newRay = Ray(startPoint, d_o, vec3(0.0));
+
+	return newRay;
+}
+
+Ray diffuseReflection(Ray r, Primitive hitSurface, float randAz, float randInc) {
+	float x = cos(randAz) * sin(randInc);
+	float y = sin(randAz) * sin(randInc);
+	float z = cos(randInc);
+	vec3 tangent; 
+	vec3 bitangent;
+	vec3 normal = hitSurface.normal;
+
+	tangent = normalize(-r.direction + dot(normal, r.direction) * normal);
+	bitangent = normalize(cross(normal, tangent));
+
+	vec3 worldDir = normalize(normal * z + tangent * x + bitangent * y);
+
+	vec3 startPoint = r.endPoint;
+	Ray newRay = Ray(startPoint, worldDir, vec3(0.0));
+
+	return newRay;
+}
 
 void main() {
     vec4 coord = gl_FragCoord;
@@ -219,48 +245,61 @@ void main() {
 
     vec3 direction = normalize(forward + u * right + v * up);
 
-	// Background color
-	FragColor = vec4(0.2, 0.2, 0.2, 1);
-
-	//Intersection tests for spheres, then triangles.
-	float closestTimeSphere = -1.0;
-	float closestTimeTriangle = -1.0;
-	Sphere closestSphere;
-	Triangle closestTriangle;
-	
-	/*for(int i = 0; i < spheres.length(); i++){
-		float distance_1 = sphereIntersectionTest(direction, spheres[i]);
-		if ((distance_1 < closestTimeSphere || closestTimeSphere < 0.0) && distance_1 > 0.0) {
-			closestTimeSphere = distance_1;
-			closestSphere = spheres[i];
-			vec3 t = cameraPosition + distance_1 * direction;
-			vec3 normal = normalize(t - spheres[i].spherePOS);
-
-			vec3 directIllumination = calculateDirectIllumination(direction, t, normal, vec3(1.0,0.0,0.0));
-			FragColor = vec4(directIllumination,1.0);
-		}
-	}
-	for(int q = 0; q < triangles.length(); q++){
-		float distance_2 = triangleIntersectionTest(direction, triangles[q]);
-		if((distance_2 < closestTimeTriangle || closestTimeTriangle < 0.0 ) && distance_2 > 0.0 && (closestTimeSphere > distance_2 || closestTimeSphere < 0.0)){
-			closestTimeTriangle = distance_2;
-			closestTriangle = triangles[q];
-			vec3 normal = triangles[q].triangleNormal;
-			vec3 t = cameraPosition + distance_2 * direction;
-			
-			vec3 directIllumination = calculateDirectIllumination(direction, t, normal, triangles[q].triangleColor);
-			FragColor = vec4(directIllumination,1.0);		
-		}
-	}*/
+	// Initial ray initialization
 	Ray ray = Ray(direction, cameraPosition, vec3(0));
-	
-	
-	vec2 hit = intersectionTest(ray);
-	vec3 t = ray.startPoint + hit.x * ray.direction;
 
-	vec3 directIllumination = calculateDirectIllumination(ray.direction, t, primitives[int(hit.y)].normal, primitives[int(hit.y)].color);
+	vec3 accumulatedColor = vec3(0.0); // Final accumulated light
+    vec3 importance = vec3(1.0);      // Keeps track of ray contribution
 
-	FragColor = vec4(directIllumination,1.0);
+	for (int i = 0; i < maxBounces; i++){
+		vec2 hit = intersectionTest(ray);
+		
+		if(hit.x < 0.0) { // If no object is hit
+			accumulatedColor += importance * vec3(0.2, 0.2, 0.2); // Background color
+			break;
+		}
+
+		vec3 endPoint = ray.startPoint + hit.x * ray.direction;
+		ray.endPoint = endPoint;
+
+		Primitive hitSurface = primitives[int(hit.y)];
+
+		if (hitSurface.bounceOdds == 0.0) { // If mirror
+			ray = perfectReflection(ray, hitSurface);
+			continue;
+		}
+
+		accumulatedColor = hitSurface.color; // Temporary, for testing reflection
+
+		/*
+		else if (hitSurface.bounceOdds == 1.0) { // Add check if (surface is diffuse)
+			vec3 directIllumination = calculateDirectIllumination(ray.direction, endPoint, hitSurface.normal, hitSurface.color);
+			//accumulatedColor += importance * directIllumination;
+
+			accumulatedColor = hitSurface.color; // Temporary, for testing reflection
+			
+			//importance *= hitSurface.color;
+
+			float randomValue1 = RandomFloat(seed);
+			float randomValue2 = RandomFloat(seed);
+
+			float randInclination = acos(sqrt(1.0 - randomValue1));
+			float randAzimuth = 2.0 * M_PI * randomValue2;
+			float rr = randAzimuth / hitSurface.bounceOdds;
+
+			if (rr <= 2 * M_PI) { // Russian roulette determines to reflect
+				ray = diffuseReflection(ray, hitSurface, randAzimuth, randInclination);
+			}
+			else { // Terminate ray path
+				break;
+			}
+		}
+		*/
+
+	}
+	
+	// Output final color
+    FragColor = vec4(accumulatedColor, 1.0);
 
 }
 

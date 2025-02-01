@@ -360,8 +360,8 @@ int main() {
         for (int i = 24; i < MAX_PRIMITVES; i++) {
             primitives[i].ID = 1;
             primitives[i].color = vec3(1.0f, 1.0f, 0.0f);
-            primitives[i].vertex1 = vec3(0.0f, 0.0f, 11.0f);
-            primitives[i].vertex2 = vec3(2.0f, 0.0f, 0.0f);
+            primitives[i].vertex1 = vec3(0.0f, 0.0f, 6.0f) + vec3(3*sin(currentTime), 3*cos(currentTime), 5*cos(currentTime));
+            primitives[i].vertex2 = vec3(1.2f, 0.0f, 0.0f);
             primitives[i].bounceOdds = 1.0f;
         }
     

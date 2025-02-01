@@ -28,7 +28,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 int screenWidth = 800;
 int screenHeight = 600;
 
-Camera mainCamera = Camera(vec3(0.0f, 0.0f, -1.0f), vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f), 80.0f, screenWidth, screenHeight);
+Camera mainCamera = Camera(vec3(0.0f, 0.0f, 5.0f), vec3(0.0f, 0.0f, -1.0f), vec3(0.0f, 1.0f, 0.0f), 80.0f, screenWidth, screenHeight);
 
 float verts[] = {
     //bottom left Triangle
@@ -203,9 +203,9 @@ void getRoom(Primitive triangles[]) {
         triangles[i].bounceOdds = 1.0f;
         i++;
         //right top
-        triangles[i].vertex1 = vec3(0.0f, 5.0f, -3.0f);
-        triangles[i].vertex2 = vec3(-6.0f, 5.0f, 0.0f);
-        triangles[i].vertex3 = vec3(-6.0f, -5.0f, 0.0f);
+        triangles[i].vertex1 = vec3(6.0f, -5.0f, 0.0f);
+        triangles[i].vertex2 = vec3(0.0f, 5.0f, -3.0f);
+        triangles[i].vertex3 = vec3(6.0f, 5.0f, 0.0f);
         e1 = triangles[i].vertex2 - triangles[i].vertex1;
         e2 = triangles[i].vertex3 - triangles[i].vertex2;
         triangles[i].normal = vec3(normalize(cross(e2, e1)));

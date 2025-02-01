@@ -35,7 +35,7 @@ layout(std430, binding = 0) buffer PrimitiveBuffer{
 	Primitive primitives[100];
 };
 
-int maxBounces = 2;
+int maxBounces = 5;
 
 out vec4 FragColor;
 
@@ -210,7 +210,7 @@ vec3 calculateDirectIllumination(vec3 dir, vec3 hitPoint, vec3 normal, vec3 surf
 Ray perfectReflection(Ray r, Primitive hitSurface) {
 	vec3 d_o = normalize(r.direction) - 2.0 * dot(normalize(r.direction), hitSurface.normal) * hitSurface.normal;
 	vec3 startPoint = r.endPoint;
-	Ray newRay = Ray(startPoint, d_o, vec3(0.0));
+	Ray newRay = Ray(d_o, startPoint, vec3(0.0));
 
 	return newRay;
 }
@@ -229,7 +229,7 @@ Ray diffuseReflection(Ray r, Primitive hitSurface, float randAz, float randInc) 
 	vec3 worldDir = normalize(normal * z + tangent * x + bitangent * y);
 
 	vec3 startPoint = r.endPoint;
-	Ray newRay = Ray(startPoint, worldDir, vec3(0.0));
+	Ray newRay = Ray(worldDir, startPoint, vec3(0.0));
 
 	return newRay;
 }
@@ -269,16 +269,11 @@ void main() {
 			continue;
 		}
 
-		accumulatedColor = hitSurface.color; // Temporary, for testing reflection
-
-		/*
 		else if (hitSurface.bounceOdds == 1.0) { // Add check if (surface is diffuse)
 			vec3 directIllumination = calculateDirectIllumination(ray.direction, endPoint, hitSurface.normal, hitSurface.color);
-			//accumulatedColor += importance * directIllumination;
-
-			accumulatedColor = hitSurface.color; // Temporary, for testing reflection
+			accumulatedColor += importance * directIllumination;
 			
-			//importance *= hitSurface.color;
+			importance *= hitSurface.color;
 
 			float randomValue1 = RandomFloat(seed);
 			float randomValue2 = RandomFloat(seed);
@@ -294,7 +289,7 @@ void main() {
 				break;
 			}
 		}
-		*/
+
 
 	}
 	

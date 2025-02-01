@@ -36,6 +36,7 @@ layout(std430, binding = 0) buffer PrimitiveBuffer{
 };
 
 int maxBounces = 5;
+int samples = 25;
 
 out vec4 FragColor;
 
@@ -238,17 +239,20 @@ void main() {
     vec4 coord = gl_FragCoord;
 
 	seed = uint(coord.y * screenWidth + coord.x);
-
+	vec3 accumulatedColor = vec3(0.0); // Final accumulated light
     // Coordinates in imagePlane
-    float u = -(coord.x / screenWidth * imagePlaneWidth - imagePlaneWidth/2.0);
-    float v = (coord.y / screenHeight - 1.0) * imagePlaneHeight + imagePlaneHeight/2.0;
-
-    vec3 direction = normalize(forward + u * right + v * up);
+    
+	for(int q = 0; q < samples; q++){
+	float randomNumberx = RandomFloat(seed) - 0.5;
+	float randomNumbery = RandomFloat(seed) - 0.5;
+	float u = -((coord.x+randomNumberx) / screenWidth * imagePlaneWidth - imagePlaneWidth/2.0);
+    float v = ((coord.y+randomNumbery) / screenHeight - 1.0) * imagePlaneHeight + imagePlaneHeight/2.0;
+    vec3 direction = normalize(forward + u  * right + v * up);
 
 	// Initial ray initialization
 	Ray ray = Ray(direction, cameraPosition, vec3(0));
 
-	vec3 accumulatedColor = vec3(0.0); // Final accumulated light
+	
     vec3 importance = vec3(1.0);      // Keeps track of ray contribution
 
 	for (int i = 0; i < maxBounces; i++){
@@ -290,11 +294,11 @@ void main() {
 			}
 		}
 
-
+	}
 	}
 	
 	// Output final color
-    FragColor = vec4(accumulatedColor, 1.0);
-
+    FragColor = vec4(accumulatedColor/samples, 1.0);
+	//FragColor = vec4(randomNumberx, randomNumbery, 0, 1);
 }
 

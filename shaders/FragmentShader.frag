@@ -297,7 +297,7 @@ void main() {
 			float randAzimuth = 2.0 * M_PI * randomValue2;
 			float rr = randAzimuth / hitSurface.bounceOdds;
 
-			if (rr <= 2 * M_PI || i != maxBounces - 1) { // Russian roulette determines to reflect
+			if (rr <= 2 * M_PI && i != maxBounces - 1) { // Russian roulette determines to reflect
 				ray = diffuseReflection(ray, hitSurface, randAzimuth, randInclination);
 			}
 			else { // Terminate ray path

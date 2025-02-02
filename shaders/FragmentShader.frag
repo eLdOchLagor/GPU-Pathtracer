@@ -40,14 +40,13 @@ int samples = 35;
 
 out vec4 FragColor;
 
-uniform float time;
-
 uniform vec3 cameraPosition;
 uniform vec3 forward;
 uniform vec3 right;
 uniform vec3 up;
 uniform float imagePlaneWidth;
 uniform float imagePlaneHeight;
+
 uniform int screenWidth;
 uniform int screenHeight;
 

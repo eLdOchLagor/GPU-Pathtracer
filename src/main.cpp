@@ -2,8 +2,9 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "Shader.h"
-#include "Camera.h"
 #include "Scene.h"
+#include "Camera.h"
+
 
 
 #define MAIN
@@ -11,16 +12,7 @@
 #include "VectorUtils4.h"
 
 
-struct Primitive {
-    alignas(16) vec3 vertex1;
-    alignas(16) vec3 vertex2;
-    alignas(16) vec3 vertex3;
-    alignas(16) vec3 color;
-    alignas(16) vec3 normal;
-    alignas(4) int ID; // 0 == Triangle, 1 == Sphere
-    alignas(4) float bounceOdds; //Odds that the ray would bounce off of the surface.
-    alignas(8) char padding;
-};
+
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -41,244 +33,13 @@ float verts[] = {
     -1.0f, 1.0f, 0.0f
 };
 
-void getRoom(Primitive triangles[]) {
-    vec3 e1 = vec3(0.0f);
-    vec3 e2 = vec3(0.0f);
-    int i = 0;
-    //floor
-        //triangle front
-        triangles[i].vertex1 = vec3(0.0f, -5.0f, -3.0f);
-        triangles[i].vertex2 = vec3(6.0f, -5.0f, 0.0f);
-        triangles[i].vertex3 = vec3(-6.0f, -5.0f, 0.0f);
-        triangles[i].normal = vec3(0.0f, 1.0f, 0.0f);
-        triangles[i].color = vec3(79, 163, 146) / 255.0f;
-        triangles[i].ID = 0;
-        triangles[i].bounceOdds = 1.0f;
-        triangles[i].padding = 'L';
-        i++;
-        //triangle mid right
-        triangles[i].vertex1 = vec3(6.0f, -5.0f, 0.0f);
-        triangles[i].vertex2 = vec3(6.0f, -5.0f, 10.0f);
-        triangles[i].vertex3 = vec3(-6.0f, -5.0f, 10.0f);
-        triangles[i].normal = vec3(0.0f,1.0f,0.0f);
-        triangles[i].color = vec3(79, 163, 146) / 255.0f;
-        triangles[i].ID = 0;
-        triangles[i].bounceOdds = 1.0f;
-        triangles[i].padding = 'L';
-        i++;
-        //triangle mid left
-        triangles[i].vertex1 = vec3(6.0f, -5.0f, 0.0f);
-        triangles[i].vertex2 = vec3(-6.0f, -5.0f, 10.0f);
-        triangles[i].vertex3 = vec3(-6.0f, -5.0f, 0.0f);
-        triangles[i].normal = vec3(0.0f, 1.0f, 0.0f);
-        triangles[i].color = vec3(79, 163, 146) / 255.0f;
-        triangles[i].ID = 0;
-        triangles[i].bounceOdds = 1.0f;
-        triangles[i].padding = 'L';
-        i++;
-        //triangle back
-        triangles[i].vertex1 = vec3(0.0f, -5.0f, 13.0f);
-        triangles[i].vertex2 = vec3(-6.0f, -5.0f, 10.0f);
-        triangles[i].vertex3 = vec3(6.0f, -5.0f, 10.0f);
-        triangles[i].normal = vec3(0.0f, 1.0f, 0.0f);
-        triangles[i].color = vec3(79, 163, 146) / 255.0f;
-        triangles[i].ID = 0;
-        triangles[i].bounceOdds = 1.0f;
-        triangles[i].padding = 'L';
-        i++;
-    //backroom walls
-        //leftwall back
-        triangles[i].vertex1 = vec3(-6.0f, -5.0f, 10.0f);
-        triangles[i].vertex2 = vec3(0.0f, -5.0f, 13.0f);
-        triangles[i].vertex3 = vec3(0.0f, 5.0f, 13.0f);
-        e1 = triangles[i].vertex2 - triangles[i].vertex1;
-        e2 = triangles[i].vertex3 - triangles[i].vertex2;
-        triangles[i].normal = vec3(normalize(cross(e2, e1)));
-        triangles[i].color = vec3(224, 204, 177) / 255.0f;
-        triangles[i].ID = 0;
-        triangles[i].bounceOdds = 0.0f;
-        triangles[i].padding = 'L';
-        i++;
-        //leftwall front
-        triangles[i].vertex1 = vec3(-6.0f, -5.0f, 10.0f);
-        triangles[i].vertex2 = vec3(0.0f, 5.0f, 13.0f);
-        triangles[i].vertex3 = vec3(-6.0f, 5.0f, 10.0f);
-        e1 = triangles[i].vertex2 - triangles[i].vertex1;
-        e2 = triangles[i].vertex3 - triangles[i].vertex2;
-        triangles[i].normal = vec3(normalize(cross(e2, e1)));
-        triangles[i].color = vec3(224, 204, 177) / 255.0f;
-        triangles[i].ID = 0;
-        triangles[i].bounceOdds = 0.0f;
-        triangles[i].padding = 'L';
-        i++;
-    //backroom walls
-        //leftwall back
-        triangles[i].vertex1 = vec3(6.0f, -5.0f, 10.0f);
-        triangles[i].vertex2 = vec3(0.0f, 5.0f, 13.0f);
-        triangles[i].vertex3 = vec3(0.0f, -5.0f, 13.0f);      
-        e1 = triangles[i].vertex2 - triangles[i].vertex1;
-        e2 = triangles[i].vertex3 - triangles[i].vertex2;
-        triangles[i].normal = vec3(normalize(cross(e2, e1)));
-        triangles[i].color = vec3(224, 204, 177) / 255.0f;
-        triangles[i].ID = 0;
-        triangles[i].bounceOdds = 1.0f;
-        triangles[i].padding = 'L';
-        i++;
-        //leftwall front
-        triangles[i].vertex1 = vec3(6.0f, -5.0f, 10.0f);
-        triangles[i].vertex2 = vec3(6.0f, 5.0f, 10.0f);
-        triangles[i].vertex3 = vec3(0.0f, 5.0f, 13.0f);
-        e1 = triangles[i].vertex2 - triangles[i].vertex1;
-        e2 = triangles[i].vertex3 - triangles[i].vertex2;
-        triangles[i].normal = vec3(normalize(cross(e2, e1)));
-        triangles[i].color = vec3(224, 204, 177) / 255.0f;
-        triangles[i].ID = 0;
-        triangles[i].bounceOdds = 1.0f;
-        triangles[i].padding = 'L';
-        i++;
-    //right walls 
-        //bottom wall
-        triangles[i].vertex1 = vec3(6.0f, -5.0f, 0.0f);
-        triangles[i].vertex2 = vec3(6.0f, 5.0f, 0.0f);
-        triangles[i].vertex3 = vec3(6.0f, -5.0f, 10.0f);
-        triangles[i].normal = vec3(-1.0f,0.0f,0.0f);
-        triangles[i].color = vec3(86, 77, 120) / 255.0f;
-        triangles[i].ID = 0;
-        triangles[i].bounceOdds = 1.0f;
-        triangles[i].padding = 'L';
-        i++;
-        //top wall
-        triangles[i].vertex1 = vec3(6.0f, -5.0f, 10.0f);
-        triangles[i].vertex2 = vec3(6.0f, 5.0f, 0.0f);
-        triangles[i].vertex3 = vec3(6.0f, 5.0f, 10.0f);
-        triangles[i].normal = vec3(-1.0f, 0.0f, 0.0f);
-        triangles[i].color = vec3(86, 77, 120) / 255.0f;
-        triangles[i].ID = 0;
-        triangles[i].bounceOdds = 1.0f;
-        triangles[i].padding = 'L';
-        i++;
 
-    //left walls 
-        //bottom wall
-        triangles[i].vertex1 = vec3(-6.0f, -5.0f, 0.0f);
-        triangles[i].vertex2 = vec3(-6.0f, -5.0f, 10.0f);
-        triangles[i].vertex3 = vec3(-6.0f, 5.0f, 0.0f);
-        triangles[i].normal = vec3(1.0f, 0.0f, 0.0f);
-        triangles[i].color = vec3(15, 173, 207) / 255.0f;
-        triangles[i].ID = 0;
-        triangles[i].bounceOdds = 1.0f;
-        triangles[i].padding = 'L';
-        i++;
-        //top wall
-        triangles[i].vertex1 = vec3(-6.0f, -5.0f, 10.0f);
-        triangles[i].vertex2 = vec3(-6.0f, 5.0f, 10.0f);
-        triangles[i].vertex3 = vec3(-6.0f, 5.0f, 0.0f);
-        triangles[i].normal = vec3(1.0f, 0.0f, 0.0f);
-        triangles[i].color = vec3(15, 173, 207) / 255.0f;
-        triangles[i].ID = 0;
-        triangles[i].bounceOdds = 1.0f;
-        triangles[i].padding = 'L';
-        i++;
-    //frontroom walls
-        //left bottom
-        triangles[i].vertex1 = vec3(0.0f, -5.0f, -3.0f);
-        triangles[i].vertex2 = vec3(-6.0f, -5.0f, 0.0f);
-        triangles[i].vertex3 = vec3(0.0f, 5.0f, -3.0f);
-        e1 = triangles[i].vertex2 - triangles[i].vertex1;
-        e2 = triangles[i].vertex3 - triangles[i].vertex2;
-        triangles[i].normal = vec3(normalize(cross(e2, e1)));
-        triangles[i].color = vec3(255, 99, 131) / 255.0f;
-        triangles[i].ID = 0;
-        triangles[i].bounceOdds = 1.0f;
-        triangles[i].padding = 'L';
-        i++;
-        //left top
-        triangles[i].vertex1 = vec3(-6.0f, -5.0f, 0.0f);
-        triangles[i].vertex2 = vec3(-6.0f, 5.0f, 0.0f);
-        triangles[i].vertex3 = vec3(0.0f, 5.0f, -3.0f);
-        e1 = triangles[i].vertex2 - triangles[i].vertex1;
-        e2 = triangles[i].vertex3 - triangles[i].vertex2;
-        triangles[i].normal = vec3(normalize(cross(e2, e1)));
-        triangles[i].color = vec3(255, 99, 131) / 255.0f;
-        triangles[i].ID = 0;
-        triangles[i].bounceOdds = 1.0f;
-        triangles[i].padding = 'L';
-        i++;
-    //frontroom walls
-        //right bottom
-        triangles[i].vertex1 = vec3(0.0f, -5.0f, -3.0f);
-        triangles[i].vertex2 = vec3(0.0f, 5.0f, -3.0f);
-        triangles[i].vertex3 = vec3(6.0f, -5.0f, 0.0f);
-        e1 = triangles[i].vertex2 - triangles[i].vertex1;
-        e2 = triangles[i].vertex3 - triangles[i].vertex2;
-        triangles[i].normal = vec3(normalize(cross(e2, e1)));
-        triangles[i].color = vec3(255, 99, 131) / 255.0f;
-        triangles[i].ID = 0;
-        triangles[i].bounceOdds = 0.0f;
-        triangles[i].padding = 'L';
-        i++;
-        //right top
-        triangles[i].vertex1 = vec3(6.0f, -5.0f, 0.0f);
-        triangles[i].vertex2 = vec3(0.0f, 5.0f, -3.0f);
-        triangles[i].vertex3 = vec3(6.0f, 5.0f, 0.0f);
-        e1 = triangles[i].vertex2 - triangles[i].vertex1;
-        e2 = triangles[i].vertex3 - triangles[i].vertex2;
-        triangles[i].normal = vec3(normalize(cross(e2, e1)));
-        triangles[i].color = vec3(255, 99, 131) / 255.0f;
-        triangles[i].ID = 0;
-        triangles[i].bounceOdds = 0.0f;
-        triangles[i].padding = 'L';
-        i++;
-    //roof
-        //triangle front
-        triangles[i].vertex1 = vec3(0.0f, 5.0f, -3.0f);
-        triangles[i].vertex2 = vec3(-6.0f, 5.0f, 0.0f);
-        triangles[i].vertex3 = vec3(6.0f, 5.0f, 0.0f);
-        triangles[i].normal = vec3(0.0f, -1.0f, 0.0f);
-        triangles[i].color = vec3(243,186,42) / 255.0f;
-        triangles[i].ID = 0;
-        triangles[i].bounceOdds = 1.0f;
-        triangles[i].padding = 'L';
-        i++;
-        //triangle mid right
-        triangles[i].vertex1 = vec3(6.0f, 5.0f, 0.0f);
-        triangles[i].vertex2 = vec3(-6.0f, 5.0f, 10.0f);
-        triangles[i].vertex3 = vec3(6.0f, 5.0f, 10.0f);
-        triangles[i].normal = vec3(0.0f, -1.0f, 0.0f);
-        triangles[i].color = vec3(243, 186, 42) / 255.0f;
-        triangles[i].ID = 0;
-        triangles[i].bounceOdds = 1.0f;
-        triangles[i].padding = 'L';
-        i++;
-        //triangle mid left
-        triangles[i].vertex1 = vec3(6.0f, 5.0f, 0.0f);
-        triangles[i].vertex2 = vec3(-6.0f, 5.0f, 0.0f);
-        triangles[i].vertex3 = vec3(-6.0f, 5.0f, 10.0f);
-        triangles[i].normal = vec3(0.0f, -1.0f, 0.0f);
-        triangles[i].color = vec3(243, 186, 42) / 255.0f;
-        triangles[i].ID = 0;
-        triangles[i].bounceOdds = 1.0f;
-        triangles[i].padding = 'L';
-        i++;
-        //triangle back
-        triangles[i].vertex1 = vec3(-6.0f, 5.0f, 10.0f);
-        triangles[i].vertex2 = vec3(0.0f, 5.0f, 13.0f);
-        triangles[i].vertex3 = vec3(6.0f, 5.0f, 10.0f);
-        triangles[i].normal = vec3(0.0f, -1.0f, 0.0f);
-        triangles[i].color = vec3(243, 186, 42) / 255.0f;
-        triangles[i].ID = 0;
-        triangles[i].bounceOdds = 1.0f;
-        triangles[i].padding = 'L';
-
-        
-}
 
 int main() {
     
-    const int MAX_PRIMITVES = 25;
-
-    Primitive primitives[MAX_PRIMITVES];
-    getRoom(primitives);
+    Scene roomScene{};
+    roomScene.getRoom();
+    
     /*triangles[MAX_TRIANGLES_FOR_ROOM].vertex1 = vec3(-0.5f, -0.5f, 0.5f);
     triangles[MAX_TRIANGLES_FOR_ROOM].vertex2 = vec3(0.5f, -0.5f, 0.5f,0.0f);
     triangles[MAX_TRIANGLES_FOR_ROOM].vertex3 = vec3(0.0f, 0.5f, 0.5f);
@@ -350,7 +111,7 @@ int main() {
 
     glGenBuffers(1, &SSBO_Primitives);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Primitives);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, (MAX_PRIMITVES) * sizeof(Primitive), primitives, GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, roomScene.primitives.size() * sizeof(Primitive), roomScene.primitives.data(), GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, SSBO_Primitives);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
@@ -374,9 +135,8 @@ int main() {
         deltaTime = currentTime - previousTime;
 
         std::clog  << "\rFPS: " << 1 / deltaTime;
-        // Pass Uniforms
-        glUniform1f(timeLoc, currentTime);
 
+        /*
         for (int i = 24; i < MAX_PRIMITVES; i++) {
             primitives[i].ID = 1;
             primitives[i].color = vec3(1.0f, 1.0f, 0.0f);
@@ -384,7 +144,8 @@ int main() {
             primitives[i].vertex2 = vec3(1.2f, 0.0f, 0.0f);
             primitives[i].bounceOdds = 1.0f;
         }
-    
+        */
+
         uploadUniformVec3ToShader(shaderProgram, "cameraPosition", mainCamera.GetPosition());
         uploadUniformVec3ToShader(shaderProgram, "forward", mainCamera.GetForward());
         uploadUniformVec3ToShader(shaderProgram, "right", mainCamera.GetRight());
@@ -396,10 +157,11 @@ int main() {
         uploadUniformIntToShader(shaderProgram, "screenWidth", screenWidth);
         uploadUniformIntToShader(shaderProgram, "screenHeight", screenHeight);
 
-        
+        /*
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Primitives);
         glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, (MAX_PRIMITVES) * sizeof(Primitive), primitives);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+        */
 
         // Clear the screen
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);

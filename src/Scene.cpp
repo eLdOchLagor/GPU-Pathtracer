@@ -1,5 +1,27 @@
 #include "Scene.h"
 
+Scene::Scene(int presetID) {
+    switch (presetID) {
+    case 0:
+        getRoom();
+        break;
+    case 1:
+        getSpheres();
+    default:
+        break;
+    }
+}
+
+void Scene::getSpheres() {
+    Primitive temp{ vec3(-10.0, -5.0, 10.0), vec3(-10.0, -5.0, -10.0), vec3(10.0, -5.0, -10.0),  vec3(0.0f, 1.0f, 0.0f), vec3(79, 163, 146) / 255.0f, 0, 1.0f, 'L' };
+    primitives.push_back(temp);
+
+    temp = Primitive{ vec3(-10.0, -5.0, 10.0), vec3(-10.0, -5.0, -10.0), vec3(10.0, -5.0, -10.0),  vec3(0.0f, 1.0f, 0.0f), vec3(79, 163, 146) / 255.0f, 0, 1.0f, 'L' };
+    primitives.push_back(temp);
+
+}
+
+
 void Scene::getRoom() {
     // Initializes 24 empty Primitives in the std::vector
     primitives.resize(24);

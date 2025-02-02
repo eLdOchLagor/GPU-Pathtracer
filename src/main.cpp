@@ -20,7 +20,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 int screenWidth = 800;
 int screenHeight = 600;
 
-Camera mainCamera = Camera(vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f), 80.0f, screenWidth, screenHeight);
 
 float verts[] = {
     //bottom left Triangle
@@ -37,8 +36,10 @@ float verts[] = {
 
 int main() {
     
-    Scene roomScene{};
-    roomScene.getRoom();
+    Camera mainCamera = Camera(vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f), 80.0f, screenWidth, screenHeight);
+
+    Scene roomScene{0};
+    
     
     /*triangles[MAX_TRIANGLES_FOR_ROOM].vertex1 = vec3(-0.5f, -0.5f, 0.5f);
     triangles[MAX_TRIANGLES_FOR_ROOM].vertex2 = vec3(0.5f, -0.5f, 0.5f,0.0f);

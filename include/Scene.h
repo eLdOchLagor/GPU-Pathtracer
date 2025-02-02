@@ -23,9 +23,12 @@ class Scene
 {
 public:
 
-    
+    Scene(){};
+
+    Scene(int presetID);
 
     void getRoom();
+    void getSpheres();
 
     std::vector<Primitive> primitives;
 private:

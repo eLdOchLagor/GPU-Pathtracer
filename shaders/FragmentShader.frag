@@ -154,6 +154,7 @@ float sphereIntersectionTest(Ray currentRay, Primitive targetSphere) {
 
 bool isInShadow(vec3 startPoint, vec3 y){
 	Ray shadowRay = Ray(normalize(y-startPoint), startPoint, vec3(0.0));
+	float distance = length(y - startPoint);
 
 	for(int i = 0; i < primitives.length(); i++){
 		/*
@@ -170,7 +171,7 @@ bool isInShadow(vec3 startPoint, vec3 y){
 			t = sphereIntersectionTest(shadowRay, primitives[i]);
 		}
 		
-		if(t > 0.0) return true;
+		if(t > 0.0 && t < distance) return true;
 	}
 
 	return false;
@@ -224,7 +225,7 @@ vec3 calculateDirectIllumination(vec3 dir, vec3 hitPoint, vec3 normal, vec3 surf
 	cosx = max(0.0, cosx);
 	cosy = max(0.0, cosy);
 
-	if (!isInShadow(hitPoint + 0.001*normal, y)){
+	if (!isInShadow(hitPoint + 0.0001*normal, y)){
 		float scalar_radiance = (cosx * cosy) / (length(di) * length(di));
 		float A = length(e1) * length(e2);
 

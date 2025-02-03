@@ -83,7 +83,7 @@ void Scene::getSpheres() {
 
 void Scene::getRoom() {
     // Initializes 24 empty Primitives in the std::vector
-    primitives.resize(24);
+    primitives.resize(25);
 
     vec3 e1 = vec3(0.0f);
     vec3 e2 = vec3(0.0f);
@@ -313,6 +313,28 @@ void Scene::getRoom() {
     primitives[i].ID = 0;
     primitives[i].bounceOdds = 1.0f;
     primitives[i].padding = 'L';
+    i++;
 
+    //sphere 1
+    primitives[i].vertex1 = vec3(0.0f, -3.5f, 8.0f);
+    primitives[i].vertex2 = vec3(1.5f, -5.0f, 10.0f);
+    primitives[i].vertex3 = vec3(-10.0f, -5.0f, 10.0f);
+    primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
+    primitives[i].color = vec3(255, 0, 0) / 255.0f;
+    primitives[i].ID = 1;
+    primitives[i].bounceOdds = 1.0f;
+    primitives[i].padding = 'L';
+
+    i++;
+
+    //Sphere 2
+    primitives[i].vertex1 = vec3(-1.0f, -0.5f, 8.0f);
+    primitives[i].vertex2 = vec3(1.5f, -5.0f, 10.0f);
+    primitives[i].vertex3 = vec3(-10.0f, -5.0f, 10.0f);
+    primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
+    primitives[i].color = vec3(0, 255, 0) / 255.0f;
+    primitives[i].ID = 1;
+    primitives[i].bounceOdds = 1.0f;
+    primitives[i].padding = 'L';
 
 }

@@ -13,11 +13,70 @@ Scene::Scene(int presetID) {
 }
 
 void Scene::getSpheres() {
-    Primitive temp{ vec3(-10.0, -5.0, 10.0), vec3(-10.0, -5.0, -10.0), vec3(10.0, -5.0, -10.0),  vec3(0.0f, 1.0f, 0.0f), vec3(79, 163, 146) / 255.0f, 0, 1.0f, 'L' };
-    primitives.push_back(temp);
+    primitives.resize(5);
+    /*Primitive temp{vec3(-10.0f, -5.0f, 10.0f), vec3(-10.0f, -5.0f, -10.0f), vec3(10.0f, -5.0f, -10.0f), vec3(0.0f, 1.0f, 0.0f), vec3(79.0f, 163.0f, 146.0f) / 255.0f, 0, 1.0f, 'L'};
+    primitives[1] = temp;
 
-    temp = Primitive{ vec3(-10.0, -5.0, 10.0), vec3(-10.0, -5.0, -10.0), vec3(10.0, -5.0, -10.0),  vec3(0.0f, 1.0f, 0.0f), vec3(79, 163, 146) / 255.0f, 0, 1.0f, 'L' };
-    primitives.push_back(temp);
+    Primitive temp2 = Primitive{ vec3(10.0, -5.0, -10.0), vec3(10.0, -5.0, 10.0), vec3(-10.0, -5.0, 10.0),  vec3(0.0f, 1.0f, 0.0f), vec3(79, 163, 146) / 255.0f, 0, 1.0f, 'L' };
+    primitives.push_back(temp2);
+    */
+    //floor
+        //triangle front
+    int i = 0;
+    primitives[i].vertex1 = vec3(-10.0f, -5.0f, 10.0f);
+    primitives[i].vertex2 = vec3(-10.0f, -5.0f, -10.0f);
+    primitives[i].vertex3 = vec3(10.0f, -5.0f, -10.0f);
+    primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
+    primitives[i].color = vec3(79, 163, 146) / 255.0f;
+    primitives[i].ID = 0;
+    primitives[i].bounceOdds = 1.0f;
+    primitives[i].padding = 'L';
+    i++;
+   
+    //triangle mid right
+    primitives[i].vertex1 = vec3(10.0f, -5.0f, -10.0f);
+    primitives[i].vertex2 = vec3(10.0f, -5.0f, 10.0f);
+    primitives[i].vertex3 = vec3(-10.0f, -5.0f, 10.0f);
+    primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
+    primitives[i].color = vec3(79, 163, 146) / 255.0f;
+    primitives[i].ID = 0;
+    primitives[i].bounceOdds = 1.0f;
+    primitives[i].padding = 'L';
+    i++;
+
+    //triangle mid right
+    primitives[i].vertex1 = vec3(0.0f, 0.0f, 4.0f);
+    primitives[i].vertex2 = vec3(1.0f, -5.0f, 10.0f);
+    primitives[i].vertex3 = vec3(-10.0f, -5.0f, 10.0f);
+    primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
+    primitives[i].color = vec3(79, 163, 146) / 255.0f;
+    primitives[i].ID = 1;
+    primitives[i].bounceOdds = 1.0f;
+    primitives[i].padding = 'L';
+    i++;
+
+    //triangle mid right
+    primitives[i].vertex1 = vec3(3.0f, 0.0f, 7.0f);
+    primitives[i].vertex2 = vec3(0.75f, -5.0f, 10.0f);
+    primitives[i].vertex3 = vec3(-10.0f, -5.0f, 10.0f);
+    primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
+    primitives[i].color = vec3(79, 163, 146) / 255.0f;
+    primitives[i].ID = 1;
+    primitives[i].bounceOdds = 1.0f;
+    primitives[i].padding = 'L';
+    i++;
+    //triangle mid right
+    primitives[i].vertex1 = vec3(-6.0f, 2.0f, 10.0f);
+    primitives[i].vertex2 = vec3(3.0f, -5.0f, 10.0f);
+    primitives[i].vertex3 = vec3(-10.0f, -5.0f, 10.0f);
+    primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
+    primitives[i].color = vec3(79, 163, 146) / 255.0f;
+    primitives[i].ID = 1;
+    primitives[i].bounceOdds = 1.0f;
+    primitives[i].padding = 'L';
+    i++;
+
+    
 
 }
 

@@ -45,7 +45,7 @@ void Scene::getSpheres() {
     i++;
 
     //triangle mid right
-    primitives[i].vertex1 = vec3(0.0f, 0.0f, 4.0f);
+    primitives[i].vertex1 = vec3(0.0f, -4.0f, 4.0f);
     primitives[i].vertex2 = vec3(1.0f, -5.0f, 10.0f);
     primitives[i].vertex3 = vec3(-10.0f, -5.0f, 10.0f);
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
@@ -56,7 +56,7 @@ void Scene::getSpheres() {
     i++;
 
     //triangle mid right
-    primitives[i].vertex1 = vec3(3.0f, 0.0f, 7.0f);
+    primitives[i].vertex1 = vec3(3.0f, -4.0f, 7.0f);
     primitives[i].vertex2 = vec3(0.75f, -5.0f, 10.0f);
     primitives[i].vertex3 = vec3(-10.0f, -5.0f, 10.0f);
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
@@ -66,7 +66,7 @@ void Scene::getSpheres() {
     primitives[i].padding = 'L';
     i++;
     //triangle mid right
-    primitives[i].vertex1 = vec3(-6.0f, 2.0f, 10.0f);
+    primitives[i].vertex1 = vec3(-6.0f, -2.0f, 10.0f);
     primitives[i].vertex2 = vec3(3.0f, -5.0f, 10.0f);
     primitives[i].vertex3 = vec3(-10.0f, -5.0f, 10.0f);
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);

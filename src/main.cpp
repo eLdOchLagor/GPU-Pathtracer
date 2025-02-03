@@ -36,7 +36,7 @@ float verts[] = {
 
 int main() {
     
-    Camera mainCamera = Camera(vec3(0.0f, 0.0f, -1.0f), vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f), 80.0f, screenWidth, screenHeight);
+    Camera mainCamera = Camera(vec3(0.0f, -3.0f, -1.0f), vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f), 80.0f, screenWidth, screenHeight);
 
     Scene roomScene{1};
     

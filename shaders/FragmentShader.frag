@@ -36,7 +36,7 @@ layout(std430, binding = 0) buffer PrimitiveBuffer{
 };
 
 int maxBounces = 5;
-int samples = 35;
+int samples = 5;
 
 out vec4 FragColor;
 
@@ -152,6 +152,30 @@ float sphereIntersectionTest(Ray currentRay, Primitive targetSphere) {
 		return -1.0;
 }
 
+bool isInShadow(vec3 startPoint, vec3 y){
+	Ray shadowRay = Ray(normalize(y-startPoint), startPoint, vec3(0.0));
+
+	for(int i = 0; i < primitives.length(); i++){
+		/*
+		if (primitives[i] == originSurface){ // Skip if it is the originSurface or if object is transparent
+			continue;
+		}
+		*/
+		float t = -1.0;
+
+		if(primitives[i].ID == 0){
+			t = triangleIntersectionTest(shadowRay, primitives[i]);
+		}
+		else if(primitives[i].ID == 1){
+			t = sphereIntersectionTest(shadowRay, primitives[i]);
+		}
+		
+		if(t > 0.0) return true;
+	}
+
+	return false;
+}
+
 //Returns the closest distance hit. First value of returned vec2 is the distance, second value is the index of the object int the primitives array.
 vec2 intersectionTest(Ray currentRay){
 	float closestDistance = -1.0;
@@ -200,10 +224,12 @@ vec3 calculateDirectIllumination(vec3 dir, vec3 hitPoint, vec3 normal, vec3 surf
 	cosx = max(0.0, cosx);
 	cosy = max(0.0, cosy);
 
-	float scalar_radiance = (cosx * cosy) / (length(di) * length(di));
-	float A = length(e1) * length(e2);
+	if (!isInShadow(hitPoint + 0.001*normal, y)){
+		float scalar_radiance = (cosx * cosy) / (length(di) * length(di));
+		float A = length(e1) * length(e2);
 
-	radiance = vec3(AreaLight.radiance * scalar_radiance * A/M_PI) * surfaceColor;
+		radiance = vec3(AreaLight.radiance * scalar_radiance * A/M_PI) * surfaceColor;
+	}
 
 	return radiance;
 }

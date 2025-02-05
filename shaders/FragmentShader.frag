@@ -40,6 +40,9 @@ int samples = 5;
 
 out vec4 FragColor;
 
+uniform sampler2D accumTexture;
+uniform int frameCount;
+
 uniform vec3 cameraPosition;
 uniform vec3 forward;
 uniform vec3 right;
@@ -265,10 +268,13 @@ Ray diffuseReflection(Ray r, Primitive hitSurface, float randAz, float randInc) 
 void main() {
     vec4 coord = gl_FragCoord;
 
-	seed = uint(coord.y * screenWidth + coord.x);
+	seed = uint(coord.y * screenWidth + coord.x) ^ (frameCount * 1664525u);
 	vec3 accumulatedColor = vec3(0.0); // Final accumulated light
     // Coordinates in imagePlane
     
+	vec2 texCoords = gl_FragCoord.xy / vec2(textureSize(accumTexture, 0));
+	vec3 prevColor = texture(accumTexture, texCoords).rgb;
+
 	for(int q = 0; q < samples; q++){
 	float randomNumberx = RandomFloat(seed) - 0.5;
 	float randomNumbery = RandomFloat(seed) - 0.5;
@@ -334,9 +340,10 @@ void main() {
 	}
 	}
 	
+	accumulatedColor /= samples;
 	// Output final color
-	vec3 GammaCorrected = pow(accumulatedColor/samples, vec3(1.0 / 2.2));
-    FragColor = vec4(GammaCorrected, 1.0);
+	vec3 ac = (prevColor * float(frameCount) + accumulatedColor) / float(frameCount + 1); // Blend with previous color
+    FragColor = vec4(ac, 1.0);
 	
 }
 

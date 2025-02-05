@@ -20,6 +20,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 int screenWidth = 800;
 int screenHeight = 600;
 
+int frameCount = 0;
 
 float verts[] = {
     //bottom left Triangle
@@ -72,11 +73,17 @@ int main() {
     // Shader initialization ----------------------------------------------------------------
     Shader VertexShader = Shader("..\\shaders\\VertexShader.vert", GL_VERTEX_SHADER);
     Shader FragmentShader = Shader("..\\shaders\\FragmentShader.frag", GL_FRAGMENT_SHADER);
+    Shader DisplayFragment = Shader("..\\shaders\\DisplayShader.frag", GL_FRAGMENT_SHADER);
 
     unsigned int shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, VertexShader.shaderID);
     glAttachShader(shaderProgram, FragmentShader.shaderID);
     glLinkProgram(shaderProgram);
+
+    unsigned int DisplayShader = glCreateProgram();
+    glAttachShader(DisplayShader, VertexShader.shaderID);
+    glAttachShader(DisplayShader, DisplayFragment.shaderID);
+    glLinkProgram(DisplayShader);
 
     // Check for linking errors
     int success;
@@ -97,6 +104,17 @@ int main() {
     unsigned int timeLoc = glGetUniformLocation(shaderProgram, "time");
 
     
+    // Texture for storing accumulated color
+    GLuint textures[2];
+    glGenTextures(2, textures);
+    for (int i = 0; i < 2; i++) {
+        glBindTexture(GL_TEXTURE_2D, textures[i]);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, screenWidth, screenHeight, 0, GL_RGBA, GL_FLOAT, nullptr);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    }
+    // --------------------------------------------------------------------
+
     unsigned int VBO, VAO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -129,9 +147,15 @@ int main() {
     // Updates glViewport when window is resized
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+    int currentTexture = 0;
+    GLuint framebuffer;
+    glGenFramebuffers(1, &framebuffer);
+
     // Rendering loop
     while (!glfwWindowShouldClose(window))
     {
+        int nextTexture = 1 - currentTexture;
+
         float currentTime = glfwGetTime();
         deltaTime = currentTime - previousTime;
 
@@ -157,6 +181,7 @@ int main() {
 
         uploadUniformIntToShader(shaderProgram, "screenWidth", screenWidth);
         uploadUniformIntToShader(shaderProgram, "screenHeight", screenHeight);
+        uploadUniformIntToShader(shaderProgram, "frameCount", frameCount);
 
         /*
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Primitives);
@@ -164,22 +189,44 @@ int main() {
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
         */
 
-        // Clear the screen
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        // Pathtracing pass, Rendering to texture
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textures[nextTexture], 0);
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        
+        glUseProgram(shaderProgram); // Pathtracing shader
 
-        // Use the shader program
-        glUseProgram(shaderProgram);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textures[currentTexture]);
+
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);  // Unbind framebuffer to render to screen
+        // -------------------------------------------------------------------------------
+
+        // Display pass, render accumulated image to screen
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glUseProgram(DisplayShader);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textures[nextTexture]); // Bind the accumulated result
+
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        // -----------------------------------------------------
+
+        
         // Swap the buffers
         glfwSwapBuffers(window);
-
-        // Poll for events
         glfwPollEvents();
+
         previousTime = currentTime;
+        currentTexture = nextTexture;
+        frameCount++;
     }
 
     glfwTerminate();

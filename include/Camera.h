@@ -7,8 +7,10 @@
 class Camera
 {
 public:
+	Camera() {};
+
 	Camera(vec3 pos, vec3 fwd, vec3 up, float fov, int width, int height) {
-		_position = pos;
+		position = pos;
 		_forward = normalize(fwd);
 		
 		_aspectRatio = (float)width / height;
@@ -18,7 +20,7 @@ public:
 		_imagePlaneWidth = _imagePlaneHeight * _aspectRatio;
 	};
 
-	vec3 GetPosition() { return _position; }
+	vec3 GetPosition() { return position; }
 	vec3 GetForward() { return _forward; }
 	vec3 GetUp() { return _trueUp; }
 	vec3 GetRight() { return _right; }
@@ -26,8 +28,19 @@ public:
     float GetImagePlaneHeight() { return _imagePlaneHeight; }
 	float GetImagePlaneWidth() { return _imagePlaneWidth; }
 
+	void SetForward(vec3 fwd) { 
+		_forward = normalize(fwd); 
+		UpdateCamera();
+	}
+
+	void UpdateCamera() {
+		_right = normalize(cross(_forward, vec3(0.0f, 1.0f, 0.0f)));
+		_trueUp = cross(_right, _forward);
+	}
+
+	vec3 position;
+
 private:
-	vec3 _position;
 	vec3 _forward;
 	vec3 _trueUp;
 	vec3 _right;

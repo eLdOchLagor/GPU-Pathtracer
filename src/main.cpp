@@ -13,9 +13,11 @@
 
 
 
-
+// GLFW Callback functions
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+
 void processInput(GLFWwindow* window);
 void clearAccumulationBuffer();
 
@@ -73,6 +75,7 @@ int main() {
     }
     glfwMakeContextCurrent(window);
 
+    // Capture mouse
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -164,6 +167,7 @@ int main() {
     // Updates glViewport when window is resized
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
     int currentTexture = 0;
     glGenFramebuffers(1, &framebuffer);
@@ -287,6 +291,31 @@ void processInput(GLFWwindow* window)
     {
         frameCount = 0;
         clearAccumulationBuffer();
+    }
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    if (yoffset != 0.0)
+    {
+        float currentFOV = mainCamera.GetFOV();
+        mainCamera.SetFOV(currentFOV - yoffset);
+
+        // Redo these checks, it still resets accumulation currently, make sure it doesnt
+        if (mainCamera.GetFOV() > 180.0f)
+        {
+            mainCamera.SetFOV(179.0f);
+            return;
+        }
+        if (mainCamera.GetFOV() < 0.0f)
+        {
+            mainCamera.SetFOV(1.0f);
+            return;
+        }
+
+        frameCount = 0;
+        clearAccumulationBuffer();
+
     }
 }
 

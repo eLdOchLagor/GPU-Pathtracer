@@ -13,10 +13,12 @@ public:
 		position = pos;
 		_forward = normalize(fwd);
 		
+		_fov = fov;
+
 		_aspectRatio = (float)width / height;
 		_right = normalize(cross(_forward, up));
 		_trueUp = cross(_right, _forward);
-		_imagePlaneHeight = 2 * tan(M_PI*fov/180.0f / 2.0f);
+		_imagePlaneHeight = 2 * tan(M_PI* _fov/180.0f / 2.0f);
 		_imagePlaneWidth = _imagePlaneHeight * _aspectRatio;
 	};
 
@@ -27,15 +29,26 @@ public:
 
     float GetImagePlaneHeight() { return _imagePlaneHeight; }
 	float GetImagePlaneWidth() { return _imagePlaneWidth; }
+	float GetFOV() { return _fov; }
 
 	void SetForward(vec3 fwd) { 
 		_forward = normalize(fwd); 
-		UpdateCamera();
+		UpdateCameraVectors();
 	}
 
-	void UpdateCamera() {
+	void SetFOV(float fov) {
+		_fov = fov;
+		UpdateCameraPlane();
+	}
+
+	void UpdateCameraVectors() {
 		_right = normalize(cross(_forward, vec3(0.0f, 1.0f, 0.0f)));
 		_trueUp = cross(_right, _forward);
+	}
+
+	void UpdateCameraPlane() {
+		_imagePlaneHeight = 2 * tan(M_PI * _fov / 180.0f / 2.0f);
+		_imagePlaneWidth = _imagePlaneHeight * _aspectRatio;
 	}
 
 	vec3 position;
@@ -44,7 +57,8 @@ private:
 	vec3 _forward;
 	vec3 _trueUp;
 	vec3 _right;
-	
+
+	float _fov;
 	float _aspectRatio; // Only used in Camera constructor
 
 	float _imagePlaneHeight;

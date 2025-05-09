@@ -58,6 +58,8 @@ private:
 	vec3 _trueUp;
 	vec3 _right;
 
+
+
 	float _fov;
 	float _aspectRatio; // Only used in Camera constructor
 

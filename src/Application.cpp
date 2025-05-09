@@ -6,6 +6,13 @@ Application::Application(int width, int height, const std::string& title) {
 	window = createWindow(title);
     mainCamera = Camera(vec3(0.0f, 0.0f, -1.0f), vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f), 80.0f, screenWidth, screenHeight);
 	roomScene = Scene{ 0 };
+
+	Init();
+}
+
+Application::~Application() {
+	glfwDestroyWindow(window);
+	glfwTerminate();
 }
 
 GLFWwindow* Application::createWindow(const std::string& title) {
@@ -20,7 +27,7 @@ GLFWwindow* Application::createWindow(const std::string& title) {
     {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
-        return;
+        return NULL;
     }
     glfwMakeContextCurrent(window);
 
@@ -53,12 +60,12 @@ void Application::Init() {
     Shader FragmentShader = Shader("..\\shaders\\FragmentShader.frag", GL_FRAGMENT_SHADER);
     Shader DisplayFragment = Shader("..\\shaders\\DisplayShader.frag", GL_FRAGMENT_SHADER);
 
-    unsigned int shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, VertexShader.shaderID);
-    glAttachShader(shaderProgram, FragmentShader.shaderID);
-    glLinkProgram(shaderProgram);
+    PathtraceShader = glCreateProgram();
+    glAttachShader(PathtraceShader, VertexShader.shaderID);
+    glAttachShader(PathtraceShader, FragmentShader.shaderID);
+    glLinkProgram(PathtraceShader);
 
-    unsigned int DisplayShader = glCreateProgram();
+    DisplayShader = glCreateProgram();
     glAttachShader(DisplayShader, VertexShader.shaderID);
     glAttachShader(DisplayShader, DisplayFragment.shaderID);
     glLinkProgram(DisplayShader);
@@ -66,17 +73,17 @@ void Application::Init() {
     // Check for linking errors
     int success;
     char infoLog[512];
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    glGetProgramiv(PathtraceShader, GL_LINK_STATUS, &success);
     if (!success)
     {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        glGetProgramInfoLog(PathtraceShader, 512, NULL, infoLog);
         std::cerr << "ERROR::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
     }
 
     glGetProgramiv(DisplayShader, GL_LINK_STATUS, &success);
     if (!success)
     {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        glGetProgramInfoLog(DisplayShader, 512, NULL, infoLog);
         std::cerr << "ERROR::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
     }
 
@@ -87,7 +94,7 @@ void Application::Init() {
 
     // ----------------------------------------------------------------------------------------
 
-    unsigned int timeLoc = glGetUniformLocation(shaderProgram, "time");
+    unsigned int timeLoc = glGetUniformLocation(PathtraceShader, "time");
 
 
     glGenTextures(2, textures);
@@ -99,7 +106,7 @@ void Application::Init() {
     }
     // --------------------------------------------------------------------
 
-    unsigned int VBO, VAO;
+    unsigned int VBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glBindVertexArray(VAO);
@@ -133,11 +140,94 @@ void Application::Init() {
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
-    int currentTexture = 0;
+    currentTexture = 0;
     glGenFramebuffers(1, &framebuffer);
 }
 
+void Application::Run() {
+    // Rendering loop
+    while (!glfwWindowShouldClose(window))
+    {
+        //processInput(window);
+
+        int nextTexture = 1 - currentTexture;
+
+        float currentTime = glfwGetTime();
+        deltaTime = currentTime - previousTime;
+
+        std::clog << "\rFPS: " << 1 / deltaTime;
+
+        /*
+        for (int i = 24; i < MAX_PRIMITVES; i++) {
+            primitives[i].ID = 1;
+            primitives[i].color = vec3(1.0f, 1.0f, 0.0f);
+            primitives[i].vertex1 = vec3(0.0f, 0.0f, 6.0f) + vec3(3*sin(currentTime), 3*cos(currentTime), 5*cos(currentTime));
+            primitives[i].vertex2 = vec3(1.2f, 0.0f, 0.0f);
+            primitives[i].bounceOdds = 1.0f;
+        }
+        */
+
+        uploadUniformVec3ToShader(PathtraceShader, "cameraPosition", mainCamera.GetPosition());
+        uploadUniformVec3ToShader(PathtraceShader, "forward", mainCamera.GetForward());
+        uploadUniformVec3ToShader(PathtraceShader, "right", mainCamera.GetRight());
+        uploadUniformVec3ToShader(PathtraceShader, "up", mainCamera.GetUp());
+
+        uploadUniformFloatToShader(PathtraceShader, "imagePlaneHeight", mainCamera.GetImagePlaneHeight());
+        uploadUniformFloatToShader(PathtraceShader, "imagePlaneWidth", mainCamera.GetImagePlaneWidth());
+
+        uploadUniformIntToShader(PathtraceShader, "screenWidth", screenWidth);
+        uploadUniformIntToShader(PathtraceShader, "screenHeight", screenHeight);
+        uploadUniformIntToShader(PathtraceShader, "frameCount", frameCount);
+
+        /*
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Primitives);
+        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, (MAX_PRIMITVES) * sizeof(Primitive), primitives);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+        */
+
+        // Pathtracing pass, Rendering to texture
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textures[nextTexture], 0);
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glUseProgram(PathtraceShader); // Pathtracing shader
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textures[currentTexture]);
+
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);  // Unbind framebuffer to render to screen
+        // -------------------------------------------------------------------------------
+
+        // Display pass, render accumulated image to screen
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glUseProgram(DisplayShader);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textures[nextTexture]); // Bind the accumulated result
+
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        // -----------------------------------------------------
+
+
+        // Swap the buffers
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+
+        previousTime = currentTime;
+        currentTexture = nextTexture;
+        frameCount++;
+    }
+}
+
 void Application::mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+    /*
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos; // reversed since y-coordinates range from bottom to top
     lastX = xpos;
@@ -166,10 +256,12 @@ void Application::mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     // Reset accumulation
     frameCount = 0;
     clearAccumulationBuffer();
+    */
 }
 
 void Application::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
+	/*
     if (yoffset != 0.0)
     {
         float currentFOV = mainCamera.GetFOV();
@@ -191,9 +283,26 @@ void Application::scroll_callback(GLFWwindow* window, double xoffset, double yof
         clearAccumulationBuffer();
 
     }
+    */
 }
 
 void Application::framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+}
+
+void Application::clearAccumulationBuffer() {
+    /*
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+    // Bind both textures and clear them
+    for (int i = 0; i < 2; i++) {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textures[i], 0);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Reset to black
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
+
+    // Unbind
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    */
 }

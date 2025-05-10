@@ -9,7 +9,7 @@ Scene::Scene(int presetID) {
         getSpheres();
         break;
     case 2:
-		CreateSceneFromModel("..\\models\\tetrahedron.obj");
+		CreateSceneFromModel("..\\models\\Sphere.obj");
         break;
     default:
         break;
@@ -33,7 +33,7 @@ void Scene::CreateSceneFromModel(const std::string& path) {
 		primitives[primIdx].vertex2 = vertices[i + 1];
 		primitives[primIdx].vertex3 = vertices[i + 2];
 		primitives[primIdx].normal = normals[i];
-		primitives[primIdx].color = vec3(79, 163, 146) / 255.0f; // Arbitrary color
+		primitives[primIdx].color = vec3(255, 100, 100) / 255.0f; // Arbitrary color
         primitives[primIdx].ID = 0;
         primitives[primIdx].bounceOdds = 1.0f;
         primitives[primIdx].padding = 'L';

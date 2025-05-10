@@ -32,7 +32,7 @@ struct Primitive{
 };
 
 layout(std430, binding = 0) buffer PrimitiveBuffer{
-	Primitive primitives[25];
+	Primitive primitives[125];
 };
 
 int maxBounces = 5;

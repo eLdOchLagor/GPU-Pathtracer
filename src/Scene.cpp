@@ -9,7 +9,7 @@ Scene::Scene(int presetID) {
         getSpheres();
         break;
     case 2:
-		CreateSceneFromModel("..\\models\\Sphere.obj");
+		CreateSceneFromModel("..\\models\\StanfordBunny348.obj");
         break;
     default:
         break;

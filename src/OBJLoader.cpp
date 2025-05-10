@@ -43,6 +43,7 @@ bool OBJLoader::loadOBJ(const std::string& path, std::vector<vec3>& out_vertices
             unsigned int vi[3], uvi[3], ni[3];
             char slash;
 
+			// TODO: Loader only works if there is vertex, uv, and normal data. Need to be handled differntly if no UV data is present.
             for (int i = 0; i < 3; ++i) {
                 ss >> vi[i] >> slash >> uvi[i] >> slash >> ni[i];
                 vertexIndices.push_back(vi[i]);
@@ -55,7 +56,7 @@ bool OBJLoader::loadOBJ(const std::string& path, std::vector<vec3>& out_vertices
 	// Use the indices to correctly construct the final vertex, uv, and normal vectors
     for (size_t i = 0; i < vertexIndices.size(); i++) {
         out_vertices.push_back(temp_vertices[vertexIndices[i] - 1]);
-        out_uvs.push_back(temp_uvs[uvIndices[i] - 1]);
+		//out_uvs.push_back(temp_uvs[uvIndices[i] - 1]); // Commented out to avoid UVs
         out_normals.push_back(temp_normals[normalIndices[i] - 1]);
     }
 

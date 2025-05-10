@@ -31,6 +31,9 @@ GLFWwindow* Application::createWindow(const std::string& title) {
     }
     glfwMakeContextCurrent(window);
 
+    // Set the user pointer to the current Application instance
+    glfwSetWindowUserPointer(window, this);
+
     return window;
 }
 
@@ -148,7 +151,7 @@ void Application::Run() {
     // Rendering loop
     while (!glfwWindowShouldClose(window))
     {
-        //processInput(window);
+        processInput(window);
 
         int nextTexture = 1 - currentTexture;
 
@@ -259,31 +262,67 @@ void Application::mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     */
 }
 
+void Application::processInput(GLFWwindow* window)
+{
+    Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
+
+    bool cameraMoved = false;
+    float cameraSpeed = 6.0f * app->deltaTime;
+
+    // NOTE: Left and right are reversed
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, true);
+    }
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        app->mainCamera.position += cameraSpeed * app->mainCamera.GetForward();
+        cameraMoved = true;
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        app->mainCamera.position -= cameraSpeed * app->mainCamera.GetForward();
+        cameraMoved = true;
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        app->mainCamera.position += app->mainCamera.GetRight() * cameraSpeed;
+        cameraMoved = true;
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        app->mainCamera.position -= app->mainCamera.GetRight() * cameraSpeed;
+        cameraMoved = true;
+    }
+
+    if (cameraMoved)
+    {
+        app->frameCount = 0;
+        clearAccumulationBuffer(window);
+    }
+}
+
 void Application::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	/*
+    Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
+
     if (yoffset != 0.0)
     {
-        float currentFOV = mainCamera.GetFOV();
-        mainCamera.SetFOV(currentFOV - yoffset);
+        float currentFOV = app->mainCamera.GetFOV();
+        app->mainCamera.SetFOV(currentFOV - yoffset);
 
         // Redo these checks, it still resets accumulation currently, make sure it doesnt
-        if (mainCamera.GetFOV() > 180.0f)
+        if (app->mainCamera.GetFOV() > 180.0f)
         {
-            mainCamera.SetFOV(179.0f);
+            app->mainCamera.SetFOV(179.0f);
             return;
         }
-        if (mainCamera.GetFOV() < 0.0f)
+        if (app->mainCamera.GetFOV() < 0.0f)
         {
-            mainCamera.SetFOV(1.0f);
+            app->mainCamera.SetFOV(1.0f);
             return;
         }
 
-        frameCount = 0;
-        clearAccumulationBuffer();
+        app->frameCount = 0;
+        clearAccumulationBuffer(window);
 
     }
-    */
+    
 }
 
 void Application::framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -291,18 +330,19 @@ void Application::framebuffer_size_callback(GLFWwindow* window, int width, int h
     glViewport(0, 0, width, height);
 }
 
-void Application::clearAccumulationBuffer() {
-    /*
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+void Application::clearAccumulationBuffer(GLFWwindow* window) {
+    Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
+
+    glBindFramebuffer(GL_FRAMEBUFFER, app->framebuffer);
 
     // Bind both textures and clear them
     for (int i = 0; i < 2; i++) {
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textures[i], 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, app->textures[i], 0);
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Reset to black
         glClear(GL_COLOR_BUFFER_BIT);
     }
 
     // Unbind
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    */
+    
 }

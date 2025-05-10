@@ -25,7 +25,7 @@ public:
 	static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 	static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 	static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-
+	static void processInput(GLFWwindow* window);
 
 	GLFWwindow* window;
 
@@ -48,5 +48,5 @@ private:
 
 	void Init();
 	GLFWwindow* createWindow(const std::string& title);
-	static void Application::clearAccumulationBuffer();
+	static void Application::clearAccumulationBuffer(GLFWwindow* window);
 };

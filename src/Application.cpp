@@ -229,37 +229,39 @@ void Application::Run() {
     }
 }
 
-void Application::mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-    /*
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates range from bottom to top
-    lastX = xpos;
-    lastY = ypos;
+void Application::mouse_callback(GLFWwindow* window, double xpos, double ypos) 
+{
+    Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
+    
+    float xoffset = xpos - app->mainCamera.lastX;
+    float yoffset = app->mainCamera.lastY - ypos; // reversed since y-coordinates range from bottom to top
+    app->mainCamera.lastX = xpos;
+    app->mainCamera.lastY = ypos;
 
     const float sensitivity = 0.1f;
     xoffset *= sensitivity;
     yoffset *= sensitivity;
 
-    yaw += xoffset;
-    pitch += yoffset;
+    app->mainCamera.yaw += xoffset;
+    app->mainCamera.pitch += yoffset;
 
-    if (pitch > 89.0f)
-        pitch = 89.0f;
-    if (pitch < -89.0f)
-        pitch = -89.0f;
+    if (app->mainCamera.pitch > 89.0f)
+        app->mainCamera.pitch = 89.0f;
+    if (app->mainCamera.pitch < -89.0f)
+        app->mainCamera.pitch = -89.0f;
 
     vec3 forwardDirection = vec3(0.0f);
     // As with wasd movement, left and right are opposite
-    forwardDirection.z = cos(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f);
-    forwardDirection.y = sin(pitch * M_PI / 180.0f);
-    forwardDirection.x = sin(yaw * M_PI / 180.0f) * cos(pitch * M_PI / 180.0f);
+    forwardDirection.z = cos(app->mainCamera.yaw * M_PI / 180.0f) * cos(app->mainCamera.pitch * M_PI / 180.0f);
+    forwardDirection.y = sin(app->mainCamera.pitch * M_PI / 180.0f);
+    forwardDirection.x = sin(app->mainCamera.yaw * M_PI / 180.0f) * cos(app->mainCamera.pitch * M_PI / 180.0f);
 
-    mainCamera.SetForward(forwardDirection);
+    app->mainCamera.SetForward(forwardDirection);
 
     // Reset accumulation
-    frameCount = 0;
-    clearAccumulationBuffer();
-    */
+    app->frameCount = 0;
+    clearAccumulationBuffer(window);
+    
 }
 
 void Application::processInput(GLFWwindow* window)

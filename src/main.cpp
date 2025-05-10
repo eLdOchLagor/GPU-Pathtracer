@@ -3,12 +3,7 @@
 #define MAIN
 #include "VectorUtils4.h"
 
-//float lastX = screenWidth/2.0f, lastY = screenHeight/2.0f;
-float pitch, yaw;
 
-int frameCount = 0;
-float previousTime = 0;
-float deltaTime = 0;
 
 int main() {
     

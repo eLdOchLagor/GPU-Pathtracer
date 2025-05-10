@@ -20,6 +20,9 @@ public:
 		_trueUp = cross(_right, _forward);
 		_imagePlaneHeight = 2 * tan(M_PI* _fov/180.0f / 2.0f);
 		_imagePlaneWidth = _imagePlaneHeight * _aspectRatio;
+
+		lastX = width / 2.0f;
+	    lastY = height / 2.0f;
 	};
 
 	vec3 GetPosition() { return position; }
@@ -53,11 +56,14 @@ public:
 
 	vec3 position;
 
+	// Mouse movement
+	float lastX, lastY;
+	float pitch, yaw;
+
 private:
 	vec3 _forward;
 	vec3 _trueUp;
 	vec3 _right;
-
 
 
 	float _fov;

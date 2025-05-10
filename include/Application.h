@@ -7,7 +7,6 @@
 #include "Scene.h"
 #include "Shader.h"
 #include "Camera.h"
-#include <VectorUtils4.h>
 
 class Application
 {

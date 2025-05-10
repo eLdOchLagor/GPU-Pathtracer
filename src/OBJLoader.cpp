@@ -1,7 +1,8 @@
-#include "OBJLoader.h"
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include "OBJLoader.h"
 
 bool OBJLoader::loadOBJ(const std::string& path, std::vector<vec3>& out_vertices, std::vector<vec2>& out_uvs, std::vector<vec3>& out_normals)
 {

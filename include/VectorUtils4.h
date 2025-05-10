@@ -106,7 +106,7 @@
 	#if defined(_WIN32)
 		
 	#endif
-	#include <GL/gl.h>
+	#include <glad/glad.h>
 #endif
 #include <math.h>
 #include <stdio.h>

@@ -52,7 +52,7 @@ bool OBJLoader::loadOBJ(const std::string& path, std::vector<vec3>& out_vertices
         }
     }
 
-	// Use the indecies to correctly construct the final vertex, uv, and normal vectors
+	// Use the indices to correctly construct the final vertex, uv, and normal vectors
     for (size_t i = 0; i < vertexIndices.size(); i++) {
         out_vertices.push_back(temp_vertices[vertexIndices[i] - 1]);
         out_uvs.push_back(temp_uvs[uvIndices[i] - 1]);

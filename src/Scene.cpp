@@ -7,8 +7,10 @@ Scene::Scene(int presetID) {
         break;
     case 1:
         getSpheres();
+        break;
     case 2:
 		CreateSceneFromModel("..\\models\\tetrahedron.obj");
+        break;
     default:
         break;
     }

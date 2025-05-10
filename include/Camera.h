@@ -56,7 +56,8 @@ public:
 
 	// Mouse movement
 	float lastX, lastY;
-	float pitch, yaw;
+	float pitch = 0.0f;
+	float yaw = 0.0f;
 
 private:
 	vec3 _forward;

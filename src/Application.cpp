@@ -5,7 +5,7 @@ Application::Application(int width, int height, const std::string& title) {
 	screenHeight = height;
 	window = createWindow(title);
     mainCamera = Camera(vec3(0.0f, 0.0f, -1.0f), vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f), 80.0f, screenWidth, screenHeight);
-	roomScene = Scene{ 0 };
+	roomScene = Scene{ 2 };
 
 	Init();
 }

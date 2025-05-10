@@ -2,8 +2,6 @@
 
 #include "VectorUtils4.h"
 
-
-
 class Camera
 {
 public:

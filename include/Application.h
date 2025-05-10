@@ -1,14 +1,13 @@
 #pragma once
 
-
 #include <iostream>
 #include <string>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <VectorUtils4.h>
 #include "Scene.h"
 #include "Shader.h"
 #include "Camera.h"
+#include <VectorUtils4.h>
 
 class Application
 {

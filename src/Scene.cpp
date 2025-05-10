@@ -7,8 +7,36 @@ Scene::Scene(int presetID) {
         break;
     case 1:
         getSpheres();
+    case 2:
+		CreateSceneFromModel("..\\models\\tetrahedron.obj");
     default:
         break;
+    }
+}
+
+void Scene::CreateSceneFromModel(const std::string& path) {
+	std::vector<vec3> vertices;
+	std::vector<vec2> uvs;
+	std::vector<vec3> normals;
+
+	// Load the OBJ file
+	OBJLoader::loadOBJ(path, vertices, uvs, normals);
+
+    primitives.resize(vertices.size()/3);
+
+    size_t primIdx = 0;
+    for (size_t i = 0; i < vertices.size(); i+=3)
+    {
+		primitives[primIdx].vertex1 = vertices[i];
+		primitives[primIdx].vertex2 = vertices[i + 1];
+		primitives[primIdx].vertex3 = vertices[i + 2];
+		primitives[primIdx].normal = normals[i];
+		primitives[primIdx].color = vec3(79, 163, 146) / 255.0f; // Arbitrary color
+        primitives[primIdx].ID = 0;
+        primitives[primIdx].bounceOdds = 1.0f;
+        primitives[primIdx].padding = 'L';
+
+		primIdx++;
     }
 }
 

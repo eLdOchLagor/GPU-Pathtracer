@@ -2,6 +2,10 @@
 
 #define M_PI 3.1415926535897932384626433832795
 
+#define DIFFUSE 0
+#define MIRROR 1
+#define TRANSMISSIVE 2
+
 struct Ray{
 	vec3 direction;
 	vec3 startPoint;
@@ -29,6 +33,8 @@ struct Primitive{
 	vec3 normal;
 	int ID; // 0 == Triangle, 1 == Sphere
 	float bounceOdds; //Odds that the ray would bounce off of the surface.
+	int materialType;
+	float ior;
 };
 
 layout(std430, binding = 0) buffer PrimitiveBuffer{
@@ -161,11 +167,11 @@ bool isInShadow(vec3 startPoint, vec3 y){
 	float distance = length(y - startPoint);
 
 	for(int i = 0; i < primitives.length(); i++){
-		/*
-		if (primitives[i] == originSurface){ // Skip if it is the originSurface or if object is transparent
+		
+		if (primitives[i].ID == 1 &&  primitives[i].materialType == 2){ // Skip if it hits a transmissive sphere (Special case)
 			continue;
 		}
-		*/
+		
 		float t = -1.0;
 
 		if(primitives[i].ID == 0){
@@ -200,6 +206,11 @@ vec2 intersectionTest(Ray currentRay){
 	}
 
 	return vec2(closestDistance, closestIndex);
+}
+
+float fresnelSchlick(float cosTheta, float ior) {
+	float r0 = pow((1.0 - ior) / (1.0 + ior), 2.0);
+	return r0 + (1.0 - r0) * pow(1.0 - cosTheta, 5.0);
 }
 
 vec3 calculateDirectIllumination(vec3 dir, vec3 hitPoint, vec3 normal, vec3 surfaceColor){
@@ -283,14 +294,14 @@ vec3 raytrace(Ray ray) {
 			: hitSurface.normal;
 
 		// Mirror surface
-		if (hitSurface.bounceOdds == 0.0) {
+		if (hitSurface.materialType == MIRROR) {
 			ray.direction = normalize(reflect(ray.direction, normal));
 			ray.startPoint = ray.endPoint;
 			continue;
 		}
 
 		// Diffuse surface
-		if (hitSurface.bounceOdds == 1.0) {
+		if (hitSurface.materialType == DIFFUSE) {
 			vec3 directIllumination = calculateDirectIllumination(
 				ray.direction, ray.endPoint, normal, hitSurface.color
 			);
@@ -312,6 +323,46 @@ vec3 raytrace(Ray ray) {
 				break;
 			}
 		}
+
+		// Transmissive surface
+		if (hitSurface.materialType == TRANSMISSIVE) {
+			float ior = hitSurface.ior;
+
+			// Calculate normal if sphere
+			vec3 hitPoint = ray.endPoint;
+			vec3 normal = (hitSurface.ID == 1) ? normalize(hitPoint - hitSurface.vertex1) : hitSurface.normal;
+
+			float cosTheta = clamp(dot(-ray.direction, normal), 0.0, 1.0);
+			float eta = 1.0 / ior;
+			bool entering = dot(ray.direction, normal) < 0.0;
+	
+			if (!entering) {
+				normal = -normal;
+				eta = ior;
+			}
+
+			float fresnel = fresnelSchlick(cosTheta, ior);
+
+			if (RandomFloat(seed) < fresnel) {
+				// Reflect
+				ray.direction = reflect(ray.direction, normal);
+			}
+			else{
+				// Refract
+				vec3 refracted = refract(ray.direction, normal, eta);
+				if (length(refracted) == 0.0){
+					// Total internal reflection
+					ray.direction = reflect(ray.direction, normal);
+				}
+				else {
+					ray.direction = refracted;
+				}
+
+			}
+
+			ray.startPoint = ray.endPoint + 0.001 * ray.direction;
+			importance *= hitSurface.color;
+		}
 	}
 
 	return accumulatedColor;
@@ -325,7 +376,7 @@ void main() {
 
 	vec3 accumulatedColor = vec3(0.0);
 
-	for(int q = 0; q < samples; q++)
+	for(int i = 0; i < samples; i++)
 	{
 		Ray ray = generateCameraRay(pixelCoord);
 		accumulatedColor += raytrace(ray);

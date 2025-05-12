@@ -17,7 +17,8 @@ struct Primitive {
     alignas(16) vec3 normal;
     alignas(4) int ID; // 0 == Triangle, 1 == Sphere
     alignas(4) float bounceOdds; //Odds that the ray would bounce off of the surface.
-    alignas(8) char padding;
+    alignas(4) int materialType; // 0 = diffuse, 1 = mirror, 2 = glass
+	alignas(4) float ior; // Index of refraction
 };
 
 class Scene

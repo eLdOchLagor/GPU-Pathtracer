@@ -380,7 +380,7 @@ void Scene::getRoom() {
     primitives[i].ID = 1;
     primitives[i].bounceOdds = 1.0f;
     primitives[i].materialType = 2;
-    primitives[i].ior = 1.0f;
+    primitives[i].ior = 1.5f;
 
     i++;
 

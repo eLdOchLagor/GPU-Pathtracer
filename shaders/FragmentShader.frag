@@ -32,7 +32,7 @@ struct Primitive{
 };
 
 layout(std430, binding = 0) buffer PrimitiveBuffer{
-	Primitive primitives[348];
+	Primitive primitives[];
 };
 
 int maxBounces = 5;
@@ -52,6 +52,7 @@ uniform float imagePlaneHeight;
 
 uniform int screenWidth;
 uniform int screenHeight;
+
 
 in vec3 pos;
 
@@ -198,14 +199,6 @@ vec2 intersectionTest(Ray currentRay){
 		}
 	}
 
-	// If hit object is sphere, calculate and assign normal
-	/*if (primitives[closestIndex].ID == 1 && closestDistance > 0.0) {
-		vec3 t = currentRay.startPoint + closestDistance * currentRay.direction;
-		vec3 normal = normalize(t - primitives[closestIndex].vertex1);
-
-		primitives[closestIndex].normal = normal;
-	}*/
-
 	return vec2(closestDistance, closestIndex);
 }
 
@@ -238,13 +231,6 @@ vec3 calculateDirectIllumination(vec3 dir, vec3 hitPoint, vec3 normal, vec3 surf
 	return radiance;
 }
 
-Ray perfectReflection(Ray r, Primitive hitSurface) {
-	vec3 d_o = normalize(r.direction) - 2.0 * dot(normalize(r.direction), hitSurface.normal) * hitSurface.normal;
-	vec3 startPoint = r.endPoint;
-	Ray newRay = Ray(d_o, startPoint, vec3(0.0));
-
-	return newRay;
-}
 
 Ray diffuseReflection(Ray r, Primitive hitSurface, float randAz, float randInc) {
 	float x = cos(randAz) * sin(randInc);
@@ -265,63 +251,54 @@ Ray diffuseReflection(Ray r, Primitive hitSurface, float randAz, float randInc) 
 	return newRay;
 }
 
-void main() {
-    vec4 coord = gl_FragCoord;
+Ray generateCameraRay(ivec2 pixelCoord){
+	float jitterX = RandomFloat(seed) - 0.5;
+	float jitterY = RandomFloat(seed) - 0.5;
 
-	seed = uint(coord.y * screenWidth + coord.x) ^ (frameCount * 1664525u);
-	vec3 accumulatedColor = vec3(0.0); // Final accumulated light
-    // Coordinates in imagePlane
-    
-	vec2 texCoords = gl_FragCoord.xy / vec2(textureSize(accumTexture, 0));
-	vec3 prevColor = texture(accumTexture, texCoords).rgb;
+	float u = -((pixelCoord.x + jitterX) / float(screenWidth) * imagePlaneWidth - imagePlaneWidth / 2.0);
+	float v = ((pixelCoord.y + jitterY) / float(screenHeight) - 1.0) * imagePlaneHeight + imagePlaneHeight / 2.0;
 
-	for(int q = 0; q < samples; q++){
-	float randomNumberx = RandomFloat(seed) - 0.5;
-	float randomNumbery = RandomFloat(seed) - 0.5;
-	float u = -((coord.x+randomNumberx) / screenWidth * imagePlaneWidth - imagePlaneWidth/2.0);
-    float v = ((coord.y+randomNumbery) / screenHeight - 1.0) * imagePlaneHeight + imagePlaneHeight/2.0;
-    vec3 direction = normalize(forward + u  * right + v * up);
+	vec3 direction = normalize(forward + u * right + v * up);
+	return Ray(direction, cameraPosition, vec3(0.0));
+}
 
-	// Initial ray initialization
-	Ray ray = Ray(direction, cameraPosition, vec3(0));
+vec3 raytrace(Ray ray) {
+	vec3 accumulatedColor = vec3(0.0);
+	vec3 importance = vec3(1.0); // Keeps track of ray contribution
 
-	
-    vec3 importance = vec3(1.0);      // Keeps track of ray contribution
-
-	for (int i = 0; i < maxBounces; i++){
+	for (int i = 0; i < maxBounces; i++) {
 		vec2 hit = intersectionTest(ray);
-		
-		if(hit.x < 0.0) { // If no object is hit
+
+		if (hit.x < 0.0) {
 			accumulatedColor += importance * vec3(0.2, 0.2, 0.2); // Background color
 			break;
 		}
 
-		vec3 endPoint = ray.startPoint + hit.x * ray.direction;
-		ray.endPoint = endPoint;
-
+		ray.endPoint = ray.startPoint + hit.x * ray.direction;
 		Primitive hitSurface = primitives[int(hit.y)];
 
-		if (hitSurface.bounceOdds == 0.0) { // If mirror
-			ray = perfectReflection(ray, hitSurface);
+		// Compute surface normal
+		vec3 normal = (hitSurface.ID == 1)
+			? normalize(ray.startPoint - hitSurface.vertex1) // Sphere normal
+			: hitSurface.normal;
+
+		// Mirror surface
+		if (hitSurface.bounceOdds == 0.0) {
+			ray.direction = normalize(reflect(ray.direction, normal));
+			ray.startPoint = ray.endPoint;
 			continue;
 		}
 
-		else if (hitSurface.bounceOdds == 1.0) { // Add check if (surface is diffuse)
-			//if sphere, get normal.
-			vec3 directIllumination = vec3(0);
-			if(hitSurface.ID == 1){
+		// Diffuse surface
+		if (hitSurface.bounceOdds == 1.0) {
+			vec3 directIllumination = calculateDirectIllumination(
+				ray.direction, ray.endPoint, normal, hitSurface.color
+			);
 
-				vec3 sphereNormal = normalize(ray.startPoint - hitSurface.vertex1);
-				directIllumination = calculateDirectIllumination(ray.direction, endPoint, sphereNormal, hitSurface.color);
-			}
-			//else do as normal.
-			else{
-				directIllumination = calculateDirectIllumination(ray.direction, endPoint, hitSurface.normal, hitSurface.color);
-			}
 			accumulatedColor += importance * directIllumination;
-			
 			importance *= hitSurface.color;
 
+			// Russian roulette
 			float randomValue1 = RandomFloat(seed);
 			float randomValue2 = RandomFloat(seed);
 
@@ -329,18 +306,33 @@ void main() {
 			float randAzimuth = 2.0 * M_PI * randomValue2;
 			float rr = randAzimuth / hitSurface.bounceOdds;
 
-			if (rr <= 2 * M_PI && i != maxBounces - 1) { // Russian roulette determines to reflect
+			if (rr <= 2.0 * M_PI && i != maxBounces - 1) {
 				ray = diffuseReflection(ray, hitSurface, randAzimuth, randInclination);
-			}
-			else { // Terminate ray path
+			} else {
 				break;
 			}
 		}
-
 	}
+
+	return accumulatedColor;
+}
+
+void main() {
+    ivec2 pixelCoord = ivec2(gl_FragCoord.xy);
+	seed = uint(pixelCoord.y * screenWidth + pixelCoord.x) ^ (frameCount * 1664525u);
+	vec2 texCoords = gl_FragCoord.xy / vec2(textureSize(accumTexture, 0));
+	vec3 prevColor = texture(accumTexture, texCoords).rgb;
+
+	vec3 accumulatedColor = vec3(0.0);
+
+	for(int q = 0; q < samples; q++)
+	{
+		Ray ray = generateCameraRay(pixelCoord);
+		accumulatedColor += raytrace(ray);
 	}
 	
 	accumulatedColor /= samples;
+
 	// Output final color
 	vec3 ac = (prevColor * float(frameCount) + accumulatedColor) / float(frameCount + 1); // Blend with previous color
     FragColor = vec4(ac, 1.0);

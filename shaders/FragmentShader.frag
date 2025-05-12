@@ -332,7 +332,7 @@ vec3 raytrace(Ray ray) {
 			vec3 hitPoint = ray.endPoint;
 			vec3 normal = (hitSurface.ID == 1) ? normalize(hitPoint - hitSurface.vertex1) : hitSurface.normal;
 
-			float cosTheta = clamp(dot(-ray.direction, normal), 0.0, 1.0);
+			
 			float eta = 1.0 / ior;
 			bool entering = dot(ray.direction, normal) < 0.0;
 	
@@ -340,6 +340,8 @@ vec3 raytrace(Ray ray) {
 				normal = -normal;
 				eta = ior;
 			}
+
+			float cosTheta = clamp(dot(-ray.direction, normal), 0.0, 1.0);
 
 			float fresnel = fresnelSchlick(cosTheta, ior);
 
@@ -351,6 +353,7 @@ vec3 raytrace(Ray ray) {
 				// Refract
 				vec3 refracted = refract(ray.direction, normal, eta);
 				if (length(refracted) == 0.0){
+					
 					// Total internal reflection
 					ray.direction = reflect(ray.direction, normal);
 				}

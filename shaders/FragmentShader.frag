@@ -2,6 +2,17 @@
 
 #define M_PI 3.1415926535897932384626433832795
 
+struct BVHNode {
+	vec3 bBoxMin;
+	int leftChild;
+	vec3 bBoxMax;
+	int rightChild;
+	int startTriangle;
+	int triangleCount;
+	int pad0;
+	int pad1;
+};
+
 struct Ray{
 	vec3 direction;
 	vec3 startPoint;
@@ -32,7 +43,15 @@ struct Primitive{
 };
 
 layout(std430, binding = 0) buffer PrimitiveBuffer{
-	Primitive primitives[348];
+	Primitive primitives[];
+};
+
+layout(std430, binding = 1) buffer BVHNodeBuffer{
+	BVHNode nodes[];
+};
+
+layout(std430, binding = 2) buffer TriangleIndices {
+    int triangleIndices[];
 };
 
 int maxBounces = 5;

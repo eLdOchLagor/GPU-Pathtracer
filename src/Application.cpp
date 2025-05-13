@@ -1,12 +1,11 @@
 #include "Application.h"
 
-Application::Application(int width, int height, const std::string& title) {
+Application::Application(int width, int height, const std::string& title) : bvhTree(Scene{2}.primitives) {
 	screenWidth = width;
 	screenHeight = height;
 	window = createWindow(title);
     mainCamera = Camera(vec3(0.0f, 0.0f, -1.0f), vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f), 80.0f, screenWidth, screenHeight);
 	roomScene = Scene{ 2 };
-
 	Init();
 }
 
@@ -117,6 +116,22 @@ void Application::Init() {
 
     //ubos instead of SSBO since were at an earlier version of opengl // JONATANS EXTRA FINA TESTKOD
     GLuint SSBO_Primitives;
+    GLuint SSBO_BVH;
+    GLuint SSBO_Indices;
+
+    std::vector<BVHNode> gpuNodes;
+    gpuNodes.reserve(bvhTree.getNodes().size());
+    for (const BVHNode& node : bvhTree.getNodes()) {
+        gpuNodes.push_back({
+            node.bBoxMin,
+            node.leftChild,
+            node.bBoxMax,
+            node.rightChild,
+            node.startTriangle,
+            node.triangleCount,
+            0,0
+            });
+    }
 
     // Allocate SSBO for spheres
 
@@ -127,6 +142,16 @@ void Application::Init() {
     glBufferData(GL_SHADER_STORAGE_BUFFER, roomScene.primitives.size() * sizeof(Primitive), roomScene.primitives.data(), GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, SSBO_Primitives);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glGenBuffers(1, &SSBO_BVH);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_BVH);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, gpuNodes.size() * sizeof(BVHNode), gpuNodes.data(), GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, SSBO_BVH);
+
+    glGenBuffers(1, &SSBO_Indices);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Indices);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, bvhTree.getIndices().size() * sizeof(int), bvhTree.getIndices().data(), GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, SSBO_Indices);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
 

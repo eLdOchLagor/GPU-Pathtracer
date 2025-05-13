@@ -7,6 +7,7 @@
 #include "Scene.h"
 #include "Shader.h"
 #include "Camera.h"
+#include "BVHTree.h"
 
 class Application
 {
@@ -43,6 +44,7 @@ private:
 	float deltaTime = 0;
 	int currentTexture;
 	unsigned int VAO;
+	BVHTree bvhTree;
 
 	void Init();
 	GLFWwindow* createWindow(const std::string& title);

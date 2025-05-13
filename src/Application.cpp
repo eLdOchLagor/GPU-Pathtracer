@@ -1,11 +1,11 @@
 #include "Application.h"
 
-Application::Application(int width, int height, const std::string& title) : bvhTree(Scene{2}.primitives) {
+Application::Application(int width, int height, const std::string& title) : bvhTree(Scene{0}.primitives) {
 	screenWidth = width;
 	screenHeight = height;
 	window = createWindow(title);
     mainCamera = Camera(vec3(0.0f, 0.0f, -1.0f), vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f), 80.0f, screenWidth, screenHeight);
-	roomScene = Scene{ 2 };
+	roomScene = Scene{ 0 };
 	Init();
 }
 
@@ -47,9 +47,6 @@ void Application::Init() {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return;
     }
-
-    // Capture mouse
-    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     float verts[] = {
         //bottom left Triangle
@@ -173,6 +170,7 @@ void Application::Init() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
+    glfwSetKeyCallback(window, key_callback);
 
     currentTexture = 0;
     glGenFramebuffers(1, &framebuffer);
@@ -366,6 +364,26 @@ void Application::processInput(GLFWwindow* window)
         app->frameCount = 0;
         clearAccumulationBuffer(window);
     }
+}
+
+void Application::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
+
+    if (key == GLFW_KEY_F && action == GLFW_PRESS) {
+        app->mainCamera.cameraEnabled = !app->mainCamera.cameraEnabled;
+        if (app->mainCamera.cameraEnabled)
+        {
+            //Capture mouse
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        }
+        else
+        {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        }
+        
+    }
+
 }
 
 void Application::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)

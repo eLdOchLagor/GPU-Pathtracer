@@ -27,6 +27,18 @@ inline void expandAABB(AABB& base, const AABB& other) {
 	base.max = max;
 }
 
+inline AABB mergeAABB(const AABB& a, const AABB& b) {
+	AABB result;
+	result.min = vec3::min(a.min, b.min);
+	result.max = vec3::max(a.max, b.max);
+	return result;
+}
+
+inline float surfaceArea(const AABB& aabb) {
+	vec3 extents = aabb.max - aabb.min;
+	return 2.0f * (extents.x * extents.y + extents.x * extents.z + extents.y * extents.z);
+}
+
 inline vec3 centerOfAABB(const AABB& aabb) {
 	return 0.5f * (aabb.min + aabb.max);
 }

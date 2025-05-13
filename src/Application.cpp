@@ -1,11 +1,11 @@
 #include "Application.h"
 
-Application::Application(int width, int height, const std::string& title) : bvhTree(Scene{0}.primitives) {
+Application::Application(int width, int height, const std::string& title) : bvhTree(Scene{3}.primitives) {
 	screenWidth = width;
 	screenHeight = height;
 	window = createWindow(title);
     mainCamera = Camera(vec3(0.0f, 0.0f, -1.0f), vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f), 80.0f, screenWidth, screenHeight);
-	roomScene = Scene{ 0 };
+	roomScene = Scene{ 3 };
 	Init();
 }
 
@@ -195,7 +195,7 @@ void Application::Run() {
         float currentTime = glfwGetTime();
         deltaTime = currentTime - previousTime;
 
-        std::clog << "\rFPS: " << 1 / deltaTime;
+        //std::clog << "\rFPS: " << 1 / deltaTime;
 
 		// Upload uniform variables to shader ---------------------------------------------------------
         uploadUniformVec3ToShader(PathtraceShader, "cameraPosition", mainCamera.GetPosition());

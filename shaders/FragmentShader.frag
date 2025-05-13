@@ -238,7 +238,7 @@ bool intersectAABB(vec3 rayOrigin, vec3 rayDirInv, vec3 minB, vec3 maxB) {
 
 
 int traverseBVHTree(Ray ray) {
-    const int MAX_STACK_SIZE = 1000;
+    const int MAX_STACK_SIZE = 20;
     int stack[MAX_STACK_SIZE];
     int stackPtr = 0;
     stack[stackPtr++] = 0; // Start from root node (index 0)

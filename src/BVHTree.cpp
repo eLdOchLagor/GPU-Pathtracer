@@ -50,14 +50,79 @@ int BVHTree::buildRecursive(int start, int count) {
     //pga att jag frågade chatten om en lösning å dens lösning  innehöll glm::vec3 och glm::max osv, vilket jag behövde jobba
     //runt då den försökta använda vec3[0] för att hämta x elementet, vilket Ingemars vektorer inte har som en funktion.
     //TODO: Använd en bättre heuristic.
-    int splitAxis = longestAxis(bounds);
-    float centroidSum = 0;
-    for (int i = start; i < start + count; i++) {
+    AABB centroidBounds;
+    for (int i = start; i < start + count; ++i) {
         const Primitive& p = primitives[triangleIndices[i]];
-        const vec3 centroid = (p.vertex1 + p.vertex2 + p.vertex3) / 3.0f;
-        centroidSum += centroid[splitAxis];
+        vec3 centroid = (p.vertex1 + p.vertex2 + p.vertex3) / 3.0f;
+        AABB pointBounds;
+        pointBounds.min = centroid;
+        pointBounds.max = centroid;
+        expandAABB(centroidBounds, pointBounds);
     }
-    float centroidMid = centroidSum / count;
+    int splitAxis = longestAxis(centroidBounds);
+
+    constexpr int NUM_BINS = 16;
+    struct Bin {
+        AABB bounds;
+        int count = 0;
+    };
+
+    Bin bins[NUM_BINS];
+
+    float minCentroid = centroidBounds.min[splitAxis];
+    float maxCentroid = centroidBounds.max[splitAxis];
+    float scale = NUM_BINS / (maxCentroid - minCentroid + 1e-5f); // Avoid div-by-zero
+
+    for (int i = start; i < start + count; ++i) {
+        const Primitive& p = primitives[triangleIndices[i]];
+        vec3 centroid = (p.vertex1 + p.vertex2 + p.vertex3) / 3.0f;
+        int binIdx = std::min(NUM_BINS - 1, int((centroid[splitAxis] - minCentroid) * scale));
+        bins[binIdx].bounds = mergeAABB(bins[binIdx].bounds, computeBounds(triangleIndices[i], 1));
+        bins[binIdx].count++;
+    }
+
+    AABB leftBounds[NUM_BINS - 1];
+    int leftCounts[NUM_BINS - 1];
+    AABB rightBounds[NUM_BINS - 1];
+    int rightCounts[NUM_BINS - 1];
+
+    // Left to right
+    AABB curBounds;
+    int curCount = 0;
+    for (int i = 0; i < NUM_BINS - 1; ++i) {
+        curBounds = mergeAABB(curBounds, bins[i].bounds);
+        curCount += bins[i].count;
+        leftBounds[i] = curBounds;
+        leftCounts[i] = curCount;
+    }
+
+    // Right to left
+    curBounds = {};
+    curCount = 0;
+    for (int i = NUM_BINS - 1; i > 0; --i) {
+        curBounds = mergeAABB(curBounds, bins[i].bounds);
+        curCount += bins[i].count;
+        rightBounds[i - 1] = curBounds;
+        rightCounts[i - 1] = curCount;
+    }
+
+    float bestCost = std::numeric_limits<float>::max();
+    int bestSplit = -1;
+    float parentArea = surfaceArea(bounds);
+
+    for (int i = 0; i < NUM_BINS - 1; ++i) {
+        float cost = 1.0f + (
+            leftCounts[i] * surfaceArea(leftBounds[i]) +
+            rightCounts[i] * surfaceArea(rightBounds[i])
+            ) / parentArea;
+
+        if (cost < bestCost) {
+            bestCost = cost;
+            bestSplit = i;
+        }
+    }
+
+    float splitPos = minCentroid + (bestSplit + 1) / float(NUM_BINS) * (maxCentroid - minCentroid);
 
     auto midIter = std::partition(
         triangleIndices.begin() + start,
@@ -65,13 +130,12 @@ int BVHTree::buildRecursive(int start, int count) {
         [&](int idx) {
             const Primitive& p = primitives[idx];
             vec3 centroid = (p.vertex1 + p.vertex2 + p.vertex3) / 3.0f;
-            return centroid[splitAxis] < centroidMid;  
+            return centroid[splitAxis] < splitPos;
         }
     );
 
     int mid = midIter - triangleIndices.begin();
 
-    //Edge case för en lövnod, om vi inte gör detta kan vi hamna i en inf loop.
     if (mid == start || mid == start + count) {
         nodes[nodeIndex].startTriangle = start;
         nodes[nodeIndex].triangleCount = count;
@@ -79,6 +143,7 @@ int BVHTree::buildRecursive(int start, int count) {
         nodes[nodeIndex].rightChild = -1;
         return nodeIndex;
     }
+
 
     //Gör recursion med children
     int leftChild = buildRecursive(start, mid - start);

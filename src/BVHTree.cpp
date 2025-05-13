@@ -12,7 +12,6 @@ BVHTree::BVHTree(const std::vector<Primitive>& primitives) : primitives(primitiv
         buildRecursive(0, primitives.size()); //startar byggandet av trädet.
         //std::cout << this->nodes.size(); //Bara för debugging
 		//traverseTree(); //Traversera trädet för att se att det är korrekt byggt.
-        std::cout << "JAG ÄR FÄÄÄÄRDIG";
 }
 
 //Beräknar AABB för trianglarna från och med start till start + count.
@@ -56,9 +55,7 @@ int BVHTree::buildRecursive(int start, int count) {
     for (int i = start; i < start + count; i++) {
         const Primitive& p = primitives[triangleIndices[i]];
         const vec3 centroid = (p.vertex1 + p.vertex2 + p.vertex3) / 3.0f;
-        if (splitAxis == 0) { centroidSum += centroid.x; }
-        else if (splitAxis == 1) { centroidSum += centroid.y; }
-        else if (splitAxis == 2) { centroidSum += centroid.z; }
+        centroidSum += centroid[splitAxis];
     }
     float centroidMid = centroidSum / count;
 
@@ -68,10 +65,7 @@ int BVHTree::buildRecursive(int start, int count) {
         [&](int idx) {
             const Primitive& p = primitives[idx];
             vec3 centroid = (p.vertex1 + p.vertex2 + p.vertex3) / 3.0f;
-            if (splitAxis == 0) { return centroid.x < centroidMid; }
-            else if (splitAxis == 1) { return centroid.y < centroidMid; }
-            else if (splitAxis == 2) { return centroid.z < centroidMid; }
-            
+            centroid[splitAxis] < centroidMid;  
         }
     );
 

@@ -5,21 +5,14 @@
 #include "VectorUtils4.h"
 #include <algorithm>
 
-//Om vi hade glm skulle dessa funktioner vara typ 3 rader långa :)
+
 inline AABB computeAABB(const Primitive& tri) {
 	AABB aabb;
-	float minx, miny, minz, maxx, maxy, maxz;
+	vec3 max = vec3::max(vec3::max(tri.vertex1, tri.vertex2), tri.vertex3);
+	vec3 min = vec3::min(vec3::min(tri.vertex1, tri.vertex2), tri.vertex3);
 
-	minx = fmin(fmin(tri.vertex1.x, tri.vertex2.x), tri.vertex3.x);
-	miny = fmin(fmin(tri.vertex1.y, tri.vertex2.y), tri.vertex3.y);
-	minz = fmin(fmin(tri.vertex1.z, tri.vertex2.z), tri.vertex3.z);
-
-	maxx = fmax(fmax(tri.vertex1.x, tri.vertex2.x), tri.vertex3.x);
-	maxy = fmax(fmax(tri.vertex1.y, tri.vertex2.y), tri.vertex3.y);
-	maxz = fmax(fmax(tri.vertex1.z, tri.vertex2.z), tri.vertex3.z);
-
-	aabb.min = vec3(minx, miny, minz);
-	aabb.max = vec3(maxx, maxy, maxz);
+	aabb.min = min;
+	aabb.max = max;
 
 	return aabb;
 }
@@ -27,16 +20,11 @@ inline AABB computeAABB(const Primitive& tri) {
 inline void expandAABB(AABB& base, const AABB& other) {
 	float minx, miny, minz, maxx, maxy, maxz;
 
-	minx = fmin(base.min.x, other.min.x);
-	miny = fmin(base.min.y, other.min.y);
-	minz = fmin(base.min.z, other.min.z);
+	vec3 max = vec3::max(base.max, other.max);
+	vec3 min = vec3::min(base.min, other.min);
 
-	maxx = fmax(base.max.x, other.max.x);
-	maxy = fmax(base.max.y, other.max.y);
-	maxz = fmax(base.max.z, other.max.z);
-
-	base.min = vec3(minx, miny, minz);
-	base.max = vec3(maxx, maxy, maxz);
+	base.min = min;
+	base.max = max;
 }
 
 inline vec3 centerOfAABB(const AABB& aabb) {

@@ -35,6 +35,8 @@ void Scene::CreateSceneFromModel(const std::string& path) {
 		primitives[primIdx].vertex1 = vertices[i];
 		primitives[primIdx].vertex2 = vertices[i + 1];
 		primitives[primIdx].vertex3 = vertices[i + 2];
+        primitives[primIdx].edge1 = primitives[primIdx].vertex2 - primitives[primIdx].vertex1;
+        primitives[primIdx].edge2 = primitives[primIdx].vertex3 - primitives[primIdx].vertex1;
 		primitives[primIdx].normal = normals[i];
 		primitives[primIdx].color = vec3(255, 100, 100) / 255.0f; // Arbitrary color
         primitives[primIdx].ID = 0;
@@ -60,6 +62,8 @@ void Scene::getSpheres() {
     primitives[i].vertex1 = vec3(-10.0f, -5.0f, 10.0f);
     primitives[i].vertex2 = vec3(-10.0f, -5.0f, -10.0f);
     primitives[i].vertex3 = vec3(10.0f, -5.0f, -10.0f);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
     primitives[i].ID = 0;
@@ -72,6 +76,8 @@ void Scene::getSpheres() {
     primitives[i].vertex1 = vec3(10.0f, -5.0f, -10.0f);
     primitives[i].vertex2 = vec3(10.0f, -5.0f, 10.0f);
     primitives[i].vertex3 = vec3(-10.0f, -5.0f, 10.0f);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
     primitives[i].ID = 0;
@@ -84,6 +90,8 @@ void Scene::getSpheres() {
     primitives[i].vertex1 = vec3(0.0f, -4.0f, 4.0f);
     primitives[i].vertex2 = vec3(1.0f, -5.0f, 10.0f);
     primitives[i].vertex3 = vec3(-10.0f, -5.0f, 10.0f);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
     primitives[i].ID = 1;
@@ -96,6 +104,8 @@ void Scene::getSpheres() {
     primitives[i].vertex1 = vec3(3.0f, -4.0f, 7.0f);
     primitives[i].vertex2 = vec3(0.75f, -5.0f, 10.0f);
     primitives[i].vertex3 = vec3(-10.0f, -5.0f, 10.0f);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
     primitives[i].ID = 1;
@@ -107,6 +117,8 @@ void Scene::getSpheres() {
     primitives[i].vertex1 = vec3(-6.0f, -2.0f, 10.0f);
     primitives[i].vertex2 = vec3(3.0f, -5.0f, 10.0f);
     primitives[i].vertex3 = vec3(-10.0f, -5.0f, 10.0f);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
     primitives[i].ID = 1;
@@ -126,6 +138,7 @@ void Scene::getRoom() {
 
     vec3 e1 = vec3(0.0f);
     vec3 e2 = vec3(0.0f);
+    //vec3 e3 = vec3(0.0f);
     int i = 0;
     //floor
         //triangle front
@@ -133,6 +146,8 @@ void Scene::getRoom() {
     primitives[i].vertex1 = vec3(0.0f, -5.0f, -3.0f);
     primitives[i].vertex2 = vec3(6.0f, -5.0f, 0.0f);
     primitives[i].vertex3 = vec3(-6.0f, -5.0f, 0.0f);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
     primitives[i].ID = 0;
@@ -144,6 +159,8 @@ void Scene::getRoom() {
     primitives[i].vertex1 = vec3(6.0f, -5.0f, 0.0f);
     primitives[i].vertex2 = vec3(6.0f, -5.0f, 10.0f);
     primitives[i].vertex3 = vec3(-6.0f, -5.0f, 10.0f);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
     primitives[i].ID = 0;
@@ -155,6 +172,8 @@ void Scene::getRoom() {
     primitives[i].vertex1 = vec3(6.0f, -5.0f, 0.0f);
     primitives[i].vertex2 = vec3(-6.0f, -5.0f, 10.0f);
     primitives[i].vertex3 = vec3(-6.0f, -5.0f, 0.0f);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
     primitives[i].ID = 0;
@@ -165,6 +184,8 @@ void Scene::getRoom() {
     //triangle back
     primitives[i].vertex1 = vec3(0.0f, -5.0f, 13.0f);
     primitives[i].vertex2 = vec3(-6.0f, -5.0f, 10.0f);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].vertex3 = vec3(6.0f, -5.0f, 10.0f);
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
@@ -180,6 +201,8 @@ void Scene::getRoom() {
     primitives[i].vertex3 = vec3(0.0f, 5.0f, 13.0f);
     e1 = primitives[i].vertex2 - primitives[i].vertex1;
     e2 = primitives[i].vertex3 - primitives[i].vertex2;
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(normalize(cross(e2, e1)));
     primitives[i].color = vec3(224, 204, 177) / 255.0f;
     primitives[i].ID = 0;
@@ -193,6 +216,8 @@ void Scene::getRoom() {
     primitives[i].vertex3 = vec3(-6.0f, 5.0f, 10.0f);
     e1 = primitives[i].vertex2 - primitives[i].vertex1;
     e2 = primitives[i].vertex3 - primitives[i].vertex2;
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(normalize(cross(e2, e1)));
     primitives[i].color = vec3(224, 204, 177) / 255.0f;
     primitives[i].ID = 0;
@@ -207,6 +232,8 @@ void Scene::getRoom() {
     primitives[i].vertex3 = vec3(0.0f, -5.0f, 13.0f);
     e1 = primitives[i].vertex2 - primitives[i].vertex1;
     e2 = primitives[i].vertex3 - primitives[i].vertex2;
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(normalize(cross(e2, e1)));
     primitives[i].color = vec3(224, 204, 177) / 255.0f;
     primitives[i].ID = 0;
@@ -220,6 +247,8 @@ void Scene::getRoom() {
     primitives[i].vertex3 = vec3(0.0f, 5.0f, 13.0f);
     e1 = primitives[i].vertex2 - primitives[i].vertex1;
     e2 = primitives[i].vertex3 - primitives[i].vertex2;
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(normalize(cross(e2, e1)));
     primitives[i].color = vec3(224, 204, 177) / 255.0f;
     primitives[i].ID = 0;
@@ -232,6 +261,8 @@ void Scene::getRoom() {
     primitives[i].vertex1 = vec3(6.0f, -5.0f, 0.0f);
     primitives[i].vertex2 = vec3(6.0f, 5.0f, 0.0f);
     primitives[i].vertex3 = vec3(6.0f, -5.0f, 10.0f);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(-1.0f, 0.0f, 0.0f);
     primitives[i].color = vec3(86, 77, 120) / 255.0f;
     primitives[i].ID = 0;
@@ -243,6 +274,8 @@ void Scene::getRoom() {
     primitives[i].vertex1 = vec3(6.0f, -5.0f, 10.0f);
     primitives[i].vertex2 = vec3(6.0f, 5.0f, 0.0f);
     primitives[i].vertex3 = vec3(6.0f, 5.0f, 10.0f);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(-1.0f, 0.0f, 0.0f);
     primitives[i].color = vec3(86, 77, 120) / 255.0f;
     primitives[i].ID = 0;
@@ -256,6 +289,8 @@ void Scene::getRoom() {
     primitives[i].vertex1 = vec3(-6.0f, -5.0f, 0.0f);
     primitives[i].vertex2 = vec3(-6.0f, -5.0f, 10.0f);
     primitives[i].vertex3 = vec3(-6.0f, 5.0f, 0.0f);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(1.0f, 0.0f, 0.0f);
     primitives[i].color = vec3(15, 173, 207) / 255.0f;
     primitives[i].ID = 0;
@@ -267,6 +302,8 @@ void Scene::getRoom() {
     primitives[i].vertex1 = vec3(-6.0f, -5.0f, 10.0f);
     primitives[i].vertex2 = vec3(-6.0f, 5.0f, 10.0f);
     primitives[i].vertex3 = vec3(-6.0f, 5.0f, 0.0f);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(1.0f, 0.0f, 0.0f);
     primitives[i].color = vec3(15, 173, 207) / 255.0f;
     primitives[i].ID = 0;
@@ -281,6 +318,8 @@ void Scene::getRoom() {
     primitives[i].vertex3 = vec3(0.0f, 5.0f, -3.0f);
     e1 = primitives[i].vertex2 - primitives[i].vertex1;
     e2 = primitives[i].vertex3 - primitives[i].vertex2;
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(normalize(cross(e2, e1)));
     primitives[i].color = vec3(255, 99, 131) / 255.0f;
     primitives[i].ID = 0;
@@ -292,6 +331,8 @@ void Scene::getRoom() {
     primitives[i].vertex1 = vec3(-6.0f, -5.0f, 0.0f);
     primitives[i].vertex2 = vec3(-6.0f, 5.0f, 0.0f);
     primitives[i].vertex3 = vec3(0.0f, 5.0f, -3.0f);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     e1 = primitives[i].vertex2 - primitives[i].vertex1;
     e2 = primitives[i].vertex3 - primitives[i].vertex2;
     primitives[i].normal = vec3(normalize(cross(e2, e1)));
@@ -306,6 +347,8 @@ void Scene::getRoom() {
     primitives[i].vertex1 = vec3(0.0f, -5.0f, -3.0f);
     primitives[i].vertex2 = vec3(0.0f, 5.0f, -3.0f);
     primitives[i].vertex3 = vec3(6.0f, -5.0f, 0.0f);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     e1 = primitives[i].vertex2 - primitives[i].vertex1;
     e2 = primitives[i].vertex3 - primitives[i].vertex2;
     primitives[i].normal = vec3(normalize(cross(e2, e1)));
@@ -319,8 +362,12 @@ void Scene::getRoom() {
     primitives[i].vertex1 = vec3(6.0f, -5.0f, 0.0f);
     primitives[i].vertex2 = vec3(0.0f, 5.0f, -3.0f);
     primitives[i].vertex3 = vec3(6.0f, 5.0f, 0.0f);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     e1 = primitives[i].vertex2 - primitives[i].vertex1;
     e2 = primitives[i].vertex3 - primitives[i].vertex2;
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(normalize(cross(e2, e1)));
     primitives[i].color = vec3(255, 99, 131) / 255.0f;
     primitives[i].ID = 0;
@@ -333,6 +380,8 @@ void Scene::getRoom() {
     primitives[i].vertex1 = vec3(0.0f, 5.0f, -3.0f);
     primitives[i].vertex2 = vec3(-6.0f, 5.0f, 0.0f);
     primitives[i].vertex3 = vec3(6.0f, 5.0f, 0.0f);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(0.0f, -1.0f, 0.0f);
     primitives[i].color = vec3(243, 186, 42) / 255.0f;
     primitives[i].ID = 0;
@@ -344,6 +393,8 @@ void Scene::getRoom() {
     primitives[i].vertex1 = vec3(6.0f, 5.0f, 0.0f);
     primitives[i].vertex2 = vec3(-6.0f, 5.0f, 10.0f);
     primitives[i].vertex3 = vec3(6.0f, 5.0f, 10.0f);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(0.0f, -1.0f, 0.0f);
     primitives[i].color = vec3(243, 186, 42) / 255.0f;
     primitives[i].ID = 0;
@@ -355,6 +406,8 @@ void Scene::getRoom() {
     primitives[i].vertex1 = vec3(6.0f, 5.0f, 0.0f);
     primitives[i].vertex2 = vec3(-6.0f, 5.0f, 0.0f);
     primitives[i].vertex3 = vec3(-6.0f, 5.0f, 10.0f);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(0.0f, -1.0f, 0.0f);
     primitives[i].color = vec3(243, 186, 42) / 255.0f;
     primitives[i].ID = 0;
@@ -366,6 +419,8 @@ void Scene::getRoom() {
     primitives[i].vertex1 = vec3(-6.0f, 5.0f, 10.0f);
     primitives[i].vertex2 = vec3(0.0f, 5.0f, 13.0f);
     primitives[i].vertex3 = vec3(6.0f, 5.0f, 10.0f);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(0.0f, -1.0f, 0.0f);
     primitives[i].color = vec3(243, 186, 42) / 255.0f;
     primitives[i].ID = 0;

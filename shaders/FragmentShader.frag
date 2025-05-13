@@ -41,6 +41,8 @@ struct Primitive{
 	vec3 vertex3;
 	vec3 color;
 	vec3 normal;
+	vec3 edge1;
+    vec3 edge2;
 	int ID; // 0 == Triangle, 1 == Sphere
 	float bounceOdds; //Odds that the ray would bounce off of the surface.
 	int materialType;
@@ -92,6 +94,8 @@ struct Light
 };
 
 Light AreaLight = Light(vec3(-2, 4.99, 8), vec3(2, 4.99, 8), vec3(2, 4.99, 11), vec3(-2, 4.99, 11), vec3(0.0, -1.0, 0.0), vec3(10.0, 10.0, 10.0));
+vec3 lightE1 = AreaLight.vertex2 - AreaLight.vertex1;
+vec3 lightE2 = AreaLight.vertex4 - AreaLight.vertex1;
 // --------------------------------------------------------------------------------------------------
 
 // Random number generator --------------------------------------------------------------------------
@@ -122,8 +126,8 @@ float triangleIntersectionTest(Ray currentRay, Primitive targetTriangle) {
 		if (dot(d, targetTriangle.normal) < 0.0)
 		{
 			
-			vec3 c1 = targetTriangle.vertex2 - targetTriangle.vertex1;
-			vec3 c2 = targetTriangle.vertex3 - targetTriangle.vertex1;
+			vec3 c1 = targetTriangle.edge1;
+			vec3 c2 = targetTriangle.edge2;
 
 			vec3 P = cross(d, c2);
 			float det = dot(c1, P);
@@ -237,12 +241,12 @@ bool intersectAABB(vec3 rayOrigin, vec3 rayDirInv, vec3 minB, vec3 maxB) {
 }
 
 
-int traverseBVHTree(Ray ray) {
+int traverseBVHTree(Ray ray, vec3 rayDirInv) {
     int nodeIndex = 0;
     float closestT = -1.0;
     int closestPrimIdx = -1;
 
-    vec3 rayDirInv = 1.0 / ray.direction;
+    
 
     while (nodeIndex != -1) {
        
@@ -291,8 +295,8 @@ float fresnelSchlick(float cosTheta, float ior) {
 vec3 calculateDirectIllumination(vec3 dir, vec3 hitPoint, vec3 normal, vec3 surfaceColor){
 	vec3 radiance = vec3(0.0, 0.0, 0.0);
 
-	vec3 e1 = AreaLight.vertex2 - AreaLight.vertex1;
-	vec3 e2 = AreaLight.vertex4 - AreaLight.vertex1;
+	vec3 e1 = lightE1;
+	vec3 e2 = lightE2;
 
 	float s = RandomFloat(seed);
 	float t = RandomFloat(seed);
@@ -351,9 +355,10 @@ Ray generateCameraRay(ivec2 pixelCoord){
 vec3 raytrace(Ray ray) {
 	vec3 accumulatedColor = vec3(0.0);
 	vec3 importance = vec3(1.0); // Keeps track of ray contribution
-
+	
 	for (int i = 0; i < maxBounces; i++) {
-		int triangleIndex = traverseBVHTree(ray);
+		vec3 rayDirInv = 1.0 / ray.direction;
+		int triangleIndex = traverseBVHTree(ray, rayDirInv);
 		//vec2 hit = intersectionTest(ray);
 
 		if (triangleIndex == -1) {

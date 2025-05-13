@@ -110,6 +110,8 @@
 #endif
 #include <math.h>
 #include <stdio.h>
+#include <cmath>
+#include <algorithm>
 
 
 #ifndef M_PI
@@ -153,6 +155,33 @@
 			vec3(GLfloat x2) : x(x2), y(x2), z(x2) {}
 //			vec3(vec4 v) : x(v.x), y(v.y), z(v.z) {}
 			vec3(vec4 v);
+			GLfloat& operator[](int i) {
+				if (i == 0) return x;
+				else if (i == 1) return y;
+				else if (i == 2) return z;
+			}
+
+			const GLfloat& operator[](int i) const {
+				if (i == 0) return x;
+				else if (i == 1) return y;
+				else if (i == 2) return z;
+				
+			}
+
+			//return a vector with the max of two vectors.
+			static vec3 max(vec3 left, vec3 right) {
+				float maxx = ::fmax(left.x, right.x);
+				float maxy = ::fmax(left.y, right.y);
+				float maxz = ::fmax(left.z, right.z);
+				return vec3(maxx, maxy, maxz);
+			}
+
+			static vec3 min(vec3 left, vec3 right) {
+				float minx = ::fmin(left.x, right.x);
+				float miny = ::fmin(left.y, right.y);
+				float minz = ::fmin(left.z, right.z);
+				return vec3(minx, miny, minz);
+			}
 		#endif
 	} vec3, *vec3Ptr;
 	

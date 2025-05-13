@@ -5,6 +5,7 @@
 #include "VectorUtils4.h"
 #include <algorithm>
 
+//Om vi hade glm skulle dessa funktioner vara typ 3 rader långa :)
 inline AABB computeAABB(const Primitive& tri) {
 	AABB aabb;
 	float minx, miny, minz, maxx, maxy, maxz;

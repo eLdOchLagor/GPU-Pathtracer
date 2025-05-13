@@ -7,12 +7,13 @@
 BVHTree::BVHTree(const std::vector<Primitive>& primitives) : primitives(primitives){
         // Initialize index buffer [0, 1, ..., N-1]
         triangleIndices.resize(primitives.size());
-        std::iota(triangleIndices.begin(), triangleIndices.end(), 0);
+        std::iota(triangleIndices.begin(), triangleIndices.end(), 0); //Skapar en lista med värden från 0 till triangleIndices.size().
 
-        buildRecursive(0, primitives.size());
-        std::cout << this->nodes.size();
+        buildRecursive(0, primitives.size()); //startar byggandet av trädet.
+        std::cout << this->nodes.size(); //Bara för debugging
 }
-	
+
+//Beräknar AABB för trianglarna från och med start till start + count.
 AABB BVHTree::computeBounds(int start, int count) {
     AABB bounds = computeAABB(primitives[triangleIndices[start]]);
     for (int i = start + 1; i < start + count; i++) {

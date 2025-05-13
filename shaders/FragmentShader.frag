@@ -12,7 +12,7 @@ struct BVHNode {
 	int rightChild;
 	int startTriangle;
 	int triangleCount;
-	int pad0;
+	int escapeIndex;
 	int pad1;
 };
 
@@ -238,48 +238,49 @@ bool intersectAABB(vec3 rayOrigin, vec3 rayDirInv, vec3 minB, vec3 maxB) {
 
 
 int traverseBVHTree(Ray ray) {
-    const int MAX_STACK_SIZE = 20;
-    int stack[MAX_STACK_SIZE];
-    int stackPtr = 0;
-    stack[stackPtr++] = 0; // Start from root node (index 0)
-
+    int nodeIndex = 0;
     float closestT = -1.0;
     int closestPrimIdx = -1;
 
     vec3 rayDirInv = 1.0 / ray.direction;
 
-    while (stackPtr > 0) {
-        int nodeIndex = stack[--stackPtr];
+    while (nodeIndex != -1) {
+       
+        if (nodeIndex < 0 || nodeIndex >= nodes.length()) {
+			if(closestPrimIdx != -1){return closestPrimIdx;}
+            return -1;
+        }
+		
         BVHNode node = nodes[nodeIndex];
 
-        if (!intersectAABB(ray.startPoint, rayDirInv, node.bBoxMin, node.bBoxMax))
-            continue;
+        if (intersectAABB(ray.startPoint, rayDirInv, node.bBoxMin, node.bBoxMax)) {
+            if (node.triangleCount > 0) {
+                // Leaf node
+                for (int i = 0; i < node.triangleCount; ++i) {
+                    int primIndex = triangleIndices[node.startTriangle + i];
+                    Primitive prim = primitives[primIndex];
 
-        if (node.triangleCount > 0) {
-            // Leaf node: check all triangles
-            for (int i = 0; i < node.triangleCount; ++i) {
-                int primIndex = triangleIndices[node.startTriangle + i];
-                Primitive prim = primitives[primIndex];
-                float t = (prim.ID == 0) 
-                    ? triangleIntersectionTest(ray, prim)
-                    : sphereIntersectionTest(ray, prim);
-                
-                if (t > 0.0 && (t < closestT || closestT < 0.0)) {
-                    closestT = t;
-                    closestPrimIdx = primIndex;
+                    float t = (prim.ID == 0)
+                        ? triangleIntersectionTest(ray, prim)
+                        : sphereIntersectionTest(ray, prim);
+
+                    if (t > 0.0f && (closestT < 0.0f || t < closestT)) {
+                        closestT = t;
+                        closestPrimIdx = primIndex;
+                    }
                 }
+                nodeIndex = node.escapeIndex; // ➜ Go to next node
+            } else {
+                nodeIndex = node.leftChild; // ➜ Go to left child
             }
         } else {
-            // Internal node: push children
-            if (stackPtr + 2 <= MAX_STACK_SIZE) {
-                stack[stackPtr++] = node.leftChild;
-                stack[stackPtr++] = node.rightChild;
-            }
+            nodeIndex = node.escapeIndex; // ➜ Skip subtree
         }
     }
 
     return closestPrimIdx;
 }
+
 
 
 float fresnelSchlick(float cosTheta, float ior) {

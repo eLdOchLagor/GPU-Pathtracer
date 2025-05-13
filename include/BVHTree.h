@@ -13,8 +13,8 @@ struct BVHNode {
 	int rightChild;
 	int startTriangle;
 	int triangleCount;
-
-	int pad0;
+	int escapeIndex;
+	
 	int pad1;
 };
 

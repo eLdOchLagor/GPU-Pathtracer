@@ -132,7 +132,7 @@ void Application::Init() {
             node.rightChild,
             node.startTriangle,
             node.triangleCount,
-            0,0
+            node.escapeIndex,0
             });
     }
 
@@ -142,18 +142,18 @@ void Application::Init() {
 
     glGenBuffers(1, &SSBO_Primitives);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Primitives);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, roomScene.primitives.size() * sizeof(Primitive), roomScene.primitives.data(), GL_STATIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, roomScene.primitives.size() * sizeof(Primitive), roomScene.primitives.data(), GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, SSBO_Primitives);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     glGenBuffers(1, &SSBO_BVH);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_BVH);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, gpuNodes.size() * sizeof(BVHNode), gpuNodes.data(), GL_STATIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, gpuNodes.size() * sizeof(BVHNode), gpuNodes.data(), GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, SSBO_BVH);
 
     glGenBuffers(1, &SSBO_Indices);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Indices);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, bvhTree.getIndices().size() * sizeof(int), bvhTree.getIndices().data(), GL_STATIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, bvhTree.getIndices().size() * sizeof(int), bvhTree.getIndices().data(), GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, SSBO_Indices);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);

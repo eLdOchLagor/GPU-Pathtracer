@@ -43,7 +43,9 @@ int BVHTree::buildRecursive(int start, int count) {
         nodes[nodeIndex].triangleCount = count;
         nodes[nodeIndex].leftChild = -1;
         nodes[nodeIndex].rightChild = -1;
+        nodes[nodeIndex].escapeIndex = nodeIndex + 1; // next node in pre-order
         return nodeIndex;
+        
     }
 
     //Denhär biten är ett sätt att bryta upp trädet på. Det finns bättre å denna bit av koden är överdrivet jobbig
@@ -79,6 +81,7 @@ int BVHTree::buildRecursive(int start, int count) {
         int binIdx = std::min(NUM_BINS - 1, int((centroid[splitAxis] - minCentroid) * scale));
         bins[binIdx].bounds = mergeAABB(bins[binIdx].bounds, computeBounds(triangleIndices[i], 1));
         bins[binIdx].count++;
+
     }
 
     AABB leftBounds[NUM_BINS - 1];
@@ -141,6 +144,7 @@ int BVHTree::buildRecursive(int start, int count) {
         nodes[nodeIndex].triangleCount = count;
         nodes[nodeIndex].leftChild = -1;
         nodes[nodeIndex].rightChild = -1;
+        nodes[nodeIndex].escapeIndex = nodeIndex + 1; // next node in pre-order
         return nodeIndex;
     }
 
@@ -155,6 +159,17 @@ int BVHTree::buildRecursive(int start, int count) {
     nodes[nodeIndex].rightChild = rightChild;
     nodes[nodeIndex].startTriangle = -1;
     nodes[nodeIndex].triangleCount = 0;
+
+    // After building left subtree, set its escape to point to right subtree
+    nodes[leftChild].escapeIndex = rightChild;
+
+
+    nodes[nodeIndex].escapeIndex = nodes.size(); // Next in list
+
+    // Right child's escape is this node's escape (assigned by parent)
+    nodes[rightChild].escapeIndex = nodes[nodeIndex].escapeIndex;
+
+    
     
     return nodeIndex;
 }

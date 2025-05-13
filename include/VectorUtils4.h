@@ -110,6 +110,8 @@
 #endif
 #include <math.h>
 #include <stdio.h>
+#include <cmath>
+#include <algorithm>
 
 
 #ifndef M_PI
@@ -157,30 +159,28 @@
 				if (i == 0) return x;
 				else if (i == 1) return y;
 				else if (i == 2) return z;
-				else throw std::out_of_range("vec3 index out of range");
 			}
 
 			const GLfloat& operator[](int i) const {
 				if (i == 0) return x;
 				else if (i == 1) return y;
 				else if (i == 2) return z;
-				else throw std::out_of_range("vec3 index out of range");
+				
 			}
 
 			//return a vector with the max of two vectors.
 			static vec3 max(vec3 left, vec3 right) {
-				float maxx, maxy, maxz;
-				maxx = fmax(left.x, right.x);
-				maxy = fmax(left.y, right.y);
-				maxz = fmax(left.z, right.z);
+				float maxx = ::fmax(left.x, right.x);
+				float maxy = ::fmax(left.y, right.y);
+				float maxz = ::fmax(left.z, right.z);
 				return vec3(maxx, maxy, maxz);
 			}
+
 			static vec3 min(vec3 left, vec3 right) {
-				float maxx, maxy, maxz;
-				maxx = fmin(left.x, right.x);
-				maxy = fmin(left.y, right.y);
-				maxz = fmin(left.z, right.z);
-				return vec3(maxx, maxy, maxz);
+				float minx = ::fmin(left.x, right.x);
+				float miny = ::fmin(left.y, right.y);
+				float minz = ::fmin(left.z, right.z);
+				return vec3(minx, miny, minz);
 			}
 		#endif
 	} vec3, *vec3Ptr;

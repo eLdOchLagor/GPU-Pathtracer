@@ -65,7 +65,7 @@ int BVHTree::buildRecursive(int start, int count) {
         [&](int idx) {
             const Primitive& p = primitives[idx];
             vec3 centroid = (p.vertex1 + p.vertex2 + p.vertex3) / 3.0f;
-            centroid[splitAxis] < centroidMid;  
+            return centroid[splitAxis] < centroidMid;  
         }
     );
 

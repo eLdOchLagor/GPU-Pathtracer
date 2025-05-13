@@ -31,9 +31,9 @@ inline void expandAABB(AABB& base, const AABB& other) {
 	miny = fmin(base.min.y, other.min.y);
 	minz = fmin(base.min.z, other.min.z);
 
-	maxx = fmin(base.max.x, other.max.x);
-	maxy = fmin(base.max.y, other.max.y);
-	maxz = fmin(base.max.z, other.max.z);
+	maxx = fmax(base.max.x, other.max.x);
+	maxy = fmax(base.max.y, other.max.y);
+	maxz = fmax(base.max.z, other.max.z);
 
 	base.min = vec3(minx, miny, minz);
 	base.max = vec3(maxx, maxy, maxz);

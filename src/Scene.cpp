@@ -11,6 +11,9 @@ Scene::Scene(int presetID) {
     case 2:
 		CreateSceneFromModel("..\\models\\StanfordBunny348.obj");
         break;
+    case 3:
+        CreateSceneFromModel("..\\models\\testBVH.obj");
+        break;
     default:
         break;
     }
@@ -396,3 +399,4 @@ void Scene::getRoom() {
     primitives[i].ior = 1.0f;
 
 }
+

@@ -11,6 +11,7 @@ BVHTree::BVHTree(const std::vector<Primitive>& primitives) : primitives(primitiv
 
         buildRecursive(0, primitives.size()); //startar byggandet av trädet.
         std::cout << this->nodes.size(); //Bara för debugging
+		traverseTree(); //Traversera trädet för att se att det är korrekt byggt.
 }
 
 //Beräknar AABB för trianglarna från och med start till start + count.
@@ -96,4 +97,20 @@ int BVHTree::buildRecursive(int start, int count) {
     nodes[nodeIndex].triangleCount = 0;
     
     return nodeIndex;
+}
+
+void BVHTree::traverseTree() {
+	// Traverse the BVH tree and perform operations on each node
+	for (const auto& node : nodes) {
+		// Perform operations on the node
+		std::cout << "Node AABB: " << node.bBoxMin.x << ", " << node.bBoxMin.y << ", " << node.bBoxMin.z << " to "
+			<< node.bBoxMax.x << ", " << node.bBoxMax.y << ", " << node.bBoxMax.z << std::endl;
+        if (node.rightChild == -1 && node.leftChild == -1) {
+            for (int i = node.startTriangle; i < node.startTriangle + node.triangleCount; i++) {
+				const Primitive& temp = primitives[triangleIndices[i]];
+                std::cout << "¨Triangle " << i << " with vertex1:" << temp.vertex1.x << ", " << temp.vertex1.y << ", " << temp.vertex1.z << ", vertex2: "
+                    <<temp.vertex2.x << ", " << temp.vertex2.y << ", " << temp.vertex2.z << ", vertex3: " 
+                   <<temp.vertex3.x << ", " << temp.vertex3.y << ", " << temp.vertex3.z << std::endl;
+        } }
+	}
 }

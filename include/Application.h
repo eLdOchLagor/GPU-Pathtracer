@@ -1,5 +1,8 @@
 #pragma once
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 #include <iostream>
 #include <string>
 #include <glad/glad.h>
@@ -8,6 +11,8 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "BVHTree.h"
+
+
 
 class Application
 {
@@ -46,7 +51,11 @@ private:
 	unsigned int VAO;
 	BVHTree bvhTree;
 
+	int numberOfSamples = 1;
+	int maxBounces = 5;
+
 	void Init();
 	GLFWwindow* createWindow(const std::string& title);
+	void RenderGui(GLFWwindow* window);
 	static void Application::clearAccumulationBuffer(GLFWwindow* window);
 };

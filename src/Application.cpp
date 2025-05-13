@@ -1,15 +1,20 @@
 #include "Application.h"
 
-Application::Application(int width, int height, const std::string& title) : bvhTree(Scene{3}.primitives) {
+Application::Application(int width, int height, const std::string& title) : bvhTree(Scene{0}.primitives) {
 	screenWidth = width;
 	screenHeight = height;
 	window = createWindow(title);
     mainCamera = Camera(vec3(0.0f, 0.0f, -1.0f), vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f), 80.0f, screenWidth, screenHeight);
-	roomScene = Scene{ 3 };
+	roomScene = Scene{ 0 };
 	Init();
 }
 
 Application::~Application() {
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
 	glfwDestroyWindow(window);
 	glfwTerminate();
 }
@@ -44,7 +49,7 @@ void Application::Init() {
     }
 
     // Capture mouse
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     float verts[] = {
         //bottom left Triangle
@@ -171,6 +176,14 @@ void Application::Init() {
 
     currentTexture = 0;
     glGenFramebuffers(1, &framebuffer);
+
+	// ImGui Initialization
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
 }
 
 void Application::Run() {
@@ -186,16 +199,7 @@ void Application::Run() {
 
         std::clog << "\rFPS: " << 1 / deltaTime;
 
-        /*
-        for (int i = 24; i < MAX_PRIMITVES; i++) {
-            primitives[i].ID = 1;
-            primitives[i].color = vec3(1.0f, 1.0f, 0.0f);
-            primitives[i].vertex1 = vec3(0.0f, 0.0f, 6.0f) + vec3(3*sin(currentTime), 3*cos(currentTime), 5*cos(currentTime));
-            primitives[i].vertex2 = vec3(1.2f, 0.0f, 0.0f);
-            primitives[i].bounceOdds = 1.0f;
-        }
-        */
-
+		// Upload uniform variables to shader ---------------------------------------------------------
         uploadUniformVec3ToShader(PathtraceShader, "cameraPosition", mainCamera.GetPosition());
         uploadUniformVec3ToShader(PathtraceShader, "forward", mainCamera.GetForward());
         uploadUniformVec3ToShader(PathtraceShader, "right", mainCamera.GetRight());
@@ -208,12 +212,16 @@ void Application::Run() {
         uploadUniformIntToShader(PathtraceShader, "screenHeight", screenHeight);
         uploadUniformIntToShader(PathtraceShader, "frameCount", frameCount);
 
+        uploadUniformIntToShader(PathtraceShader, "numberOfSamples", numberOfSamples);
+        uploadUniformIntToShader(PathtraceShader, "maxBounces", maxBounces);
+		// ----------------------------------------------------------------------------------------------
+
         /*
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Primitives);
         glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, (MAX_PRIMITVES) * sizeof(Primitive), primitives);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
         */
-
+        
         // Pathtracing pass, Rendering to texture
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textures[nextTexture], 0);
@@ -243,7 +251,14 @@ void Application::Run() {
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // -----------------------------------------------------
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
 
+		RenderGui(window);
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         // Swap the buffers
         glfwSwapBuffers(window);
@@ -255,39 +270,67 @@ void Application::Run() {
     }
 }
 
+void Application::RenderGui(GLFWwindow* window)
+{
+    Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
+
+    ImGui::Begin("User interface");
+
+    ImGui::Text("FPS: %.1f", 1.0f / deltaTime);
+
+    if (ImGui::Button("Enable Pathtracing"))
+    {
+        std::cout << "Switches to raytracing";
+    }
+    if (ImGui::SliderInt("Samples/frame", &numberOfSamples, 1, 50))
+    {
+        app->frameCount = 0;
+        clearAccumulationBuffer(window);
+    }
+    if (ImGui::SliderInt("Max number of bounces", &maxBounces, 1, 20))
+    {
+        app->frameCount = 0;
+        clearAccumulationBuffer(window);
+    }
+    // Reset accumulation
+    
+    ImGui::End();
+}
 void Application::mouse_callback(GLFWwindow* window, double xpos, double ypos) 
 {
     Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
     
-    float xoffset = xpos - app->mainCamera.lastX;
-    float yoffset = app->mainCamera.lastY - ypos; // reversed since y-coordinates range from bottom to top
-    app->mainCamera.lastX = xpos;
-    app->mainCamera.lastY = ypos;
+    if (app->mainCamera.cameraEnabled)
+    {
+        float xoffset = xpos - app->mainCamera.lastX;
+        float yoffset = app->mainCamera.lastY - ypos; // reversed since y-coordinates range from bottom to top
+        app->mainCamera.lastX = xpos;
+        app->mainCamera.lastY = ypos;
 
-    const float sensitivity = 0.1f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
+        const float sensitivity = 0.1f;
+        xoffset *= sensitivity;
+        yoffset *= sensitivity;
 
-    app->mainCamera.yaw += xoffset;
-    app->mainCamera.pitch += yoffset;
+        app->mainCamera.yaw += xoffset;
+        app->mainCamera.pitch += yoffset;
 
-    if (app->mainCamera.pitch > 89.0f)
-        app->mainCamera.pitch = 89.0f;
-    if (app->mainCamera.pitch < -89.0f)
-        app->mainCamera.pitch = -89.0f;
+        if (app->mainCamera.pitch > 89.0f)
+            app->mainCamera.pitch = 89.0f;
+        if (app->mainCamera.pitch < -89.0f)
+            app->mainCamera.pitch = -89.0f;
 
-    vec3 forwardDirection = vec3(0.0f);
-    // As with wasd movement, left and right are opposite
-    forwardDirection.z = cos(app->mainCamera.yaw * M_PI / 180.0f) * cos(app->mainCamera.pitch * M_PI / 180.0f);
-    forwardDirection.y = sin(app->mainCamera.pitch * M_PI / 180.0f);
-    forwardDirection.x = sin(app->mainCamera.yaw * M_PI / 180.0f) * cos(app->mainCamera.pitch * M_PI / 180.0f);
+        vec3 forwardDirection = vec3(0.0f);
+        // As with wasd movement, left and right are opposite
+        forwardDirection.z = cos(app->mainCamera.yaw * M_PI / 180.0f) * cos(app->mainCamera.pitch * M_PI / 180.0f);
+        forwardDirection.y = sin(app->mainCamera.pitch * M_PI / 180.0f);
+        forwardDirection.x = sin(app->mainCamera.yaw * M_PI / 180.0f) * cos(app->mainCamera.pitch * M_PI / 180.0f);
 
-    app->mainCamera.SetForward(forwardDirection);
+        app->mainCamera.SetForward(forwardDirection);
 
-    // Reset accumulation
-    app->frameCount = 0;
-    clearAccumulationBuffer(window);
-    
+        // Reset accumulation
+        app->frameCount = 0;
+        clearAccumulationBuffer(window);
+    }
 }
 
 void Application::processInput(GLFWwindow* window)

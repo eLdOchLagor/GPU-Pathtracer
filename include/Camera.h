@@ -59,11 +59,12 @@ public:
 	float pitch = 0.0f;
 	float yaw = 0.0f;
 
+	bool cameraEnabled = false;
+
 private:
 	vec3 _forward;
 	vec3 _trueUp;
 	vec3 _right;
-
 
 	float _fov;
 	float _aspectRatio; // Only used in Camera constructor

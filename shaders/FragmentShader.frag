@@ -59,9 +59,6 @@ layout(std430, binding = 2) buffer TriangleIndices {
     int triangleIndices[];
 };
 
-int maxBounces = 5;
-int samples = 1;
-
 out vec4 FragColor;
 
 uniform sampler2D accumTexture;
@@ -73,6 +70,9 @@ uniform vec3 right;
 uniform vec3 up;
 uniform float imagePlaneWidth;
 uniform float imagePlaneHeight;
+
+uniform int numberOfSamples;
+uniform int maxBounces;
 
 uniform int screenWidth;
 uniform int screenHeight;
@@ -456,13 +456,13 @@ void main() {
 
 	vec3 accumulatedColor = vec3(0.0);
 
-	for(int i = 0; i < samples; i++)
+	for(int i = 0; i < numberOfSamples; i++)
 	{
 		Ray ray = generateCameraRay(pixelCoord);
 		accumulatedColor += raytrace(ray);
 	}
 	
-	accumulatedColor /= samples;
+	accumulatedColor /= numberOfSamples;
 
 	// Output final color
 	vec3 ac = (prevColor * float(frameCount) + accumulatedColor) / float(frameCount + 1); // Blend with previous color

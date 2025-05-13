@@ -226,6 +226,62 @@ vec2 intersectionTest(Ray currentRay){
 	return vec2(closestDistance, closestIndex);
 }
 
+bool intersectAABB(vec3 rayOrigin, vec3 rayDirInv, vec3 minB, vec3 maxB) {
+    vec3 tMin = (minB - rayOrigin) * rayDirInv;
+    vec3 tMax = (maxB - rayOrigin) * rayDirInv;
+    vec3 t1 = min(tMin, tMax);
+    vec3 t2 = max(tMin, tMax);
+    float tNear = max(max(t1.x, t1.y), t1.z);
+    float tFar = min(min(t2.x, t2.y), t2.z);
+    return tFar >= max(tNear, 0.0);
+}
+
+
+int traverseBVHTree(Ray ray) {
+    const int MAX_STACK_SIZE = 64;
+    int stack[MAX_STACK_SIZE];
+    int stackPtr = 0;
+    stack[stackPtr++] = 0; // Start from root node (index 0)
+
+    float closestT = -1.0;
+    int closestPrimIdx = -1;
+
+    vec3 rayDirInv = 1.0 / ray.direction;
+
+    while (stackPtr > 0) {
+        int nodeIndex = stack[--stackPtr];
+        BVHNode node = nodes[nodeIndex];
+
+        if (!intersectAABB(ray.startPoint, rayDirInv, node.bBoxMin, node.bBoxMax))
+            continue;
+
+        if (node.triangleCount > 0) {
+            // Leaf node: check all triangles
+            for (int i = 0; i < node.triangleCount; ++i) {
+                int primIndex = triangleIndices[node.startTriangle + i];
+                Primitive prim = primitives[primIndex];
+                float t = (prim.ID == 0) 
+                    ? triangleIntersectionTest(ray, prim)
+                    : sphereIntersectionTest(ray, prim);
+                
+                if (t > 0.0 && (t < closestT || closestT < 0.0)) {
+                    closestT = t;
+                    closestPrimIdx = primIndex;
+                }
+            }
+        } else {
+            // Internal node: push children
+            if (stackPtr + 2 <= MAX_STACK_SIZE) {
+                stack[stackPtr++] = node.leftChild;
+                stack[stackPtr++] = node.rightChild;
+            }
+        }
+    }
+
+    return closestPrimIdx;
+}
+
+
 float fresnelSchlick(float cosTheta, float ior) {
 	float r0 = pow((1.0 - ior) / (1.0 + ior), 2.0);
 	return r0 + (1.0 - r0) * pow(1.0 - cosTheta, 5.0);
@@ -296,15 +352,18 @@ vec3 raytrace(Ray ray) {
 	vec3 importance = vec3(1.0); // Keeps track of ray contribution
 
 	for (int i = 0; i < maxBounces; i++) {
-		vec2 hit = intersectionTest(ray);
+		int triangleIndex = traverseBVHTree(ray);
+		//vec2 hit = intersectionTest(ray);
 
-		if (hit.x < 0.0) {
-			accumulatedColor += importance * vec3(0.2, 0.2, 0.2); // Background color
+		if (triangleIndex == -1) {
+			accumulatedColor += importance * vec3(0.2); // Background
 			break;
 		}
 
-		ray.endPoint = ray.startPoint + hit.x * ray.direction;
-		Primitive hitSurface = primitives[int(hit.y)];
+		Primitive hitSurface = primitives[triangleIndex];
+		float t = (hitSurface.ID == 0) ? triangleIntersectionTest(ray, hitSurface) : sphereIntersectionTest(ray, hitSurface);
+
+		ray.endPoint = ray.startPoint + t * ray.direction;
 
 		// Compute surface normal
 		vec3 normal = (hitSurface.ID == 1)

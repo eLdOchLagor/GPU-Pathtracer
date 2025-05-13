@@ -10,8 +10,8 @@ BVHTree::BVHTree(const std::vector<Primitive>& primitives) : primitives(primitiv
         std::iota(triangleIndices.begin(), triangleIndices.end(), 0); //Skapar en lista med värden från 0 till triangleIndices.size().
 
         buildRecursive(0, primitives.size()); //startar byggandet av trädet.
-        std::cout << this->nodes.size(); //Bara för debugging
-		traverseTree(); //Traversera trädet för att se att det är korrekt byggt.
+        //std::cout << this->nodes.size(); //Bara för debugging
+		//traverseTree(); //Traversera trädet för att se att det är korrekt byggt.
 }
 
 //Beräknar AABB för trianglarna från och med start till start + count.
@@ -108,7 +108,7 @@ void BVHTree::traverseTree() {
         if (node.rightChild == -1 && node.leftChild == -1) {
             for (int i = node.startTriangle; i < node.startTriangle + node.triangleCount; i++) {
 				const Primitive& temp = primitives[triangleIndices[i]];
-                std::cout << "¨Triangle " << i << " with vertex1:" << temp.vertex1.x << ", " << temp.vertex1.y << ", " << temp.vertex1.z << ", vertex2: "
+                std::cout << "Triangle " << triangleIndices[i] << " with vertex1:" << temp.vertex1.x << ", " << temp.vertex1.y << ", " << temp.vertex1.z << ", vertex2: "
                     <<temp.vertex2.x << ", " << temp.vertex2.y << ", " << temp.vertex2.z << ", vertex3: " 
                    <<temp.vertex3.x << ", " << temp.vertex3.y << ", " << temp.vertex3.z << std::endl;
         } }

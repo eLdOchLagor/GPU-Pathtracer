@@ -60,7 +60,7 @@ layout(std430, binding = 2) buffer TriangleIndices {
 };
 
 int maxBounces = 5;
-int samples = 5;
+int samples = 1;
 
 out vec4 FragColor;
 
@@ -238,7 +238,7 @@ bool intersectAABB(vec3 rayOrigin, vec3 rayDirInv, vec3 minB, vec3 maxB) {
 
 
 int traverseBVHTree(Ray ray) {
-    const int MAX_STACK_SIZE = 64;
+    const int MAX_STACK_SIZE = 1000;
     int stack[MAX_STACK_SIZE];
     int stackPtr = 0;
     stack[stackPtr++] = 0; // Start from root node (index 0)

@@ -12,6 +12,7 @@ BVHTree::BVHTree(const std::vector<Primitive>& primitives) : primitives(primitiv
         buildRecursive(0, primitives.size()); //startar byggandet av trädet.
         //std::cout << this->nodes.size(); //Bara för debugging
 		//traverseTree(); //Traversera trädet för att se att det är korrekt byggt.
+        std::cout << "JAG ÄR FÄÄÄÄRDIG";
 }
 
 //Beräknar AABB för trianglarna från och med start till start + count.

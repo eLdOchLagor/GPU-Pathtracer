@@ -12,7 +12,7 @@ Scene::Scene(int presetID) {
 		CreateSceneFromModel("..\\models\\StanfordBunny348.obj");
         break;
     case 3:
-        CreateSceneFromModel("..\\models\\testBVH.obj");
+        CreateSceneFromModel("..\\models\\Bunny7K.obj");
         break;
     default:
         break;
@@ -374,6 +374,8 @@ void Scene::getRoom() {
     primitives[i].ior = 1.0f;
     i++;
 
+    /*
+    
     //sphere 1
     primitives[i].vertex1 = vec3(0.0f, -3.5f, 8.0f);
     primitives[i].vertex2 = vec3(1.5f, -5.0f, 10.0f);
@@ -398,5 +400,6 @@ void Scene::getRoom() {
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
 
+    */
 }
 

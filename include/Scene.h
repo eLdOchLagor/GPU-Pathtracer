@@ -8,6 +8,9 @@
 #include <vector>
 #include "OBJLoader.h"
 #include <VectorUtils4.h>
+#include "Primitive.h"
+
+
 
 struct Primitive {
     alignas(16) vec3 vertex1;

@@ -20,8 +20,8 @@ inline AABB computeAABB(const Primitive& tri) {
 inline void expandAABB(AABB& base, const AABB& other) {
 	float minx, miny, minz, maxx, maxy, maxz;
 
-	vec3 max = vec3::max(base.max, other.max) + vec3(0.01f);
-	vec3 min = vec3::min(base.min, other.min) - vec3(0.01f);
+	vec3 max = vec3::max(base.max, other.max) + vec3(0.0001f);
+	vec3 min = vec3::min(base.min, other.min);
 
 	base.min = min;
 	base.max = max;

@@ -42,7 +42,7 @@ struct Primitive{
 	vec3 color;
 	vec3 normal;
 	int ID; // 0 == Triangle, 1 == Sphere
-	float bounceOdds; //Odds that the ray would bounce off of the surface.
+	float smoothness; //Odds that the ray would bounce off of the surface.
 	int materialType;
 	float ior;
 };
@@ -333,7 +333,7 @@ vec3 raytrace(Ray ray) {
 
 			float randInclination = acos(sqrt(1.0 - randomValue1));
 			float randAzimuth = 2.0 * M_PI * randomValue2;
-			float rr = randAzimuth / hitSurface.bounceOdds;
+			float rr = randAzimuth / hitSurface.smoothness;
 
 			if (rr <= 2.0 * M_PI && i != maxBounces - 1) {
 				ray = diffuseReflection(ray, hitSurface, randAzimuth, randInclination);

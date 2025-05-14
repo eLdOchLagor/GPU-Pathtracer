@@ -33,9 +33,12 @@ GLFWwindow* Application::createWindow(const std::string& title) {
         glfwTerminate();
         return NULL;
     }
+
     glfwMakeContextCurrent(window);
 
-    // Set the user pointer to the current Application instance
+    glfwSwapInterval(0); // Disable VSync to uncap FPS
+
+    // Set the user pointer to the current Application instance, used to get reference to window inside static callback functions
     glfwSetWindowUserPointer(window, this);
 
     return window;
@@ -290,7 +293,31 @@ void Application::RenderGui(GLFWwindow* window)
         app->frameCount = 0;
         clearAccumulationBuffer(window);
     }
-    // Reset accumulation
+    
+    // TODO:
+    // Create rastered rendering mode
+    // Add object management
+    // When pressing a object in the menu, give options to modify material properties, position, etc.
+    // Add Glossy material (se sebastian lagues f�rsta video), g�r s� att speglar skapas genom reflektivt material
+    // Add environment lighting
+    // Fix glass material
+
+    /*
+    int selectedIndex = -1;
+
+    ImGui::BeginChild("Scene Objects");
+
+    for (int i = 0; i < 50; i++)
+    {
+        std::string label = "Object " + std::to_string(i); // Or use object names
+        if (ImGui::Selectable("test", selectedIndex == i)) {
+            selectedIndex = i;
+        }
+    }
+
+    ImGui::EndChild();
+    */
+
     
     ImGui::End();
 }

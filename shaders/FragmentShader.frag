@@ -2,9 +2,10 @@
 
 #define M_PI 3.1415926535897932384626433832795
 
-#define DIFFUSE 0
+#define GLOSSY 0
 #define MIRROR 1
 #define TRANSMISSIVE 2
+
 struct BVHNode {
 	vec3 bBoxMin;
 	int leftChild;
@@ -49,7 +50,7 @@ struct Primitive{
 	vec3 edge1;
     vec3 edge2;
 	int ID; // 0 == Triangle, 1 == Sphere
-	float bounceOdds; //Odds that the ray would bounce off of the surface.
+	float smoothness; //Odds that the ray would bounce off of the surface.
 	int materialType;
 	float ior;
 };
@@ -388,7 +389,7 @@ vec3 raytrace(Ray ray) {
 		}
 
 		// Diffuse surface
-		if (hitSurface.materialType == DIFFUSE) {
+		if (hitSurface.materialType == GLOSSY) {
 			vec3 directIllumination = calculateDirectIllumination(
 				ray.direction, ray.endPoint, normal, hitSurface.color
 			);
@@ -396,19 +397,23 @@ vec3 raytrace(Ray ray) {
 			accumulatedColor += importance * directIllumination;
 			importance *= hitSurface.color;
 
-			// Russian roulette
-			float randomValue1 = RandomFloat(seed);
-			float randomValue2 = RandomFloat(seed);
+			float randChoice = RandomFloat(seed);
 
-			float randInclination = acos(sqrt(1.0 - randomValue1));
-			float randAzimuth = 2.0 * M_PI * randomValue2;
-			float rr = randAzimuth / hitSurface.bounceOdds;
-
-			if (rr <= 2.0 * M_PI && i != maxBounces - 1) {
-				ray = diffuseReflection(ray, hitSurface, randAzimuth, randInclination);
+			if (randChoice < hitSurface.smoothness) {
+				// Reflect
+				ray.direction = reflect(ray.direction, normal);
+				
 			} else {
-				break;
+				// Diffuse reflection
+				float randomValue1 = RandomFloat(seed);
+				float randomValue2 = RandomFloat(seed);
+
+				float randInclination = acos(sqrt(1.0 - randomValue1));
+				float randAzimuth = 2.0 * M_PI * randomValue2;
+				ray = diffuseReflection(ray, hitSurface, randAzimuth, randInclination);
 			}
+
+			ray.startPoint = ray.endPoint + 0.001 * ray.direction;
 		}
 
 		// Transmissive surface

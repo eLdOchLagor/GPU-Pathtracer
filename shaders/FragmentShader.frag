@@ -5,6 +5,7 @@
 #define GLOSSY 0
 #define MIRROR 1
 #define TRANSMISSIVE 2
+#define LIGHT 3
 
 struct BVHNode {
 	vec3 bBoxMin;
@@ -20,6 +21,21 @@ struct BVHNode {
 struct HitResult {
     float t;
     int index;
+};
+
+struct PointLight {
+	vec3 position;
+	vec3 radiance;
+};
+
+struct AreaLight
+{
+	vec3 vertex1;
+	vec3 vertex2;
+	vec3 vertex3;
+	vec3 vertex4;
+	vec3 normal;
+	vec3 radiance;
 };
 
 struct Ray{
@@ -67,6 +83,14 @@ layout(std430, binding = 2) buffer TriangleIndices {
     int triangleIndices[];
 };
 
+layout(std430, binding = 3) buffer PointLights{
+	PointLight pointLights[];
+};
+
+layout(std430, binding = 4) buffer AreaLights{
+	AreaLight areaLights[];
+};
+
 out vec4 FragColor;
 
 uniform sampler2D accumTexture;
@@ -85,6 +109,10 @@ uniform int maxBounces;
 uniform int screenWidth;
 uniform int screenHeight;
 
+uniform int NUM_OF_POINT_LIGHTS;
+uniform int NUM_OF_AREA_LIGHTS;
+
+
 
 in vec3 pos;
 
@@ -99,9 +127,8 @@ struct Light
 	vec3 radiance;
 };
 
-Light AreaLight = Light(vec3(-2, 4.99, 8), vec3(2, 4.99, 8), vec3(2, 4.99, 11), vec3(-2, 4.99, 11), vec3(0.0, -1.0, 0.0), vec3(10.0, 10.0, 10.0));
-vec3 lightE1 = AreaLight.vertex2 - AreaLight.vertex1;
-vec3 lightE2 = AreaLight.vertex4 - AreaLight.vertex1;
+Light mainLight = Light(vec3(-2, 4.99, 8), vec3(2, 4.99, 8), vec3(2, 4.99, 11), vec3(-2, 4.99, 11), vec3(0.0, -1.0, 0.0), vec3(10.0, 10.0, 10.0));
+
 // --------------------------------------------------------------------------------------------------
 
 // Random number generator --------------------------------------------------------------------------
@@ -296,31 +323,42 @@ float fresnelSchlick(float cosTheta, float ior) {
 	return r0 + (1.0 - r0) * pow(1.0 - cosTheta, 5.0);
 }
 
-vec3 calculateDirectIllumination(vec3 dir, vec3 hitPoint, vec3 normal, vec3 surfaceColor){
+vec3 calculateDirectIllumination(vec3 dir, vec3 hitPoint, vec3 normal, vec3 surfaceColor, AreaLight light){
 	vec3 radiance = vec3(0.0, 0.0, 0.0);
-
-	vec3 e1 = lightE1;
-	vec3 e2 = lightE2;
 	
-	float s = RandomFloat(seed);
-	float t = RandomFloat(seed);
+	
+	for(int i = 0; i < NUM_OF_AREA_LIGHTS; i++ ){
+		vec3 e1 = areaLights[i].vertex2 - areaLights[i].vertex1;
+		vec3 e2 = areaLights[i].vertex4 - areaLights[i].vertex1;
+	
+		float s = RandomFloat(seed);
+		float t = RandomFloat(seed);
 
-	vec3 y = AreaLight.vertex1 + s * e1 + t * e2;
-	vec3 di = y - hitPoint;
+		vec3 y = areaLights[i].vertex1 + s * e1 + t * e2;
+		vec3 di = y - hitPoint;
 
-	float cosx = dot(normal, normalize(di));
-	float cosy = dot(-AreaLight.normal, normalize(di));
+		
 
-	// Make sure that surfaces facing away from the lightsource dont give negative values, these values give wrong result
-	cosx = max(0.0, cosx);
-	cosy = max(0.0, cosy);
+		if (!isInShadow(hitPoint + 0.0001*normal, y)){
+			float cosx = dot(normal, normalize(di));
+			float cosy = dot(-areaLights[i].normal, normalize(di));
 
-	if (!isInShadow(hitPoint + 0.0001*normal, y)){
-		float scalar_radiance = (cosx * cosy) / (length(di) * length(di));
-		float A = length(e1) * length(e2);
+			// Make sure that surfaces facing away from the lightsource dont give negative values, these values give wrong result
+			cosx = max(0.0, cosx);
+			cosy = max(0.0, cosy);
+			float scalar_radiance = (cosx * cosy) / (length(di) * length(di));
+			float A = length(e1) * length(e2);
 
-		radiance = vec3(AreaLight.radiance * scalar_radiance * A/M_PI) * surfaceColor;
+			radiance += vec3(areaLights[i].radiance * scalar_radiance * A/M_PI) * surfaceColor;
+		}
+
 	}
+	for(int i = 0; i < NUM_OF_POINT_LIGHTS; i++ ){
+		if(!isInShadow(hitPoint, pointLights[i].position)){
+			radiance += pointLights[i].radiance;
+		}
+	}
+	
 
 	return radiance;
 }
@@ -363,6 +401,7 @@ vec3 raytrace(Ray ray) {
 	for (int i = 0; i < maxBounces; i++) {
 		vec3 rayDirInv = 1.0 / ray.direction;
 		HitResult hit = traverseBVHTree(ray, rayDirInv);
+		
 		//vec2 hit = intersectionTest(ray);
 
 		if (hit.index == -1) {
@@ -378,11 +417,12 @@ vec3 raytrace(Ray ray) {
 		vec3 normal = (hitSurface.ID == 1)
 			? normalize(ray.startPoint - hitSurface.vertex1) // Sphere normal
 			: hitSurface.normal;
-
+		
 		// Mirror surface
 		if (hitSurface.materialType == MIRROR) {
 			ray.direction = normalize(reflect(ray.direction, normal));
 			ray.startPoint = ray.endPoint;
+			i--;
 			continue;
 		}
 
@@ -390,7 +430,7 @@ vec3 raytrace(Ray ray) {
 		if (hitSurface.materialType == GLOSSY) {
 			vec3 directIllumination = calculateDirectIllumination(
 				ray.direction, ray.endPoint, normal, hitSurface.color
-			);
+			, areaLights[0]);
 
 			accumulatedColor += importance * directIllumination;
 			importance *= hitSurface.color;
@@ -455,6 +495,10 @@ vec3 raytrace(Ray ray) {
 
 			ray.startPoint = ray.endPoint + 0.001 * ray.direction;
 			importance *= hitSurface.color;
+		}
+		if(hitSurface.materialType == LIGHT){
+			accumulatedColor += importance * hitSurface.color;
+			break;
 		}
 	}
 

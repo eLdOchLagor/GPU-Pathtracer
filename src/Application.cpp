@@ -1,11 +1,11 @@
 #include "Application.h"
 
-Application::Application(int width, int height, const std::string& title) : bvhTree(Scene{3}.primitives) {
+Application::Application(int width, int height, const std::string& title) : bvhTree(Scene{1}.primitives) {
 	screenWidth = width;
 	screenHeight = height;
 	window = createWindow(title);
     mainCamera = Camera(vec3(0.0f, 0.0f, -1.0f), vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f), 80.0f, screenWidth, screenHeight);
-	roomScene = Scene{ 3 };
+	roomScene = Scene{1};
 	Init();
 }
 
@@ -124,6 +124,8 @@ void Application::Init() {
     GLuint SSBO_Primitives;
     GLuint SSBO_BVH;
     GLuint SSBO_Indices;
+    GLuint SSBO_PointLights;
+    GLuint SSBO_AreaLights;
 
     std::vector<BVHNode> gpuNodes;
     gpuNodes.reserve(bvhTree.getNodes().size());
@@ -158,6 +160,16 @@ void Application::Init() {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Indices);
     glBufferData(GL_SHADER_STORAGE_BUFFER, bvhTree.getIndices().size() * sizeof(int), bvhTree.getIndices().data(), GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, SSBO_Indices);
+
+    glGenBuffers(1, &SSBO_PointLights);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_PointLights);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, roomScene.pointLights.size() * sizeof(PointLight), roomScene.pointLights.data(), GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, SSBO_PointLights);
+
+    glGenBuffers(1, &SSBO_AreaLights);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_AreaLights);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, roomScene.areaLights.size() * sizeof(AreaLight), roomScene.areaLights.data(), GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, SSBO_AreaLights);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
 
@@ -215,6 +227,9 @@ void Application::Run() {
 
         uploadUniformIntToShader(PathtraceShader, "numberOfSamples", numberOfSamples);
         uploadUniformIntToShader(PathtraceShader, "maxBounces", maxBounces);
+
+        uploadUniformIntToShader(PathtraceShader, "NUM_OF_POINT_LIGHTS", roomScene.pointLights.size());
+        uploadUniformIntToShader(PathtraceShader, "NUM_OF_AREA_LIGHTS", roomScene.areaLights.size());
 		// ----------------------------------------------------------------------------------------------
 
         /*

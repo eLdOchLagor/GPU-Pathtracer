@@ -9,7 +9,7 @@
 #include "OBJLoader.h"
 #include <VectorUtils4.h>
 #include "Primitive.h"
-
+#include "Light.h"
 class Scene
 {
 public:
@@ -24,6 +24,8 @@ public:
     
 
     std::vector<Primitive> primitives;
+    std::vector<PointLight> pointLights;
+    std::vector<AreaLight> areaLights;
 private:
 	
 };

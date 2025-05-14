@@ -50,6 +50,9 @@ void Scene::CreateSceneFromModel(const std::string& path) {
 
 void Scene::getSpheres() {
     primitives.resize(5);
+    areaLights.resize(0);
+    pointLights.resize(1);
+
     /*Primitive temp{vec3(-10.0f, -5.0f, 10.0f), vec3(-10.0f, -5.0f, -10.0f), vec3(10.0f, -5.0f, -10.0f), vec3(0.0f, 1.0f, 0.0f), vec3(79.0f, 163.0f, 146.0f) / 255.0f, 0, 1.0f, 'L'};
     primitives[1] = temp;
 
@@ -58,6 +61,9 @@ void Scene::getSpheres() {
     */
     //floor
         //triangle front
+
+    pointLights[0].position = vec3(5.5, 0.0, 6.0);
+    pointLights[0].radiance = vec3(1.0, 1.0, 1.0)/5.f;
     int i = 0;
     primitives[i].vertex1 = vec3(-10.0f, -5.0f, 10.0f);
     primitives[i].vertex2 = vec3(-10.0f, -5.0f, -10.0f);
@@ -135,6 +141,17 @@ void Scene::getSpheres() {
 void Scene::getRoom() {
     // Initializes 24 empty Primitives in the std::vector
     primitives.resize(27);
+    areaLights.resize(1);
+    pointLights.resize(1);
+    
+    areaLights[0].vertex1 = vec3(-2, 4.99, 8);
+    areaLights[0].vertex2 = vec3(2, 4.99, 8);
+    areaLights[0].vertex3 = vec3(2, 4.99, 11);
+    areaLights[0].vertex4 = vec3(-2, 4.99, 11);
+    areaLights[0].normal = vec3(0.0, -1.0, 0.0);
+    areaLights[0].radiance = vec3(10.0, 10.0, 10.0);
+
+    
 
     vec3 e1 = vec3(0.0f);
     vec3 e2 = vec3(0.0f);
@@ -457,6 +474,35 @@ void Scene::getRoom() {
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
 
-    
+    i++;
+
+    //Light1 side1
+    primitives[i].vertex1 = vec3(-2, 4.99, 8);
+    primitives[i].vertex2 = vec3(2, 4.99, 8);
+    primitives[i].vertex3 = vec3(2, 4.99, 11);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
+    primitives[i].normal = vec3(0.0f, -1.0f, 0.0f);
+    primitives[i].color = vec3(1.0, 1.0, 1.0);
+    primitives[i].ID = 0;
+    primitives[i].smoothness = 0.0f;
+    primitives[i].materialType = 3;
+    primitives[i].ior = 1.0f;
+
+    i++;
+    //Light1 side2
+    primitives[i].vertex1 = vec3(2, 4.99, 11);
+    primitives[i].vertex2 = vec3(-2, 4.99, 11);
+    primitives[i].vertex3 = vec3(-2, 4.99, 8);
+    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
+    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
+    primitives[i].normal = vec3(0.0f, -1.0f, 0.0f);
+    primitives[i].color = vec3(1.0,1.0,1.0);
+    primitives[i].ID = 0;
+    primitives[i].smoothness = 0.0f;
+    primitives[i].materialType = 3;
+    primitives[i].ior = 1.0f;  
+
+
 }
 

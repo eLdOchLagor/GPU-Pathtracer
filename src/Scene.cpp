@@ -9,17 +9,26 @@ Scene::Scene(int presetID) {
         getSpheres();
         break;
     case 2:
-		CreateSceneFromModel("..\\models\\StanfordBunny348.obj");
+		CreateSceneFromModel("..\\models\\StanfordBunny348.obj", 0);
         break;
     case 3:
-        CreateSceneFromModel("..\\models\\Bunny70K.obj");
+        CreateSceneFromModel("..\\models\\Bunny70K.obj", 0);
+        break;
+    case 4:
+        getCrazyScene();
         break;
     default:
         break;
     }
 }
 
-void Scene::CreateSceneFromModel(const std::string& path) {
+//Riktigt tuff för datorn att hantera på min sida.
+void Scene::getCrazyScene() {
+    getRoom();
+    CreateSceneFromModel("..\\models\\StanfordBunny348.obj", primitives.size());
+}
+
+void Scene::CreateSceneFromModel(const std::string& path,int index = 0) {
 	std::vector<vec3> vertices;
 	std::vector<vec2> uvs;
 	std::vector<vec3> normals;
@@ -27,9 +36,11 @@ void Scene::CreateSceneFromModel(const std::string& path) {
 	// Load the OBJ file
 	OBJLoader::loadOBJ(path, vertices, uvs, normals);
 
-    primitives.resize(vertices.size()/3);
+    primitives.resize(vertices.size()/3 + index);
+    areaLights.resize(1);
+    pointLights.resize(0);
 
-    size_t primIdx = 0;
+    size_t primIdx = index;
     for (size_t i = 0; i < vertices.size(); i+=3)
     {
 		primitives[primIdx].vertex1 = vertices[i];
@@ -46,6 +57,15 @@ void Scene::CreateSceneFromModel(const std::string& path) {
 
 		primIdx++;
     }
+    //pointLights[0].position = vec3(5.5, 0.0, 6.0);
+    //pointLights[0].radiance = vec3(1.0, 1.0, 1.0) / 25.f;
+
+    areaLights[0].vertex1 = vec3(-2, 4.99, 8);
+    areaLights[0].vertex2 = vec3(2, 4.99, 8);
+    areaLights[0].vertex3 = vec3(2, 4.99, 11);
+    areaLights[0].vertex4 = vec3(-2, 4.99, 11);
+    areaLights[0].normal = vec3(0.0, -1.0, 0.0);
+    areaLights[0].radiance = vec3(10.0, 10.0, 10.0);
 }
 
 void Scene::getSpheres() {
@@ -503,6 +523,6 @@ void Scene::getRoom() {
     primitives[i].materialType = 3;
     primitives[i].ior = 1.0f;  
 
-
+    i++;
 }
 

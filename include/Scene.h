@@ -18,9 +18,11 @@ public:
 
     Scene(int presetID);
 
+
     void getRoom();
     void getSpheres();
-    void CreateSceneFromModel(const std::string& path);
+    void getCrazyScene();;
+    void CreateSceneFromModel(const std::string& path, int index);
     
 
     std::vector<Primitive> primitives;

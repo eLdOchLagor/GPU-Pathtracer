@@ -270,9 +270,7 @@ HitResult traverseBVHTree(Ray ray, vec3 rayDirInv) {
                     int primIndex = triangleIndices[node.startTriangle + i];
                     Primitive prim = primitives[primIndex];
 
-                    float t = (prim.ID == 0)
-                        ? triangleIntersectionTest(ray, prim)
-                        : sphereIntersectionTest(ray, prim);
+                    float t = (prim.ID == 0) ? triangleIntersectionTest(ray, prim) : sphereIntersectionTest(ray, prim);
 
                     if (t > 0.0f && (t < closestT)) {
                         closestT = t;

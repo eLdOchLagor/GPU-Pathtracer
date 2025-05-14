@@ -8,8 +8,17 @@
 
 inline AABB computeAABB(const Primitive& tri) {
 	AABB aabb;
-	vec3 max = vec3::max(vec3::max(tri.vertex1, tri.vertex2), tri.vertex3);
-	vec3 min = vec3::min(vec3::min(tri.vertex1, tri.vertex2), tri.vertex3);
+	vec3 max;
+	vec3 min;
+	if (tri.ID == 0) {
+		max = vec3::max(vec3::max(tri.vertex1, tri.vertex2), tri.vertex3);
+		min = vec3::min(vec3::min(tri.vertex1, tri.vertex2), tri.vertex3);
+	}
+	else if (tri.ID == 1) {
+		max = vec3(tri.vertex1) + vec3(tri.vertex2.x);
+		min = vec3(tri.vertex1) - vec3(tri.vertex2.x);
+	}
+	
 
 	aabb.min = min;
 	aabb.max = max;
@@ -21,7 +30,7 @@ inline void expandAABB(AABB& base, const AABB& other) {
 	float minx, miny, minz, maxx, maxy, maxz;
 
 	vec3 max = vec3::max(base.max, other.max) + vec3(0.0001f);
-	vec3 min = vec3::min(base.min, other.min);
+	vec3 min = vec3::min(base.min, other.min) - vec3(0.0001f);
 
 	base.min = min;
 	base.max = max;

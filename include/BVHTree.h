@@ -31,6 +31,6 @@ private:
 	std::vector<int> triangleIndices; //Denna listan hittar trianglarna relaterat till noderna i trädet.
 	std::vector<BVHNode> nodes; //Noderna med children å AABB
 	AABB computeBounds(int start, int count);
-	int buildRecursive(int start, int count);
+	int buildRecursive(int start, int count, int depth);
 	void traverseTree();
 };

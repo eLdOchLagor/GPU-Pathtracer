@@ -16,6 +16,11 @@ struct BVHNode {
 	int pad1;
 };
 
+struct HitResult {
+    float t;
+    int index;
+};
+
 struct Ray{
 	vec3 direction;
 	vec3 startPoint;
@@ -115,6 +120,7 @@ float RandomFloat(uint inputSeed){
 	return (PCGHash() / float(0xFFFFFFFFU));
 }
 // ----------------------------------------------------------------------------------------------------
+HitResult traverseBVHTree(Ray ray, vec3 rayDirInv);
 
 float triangleIntersectionTest(Ray currentRay, Primitive targetTriangle) {
 
@@ -187,25 +193,11 @@ float sphereIntersectionTest(Ray currentRay, Primitive targetSphere) {
 bool isInShadow(vec3 startPoint, vec3 y){
 	Ray shadowRay = Ray(normalize(y-startPoint), startPoint, vec3(0.0));
 	float distance = length(y - startPoint);
-
-	for(int i = 0; i < primitives.length(); i++){
-		
-		if (primitives[i].ID == 1 &&  primitives[i].materialType == 2){ // Skip if it hits a transmissive sphere (Special case)
-			continue;
-		}
-		
-		float t = -1.0;
-
-		if(primitives[i].ID == 0){
-			t = triangleIntersectionTest(shadowRay, primitives[i]);
-		}
-		else if(primitives[i].ID == 1){
-			t = sphereIntersectionTest(shadowRay, primitives[i]);
-		}
-		
-		if(t > 0.0 && t < distance) return true;
+	vec3 rayDirectionInv = 1.0/shadowRay.direction;
+	HitResult hit = traverseBVHTree(shadowRay, rayDirectionInv);
+	if(hit.t > 0.0 && hit.t < distance){
+		return true;
 	}
-
 	return false;
 }
 
@@ -237,13 +229,26 @@ bool intersectAABB(vec3 rayOrigin, vec3 rayDirInv, vec3 minB, vec3 maxB) {
     vec3 t2 = max(tMin, tMax);
     float tNear = max(max(t1.x, t1.y), t1.z);
     float tFar = min(min(t2.x, t2.y), t2.z);
+	
     return tFar >= max(tNear, 0.0);
 }
 
+float intersectAABBOther(vec3 rayOrigin, vec3 rayDirInv, vec3 minB, vec3 maxB) {
+    vec3 tMin = (minB - rayOrigin) * rayDirInv;
+    vec3 tMax = (maxB - rayOrigin) * rayDirInv;
+    vec3 t1 = min(tMin, tMax);
+    vec3 t2 = max(tMin, tMax);
+    float tNear = max(max(t1.x, t1.y), t1.z);
+    float tFar = min(min(t2.x, t2.y), t2.z);
+	bool didHit = tFar > tNear && tFar > 0;
+	return didHit ? tNear : 100000;
+    
+}
 
-int traverseBVHTree(Ray ray, vec3 rayDirInv) {
+
+HitResult traverseBVHTree(Ray ray, vec3 rayDirInv) {
     int nodeIndex = 0;
-    float closestT = -1.0;
+    float closestT = 100000;
     int closestPrimIdx = -1;
 
     
@@ -251,13 +256,13 @@ int traverseBVHTree(Ray ray, vec3 rayDirInv) {
     while (nodeIndex != -1) {
        
         if (nodeIndex < 0 || nodeIndex >= nodes.length()) {
-			if(closestPrimIdx != -1){return closestPrimIdx;}
-            return -1;
+			if(closestPrimIdx != -1){return HitResult(closestT,closestPrimIdx);}
+            return HitResult(-1,-1);
         }
 		
         BVHNode node = nodes[nodeIndex];
 
-        if (intersectAABB(ray.startPoint, rayDirInv, node.bBoxMin, node.bBoxMax)) {
+        if (intersectAABBOther(ray.startPoint, rayDirInv, node.bBoxMin, node.bBoxMax) < closestT) {
             if (node.triangleCount > 0) {
                 // Leaf node
                 for (int i = 0; i < node.triangleCount; ++i) {
@@ -268,7 +273,7 @@ int traverseBVHTree(Ray ray, vec3 rayDirInv) {
                         ? triangleIntersectionTest(ray, prim)
                         : sphereIntersectionTest(ray, prim);
 
-                    if (t > 0.0f && (closestT < 0.0f || t < closestT)) {
+                    if (t > 0.0f && (t < closestT)) {
                         closestT = t;
                         closestPrimIdx = primIndex;
                     }
@@ -282,7 +287,7 @@ int traverseBVHTree(Ray ray, vec3 rayDirInv) {
         }
     }
 
-    return closestPrimIdx;
+    return HitResult(closestT,closestPrimIdx);
 }
 
 
@@ -297,7 +302,7 @@ vec3 calculateDirectIllumination(vec3 dir, vec3 hitPoint, vec3 normal, vec3 surf
 
 	vec3 e1 = lightE1;
 	vec3 e2 = lightE2;
-
+	
 	float s = RandomFloat(seed);
 	float t = RandomFloat(seed);
 
@@ -358,18 +363,17 @@ vec3 raytrace(Ray ray) {
 	
 	for (int i = 0; i < maxBounces; i++) {
 		vec3 rayDirInv = 1.0 / ray.direction;
-		int triangleIndex = traverseBVHTree(ray, rayDirInv);
+		HitResult hit = traverseBVHTree(ray, rayDirInv);
 		//vec2 hit = intersectionTest(ray);
 
-		if (triangleIndex == -1) {
+		if (hit.index == -1) {
 			accumulatedColor += importance * vec3(0.2); // Background
 			break;
 		}
 
-		Primitive hitSurface = primitives[triangleIndex];
-		float t = (hitSurface.ID == 0) ? triangleIntersectionTest(ray, hitSurface) : sphereIntersectionTest(ray, hitSurface);
+		Primitive hitSurface = primitives[hit.index];
 
-		ray.endPoint = ray.startPoint + t * ray.direction;
+		ray.endPoint = ray.startPoint + hit.t * ray.direction;
 
 		// Compute surface normal
 		vec3 normal = (hitSurface.ID == 1)

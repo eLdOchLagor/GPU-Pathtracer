@@ -12,7 +12,7 @@ Scene::Scene(int presetID) {
 		CreateSceneFromModel("..\\models\\StanfordBunny348.obj");
         break;
     case 3:
-        CreateSceneFromModel("..\\models\\Bunny7K.obj");
+        CreateSceneFromModel("..\\models\\Bunny70K.obj");
         break;
     default:
         break;

@@ -9,7 +9,7 @@ BVHTree::BVHTree(const std::vector<Primitive>& primitives) : primitives(primitiv
         triangleIndices.resize(primitives.size());
         std::iota(triangleIndices.begin(), triangleIndices.end(), 0); //Skapar en lista med värden från 0 till triangleIndices.size().
 
-        buildRecursive(0, primitives.size()); //startar byggandet av trädet.
+        buildRecursive(0, primitives.size(), 0); //startar byggandet av trädet.
         //std::cout << this->nodes.size(); //Bara för debugging
 		//traverseTree(); //Traversera trädet för att se att det är korrekt byggt.
 }
@@ -25,7 +25,7 @@ AABB BVHTree::computeBounds(int start, int count) {
 
 
 //Funktionen bygger trädet uppifrån, dvs den startar med roten och slutar med löven.
-int BVHTree::buildRecursive(int start, int count) {
+int BVHTree::buildRecursive(int start, int count, int depth) {
     
     //Hämta boundsen för de relevanta trianglarna (om vi är i roten är det alla, i löven är det den enstaka triangeln).
     AABB bounds = computeBounds(start, count);
@@ -150,8 +150,8 @@ int BVHTree::buildRecursive(int start, int count) {
 
 
     //Gör recursion med children
-    int leftChild = buildRecursive(start, mid - start);
-    int rightChild = buildRecursive(mid, start + count - mid);
+    int leftChild = buildRecursive(start, mid - start, depth + 1);
+    int rightChild = buildRecursive(mid, start + count - mid, depth + 1);
 
     //Initialisera noden. Om vi inte slapar ett löv så har det inte en specifik triangel,
     //så trianglecount är 0 och starttriangle finns ej så vi sätter den till -1

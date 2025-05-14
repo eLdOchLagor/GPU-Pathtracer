@@ -160,14 +160,14 @@ void Scene::getSpheres() {
 
 void Scene::getRoom() {
     // Initializes 24 empty Primitives in the std::vector
-    primitives.resize(27);
+    primitives.resize(24);
     areaLights.resize(1);
-    pointLights.resize(1);
+    pointLights.resize(0);
     
-    areaLights[0].vertex1 = vec3(-2, 4.99, 8);
-    areaLights[0].vertex2 = vec3(2, 4.99, 8);
-    areaLights[0].vertex3 = vec3(2, 4.99, 11);
-    areaLights[0].vertex4 = vec3(-2, 4.99, 11);
+    areaLights[0].vertex1 = vec3(-2, 4.95, 8);
+    areaLights[0].vertex2 = vec3(2, 4.95, 8);
+    areaLights[0].vertex3 = vec3(2, 4.95, 11);
+    areaLights[0].vertex4 = vec3(-2, 4.95, 11);
     areaLights[0].normal = vec3(0.0, -1.0, 0.0);
     areaLights[0].radiance = vec3(10.0, 10.0, 10.0);
 
@@ -188,7 +188,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -201,7 +201,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -214,7 +214,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -227,7 +227,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -480,7 +480,7 @@ void Scene::getRoom() {
     primitives[i].ior = 1.5f;
 
     i++;
-
+    
     //Sphere 2
     primitives[i].vertex1 = vec3(-1.0f, -0.5f, 8.0f);
     primitives[i].vertex2 = vec3(1.5f, -5.0f, 10.0f);
@@ -495,11 +495,11 @@ void Scene::getRoom() {
     primitives[i].ior = 1.0f;
 
     i++;
-
+    
     //Light1 side1
-    primitives[i].vertex1 = vec3(-2, 4.99, 8);
-    primitives[i].vertex2 = vec3(2, 4.99, 8);
-    primitives[i].vertex3 = vec3(2, 4.99, 11);
+    primitives[i].vertex1 = vec3(-2, 4.95, 8);
+    primitives[i].vertex2 = vec3(2, 4.95, 8);
+    primitives[i].vertex3 = vec3(2, 4.95, 11);
     primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
     primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(0.0f, -1.0f, 0.0f);
@@ -511,9 +511,9 @@ void Scene::getRoom() {
 
     i++;
     //Light1 side2
-    primitives[i].vertex1 = vec3(2, 4.99, 11);
-    primitives[i].vertex2 = vec3(-2, 4.99, 11);
-    primitives[i].vertex3 = vec3(-2, 4.99, 8);
+    primitives[i].vertex1 = vec3(2, 4.95, 11);
+    primitives[i].vertex2 = vec3(-2, 4.95, 11);
+    primitives[i].vertex3 = vec3(-2, 4.95, 8);
     primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
     primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(0.0f, -1.0f, 0.0f);

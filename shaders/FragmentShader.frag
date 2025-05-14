@@ -395,6 +395,7 @@ Ray generateCameraRay(ivec2 pixelCoord){
 }
 
 vec3 raytrace(Ray ray) {
+	int transmissiveBounces = 0;
 	vec3 accumulatedColor = vec3(0.0);
 	vec3 importance = vec3(1.0); // Keeps track of ray contribution
 	
@@ -456,6 +457,7 @@ vec3 raytrace(Ray ray) {
 
 		// Transmissive surface
 		if (hitSurface.materialType == TRANSMISSIVE) {
+			transmissiveBounces++;
 			float ior = hitSurface.ior;
 
 			// Calculate normal if sphere
@@ -495,9 +497,13 @@ vec3 raytrace(Ray ray) {
 
 			ray.startPoint = ray.endPoint + 0.001 * ray.direction;
 			importance *= hitSurface.color;
+			i--;
 		}
 		if(hitSurface.materialType == LIGHT){
 			accumulatedColor += importance * hitSurface.color;
+			break;
+		}
+		if(transmissiveBounces > 5){
 			break;
 		}
 	}

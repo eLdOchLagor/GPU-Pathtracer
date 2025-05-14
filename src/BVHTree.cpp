@@ -38,7 +38,7 @@ int BVHTree::buildRecursive(int start, int count, int depth) {
     nodes.push_back(node);
 
     //Om det är en lövnod så skapar vi en korrekt lövnod (inga children så vi sätter dem till -1).
-    if (count <= 16) {
+    if (count <= 4) {
         nodes[nodeIndex].startTriangle = start;
         nodes[nodeIndex].triangleCount = count;
         nodes[nodeIndex].leftChild = -1;

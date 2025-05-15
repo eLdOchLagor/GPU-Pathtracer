@@ -39,12 +39,13 @@ private:
 	
 	GLuint textures[2];
 	Camera mainCamera;
-	Scene roomScene;
+	Scene currentScene;
 	GLuint framebuffer;
 
 	unsigned int PathtraceShader;
 	unsigned int DisplayShader;
 
+	int selectedIndex = -1;
 	int frameCount = 0;
 	float previousTime = 0;
 	float deltaTime = 0;

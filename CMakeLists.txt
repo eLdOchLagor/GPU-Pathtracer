@@ -28,10 +28,11 @@ file(GLOB SHADER_FILES shaders/*)
 set_source_files_properties(${SHADER_FILES} PROPERTIES HEADER_FILE_ONLY ON)
 
 # Create the executable
-add_executable(Raytracer ${SRC_FILES} ${SHADER_FILES})
+add_executable(Raytracer ${SRC_FILES} ${SHADER_FILES} external/ImGuiFileDialog/ImGuiFileDialog.cpp)
 
 add_library(ImGui ${IMGUI_SRC} ${IMGUI_HEADERS})
 target_include_directories(ImGui PUBLIC
+    external/ImGuiFileDialog
     external/imgui
     external/glfw/include
 )

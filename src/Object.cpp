@@ -12,18 +12,21 @@ void Object::CreateObjectFromModel(const std::string& path)
 
 	// Convert loaded data into primitives for ray tracing
 	primitives.resize(vertices.size() / 3);
+	size_t primIdx = 0;
 	for (size_t i = 0; i < vertices.size(); i += 3)
 	{
-		primitives[i / 3].vertex1 = vertices[i];
-		primitives[i / 3].vertex2 = vertices[i + 1];
-		primitives[i / 3].vertex3 = vertices[i + 2];
-		primitives[i / 3].edge1 = primitives[i / 3].vertex2 - primitives[i / 3].vertex1;
-		primitives[i / 3].edge2 = primitives[i / 3].vertex3 - primitives[i / 3].vertex1;
-		primitives[i / 3].normal = normals[i];
-		primitives[i / 3].color = vec3(255, 100, 100) / 255.0f; // Arbitrary color
-		primitives[i / 3].ID = 0;
-		primitives[i / 3].smoothness = 0.0f;
-		primitives[i / 3].materialType = 0;
-		primitives[i / 3].ior = 1.0f;
+		primitives[primIdx].vertex1 = vertices[i];
+		primitives[primIdx].vertex2 = vertices[i + 1];
+		primitives[primIdx].vertex3 = vertices[i + 2];
+		primitives[primIdx].edge1 = primitives[primIdx].vertex2 - primitives[primIdx].vertex1;
+		primitives[primIdx].edge2 = primitives[primIdx].vertex3 - primitives[primIdx].vertex1;
+		primitives[primIdx].normal = normals[i];
+		primitives[primIdx].color = vec3(255, 100, 100) / 255.0f; // Arbitrary color
+		primitives[primIdx].ID = 0;
+		primitives[primIdx].smoothness = 0.0f;
+		primitives[primIdx].materialType = 0;
+		primitives[primIdx].ior = 1.0f;
+
+		primIdx++;
 	}
 }

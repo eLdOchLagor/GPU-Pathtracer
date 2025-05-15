@@ -14,6 +14,12 @@ public:
 	Object(std::string filePath);
 
     void CreateObjectFromModel(const std::string& path);
+	void SetName(const std::string& name) { this->name = name; }
+	std::string GetName() { return name; }
+
+	vec3 position = vec3(0.0f);
+	vec3 rotation = vec3(0.0f);
+	vec3 scale = vec3(0.0f);
 
 private:
 	// For rendering using ray tracing
@@ -25,9 +31,9 @@ private:
 	std::vector<vec3> normals;
 	// ----------------------------------
 
-	vec3 position;
-	vec3 rotation;
-	vec3 scale;
+	std::string name = "New Object";
+
+	
 
 	mat4 modelMatrix;
 };

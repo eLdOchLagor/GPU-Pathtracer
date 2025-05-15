@@ -290,7 +290,16 @@ void Application::RenderGui(GLFWwindow* window)
 {
     Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
 
-    ImGui::Begin("User interface");
+	// Set up ImGui window position and size
+    ImVec2 screenSize = ImGui::GetIO().DisplaySize;
+    ImVec2 windowSize(300, screenSize.y - 20); // Desired size
+
+    ImVec2 pos(screenSize.x - windowSize.x - 10, 10); // 10px margin from top-right
+    ImGui::SetNextWindowPos(pos);
+    ImGui::SetNextWindowSize(windowSize);
+	// -------------------------------------------------
+
+    ImGui::Begin("User interface", nullptr, ImGuiWindowFlags_NoResize);
 
     ImGui::Text("FPS: %.1f", 1.0f / deltaTime);
 
@@ -341,12 +350,39 @@ void Application::RenderGui(GLFWwindow* window)
     }
 
 	// If an object is selected, show its properties
-    if (selectedIndex >= 0 && selectedIndex < currentScene.objects.size()) {
+    if (selectedIndex >= 0 && selectedIndex < currentScene.objects.size()) 
+    {
+        Object& obj = currentScene.objects[selectedIndex];
+        
         ImGui::Separator();
         ImGui::Text("Selected Object %d", selectedIndex);
 
-        Object& obj = currentScene.objects[selectedIndex];
+        // Load model from disk ------------------------------------------------------------------------
+        if (ImGui::Button("Load .OBJ file")) {
+            IGFD::FileDialogConfig config;
+            config.path = ".";
+            ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".obj", config);
+        }
+        // display
+        if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
+            if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
+                std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                std::string fileName = ImGuiFileDialog::Instance()->GetCurrentFileName();
 
+                obj.CreateObjectFromModel(filePathName);
+				obj.SetName(fileName);
+
+            }
+
+            // close
+            ImGuiFileDialog::Instance()->Close();
+        }
+		// --------------------------------------------------------------------------------------------
+        
+        ImGui::Text("Transform");
+        ImGui::DragFloat3("Position", &obj.position.x, 0.01f);
+        ImGui::DragFloat3("Rotation", &obj.rotation.x, 0.5f);
+        ImGui::DragFloat3("Scale", &obj.scale.x, 0.01f);
     }
 	// ----------------------------------------------------------------------------
     

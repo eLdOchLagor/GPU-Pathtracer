@@ -5,7 +5,7 @@ Application::Application(int width, int height, const std::string& title) : bvhT
 	screenHeight = height;
 	window = createWindow(title);
     mainCamera = Camera(vec3(0.0f, 0.0f, -1.0f), vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 1.0f, 0.0f), 80.0f, screenWidth, screenHeight);
-	roomScene = Scene{0};
+	currentScene = Scene{0};
 	Init();
 }
 
@@ -147,7 +147,7 @@ void Application::Init() {
 
     glGenBuffers(1, &SSBO_Primitives);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Primitives);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, roomScene.primitives.size() * sizeof(Primitive), roomScene.primitives.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, currentScene.primitives.size() * sizeof(Primitive), currentScene.primitives.data(), GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, SSBO_Primitives);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
@@ -163,12 +163,12 @@ void Application::Init() {
 
     glGenBuffers(1, &SSBO_PointLights);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_PointLights);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, roomScene.pointLights.size() * sizeof(PointLight), roomScene.pointLights.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, currentScene.pointLights.size() * sizeof(PointLight), currentScene.pointLights.data(), GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, SSBO_PointLights);
 
     glGenBuffers(1, &SSBO_AreaLights);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_AreaLights);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, roomScene.areaLights.size() * sizeof(AreaLight), roomScene.areaLights.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, currentScene.areaLights.size() * sizeof(AreaLight), currentScene.areaLights.data(), GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, SSBO_AreaLights);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
@@ -228,8 +228,8 @@ void Application::Run() {
         uploadUniformIntToShader(PathtraceShader, "numberOfSamples", numberOfSamples);
         uploadUniformIntToShader(PathtraceShader, "maxBounces", maxBounces);
 
-        uploadUniformIntToShader(PathtraceShader, "NUM_OF_POINT_LIGHTS", roomScene.pointLights.size());
-        uploadUniformIntToShader(PathtraceShader, "NUM_OF_AREA_LIGHTS", roomScene.areaLights.size());
+        uploadUniformIntToShader(PathtraceShader, "NUM_OF_POINT_LIGHTS", currentScene.pointLights.size());
+        uploadUniformIntToShader(PathtraceShader, "NUM_OF_AREA_LIGHTS", currentScene.areaLights.size());
 		// ----------------------------------------------------------------------------------------------
 
         /*
@@ -317,22 +317,38 @@ void Application::RenderGui(GLFWwindow* window)
     // Add environment lighting
     // Fix glass material
 
-    /*
-    int selectedIndex = -1;
+	// Object management ------------------------------------------------------------
+    ImGui::BeginChild("Scene Objects", ImVec2(0, 200), true);
 
-    ImGui::BeginChild("Scene Objects");
-
-    for (int i = 0; i < 50; i++)
-    {
-        std::string label = "Object " + std::to_string(i); // Or use object names
-        if (ImGui::Selectable("test", selectedIndex == i)) {
-            selectedIndex = i;
+    if (currentScene.objects.empty()) {
+        ImGui::TextDisabled("No objects in the scene.");
+    }
+    else {
+        for (int i = 0; i < currentScene.objects.size(); i++) {
+            std::string label = "Object " + std::to_string(i); // Or use object names
+            if (ImGui::Selectable(label.c_str(), selectedIndex == i)) {
+                selectedIndex = i;
+            }
         }
     }
 
     ImGui::EndChild();
-    */
+    
+    if (ImGui::Button("Add Object")) {
+        Object newObj;
+        currentScene.objects.push_back(newObj);
+        selectedIndex = currentScene.objects.size() - 1;
+    }
 
+	// If an object is selected, show its properties
+    if (selectedIndex >= 0 && selectedIndex < currentScene.objects.size()) {
+        ImGui::Separator();
+        ImGui::Text("Selected Object %d", selectedIndex);
+
+        Object& obj = currentScene.objects[selectedIndex];
+
+    }
+	// ----------------------------------------------------------------------------
     
     ImGui::End();
 }

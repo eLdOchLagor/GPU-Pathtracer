@@ -10,6 +10,8 @@
 #include <VectorUtils4.h>
 #include "Primitive.h"
 #include "Light.h"
+#include "Object.h"
+
 class Scene
 {
 public:
@@ -26,6 +28,7 @@ public:
     
 
     std::vector<Primitive> primitives;
+    std::vector<Object> objects;
     std::vector<PointLight> pointLights;
     std::vector<AreaLight> areaLights;
 private:

@@ -51,32 +51,29 @@ void Application::Init() {
         return;
     }
 
-    float verts[] = {
-        //bottom left Triangle
-        -1.0f, -1.0f, 0.0f,
-        1.0f, -1.0f, 0.0f,
-        -1.0f, 1.0f, 0.0f,
-        //top right Triangle
-        1.0f, -1.0f, 0.0f,
-        1.0f, 1.0f, 0.0f,
-        -1.0f, 1.0f, 0.0f
-    };
-
     // Shader initialization ----------------------------------------------------------------
-    Shader VertexShader = Shader("..\\shaders\\VertexShader.vert", GL_VERTEX_SHADER);
-    //Shader FragmentShader = Shader("..\\shaders\\FragmentShaderNoBVH.frag", GL_FRAGMENT_SHADER);
-    Shader FragmentShader = Shader("..\\shaders\\FragmentShader.frag", GL_FRAGMENT_SHADER);
+    
+    //Shader FragmentShader = Shader("..\\shaders\\PathtraceShaderNoBVH.frag", GL_FRAGMENT_SHADER);
+    Shader PathtraceFragment = Shader("..\\shaders\\PathtraceShader.frag", GL_FRAGMENT_SHADER);
     Shader DisplayFragment = Shader("..\\shaders\\DisplayShader.frag", GL_FRAGMENT_SHADER);
+    Shader DisplayVertex = Shader("..\\shaders\\DisplayShader.vert", GL_VERTEX_SHADER);
+    Shader RasterVertex = Shader("..\\shaders\\RasterShader.vert", GL_VERTEX_SHADER);
+    Shader RasterFragment = Shader("..\\shaders\\RasterShader.frag", GL_FRAGMENT_SHADER);
 
     PathtraceShader = glCreateProgram();
-    glAttachShader(PathtraceShader, VertexShader.shaderID);
-    glAttachShader(PathtraceShader, FragmentShader.shaderID);
+    glAttachShader(PathtraceShader, DisplayVertex.shaderID);
+    glAttachShader(PathtraceShader, PathtraceFragment.shaderID);
     glLinkProgram(PathtraceShader);
 
     DisplayShader = glCreateProgram();
-    glAttachShader(DisplayShader, VertexShader.shaderID);
+    glAttachShader(DisplayShader, DisplayVertex.shaderID);
     glAttachShader(DisplayShader, DisplayFragment.shaderID);
     glLinkProgram(DisplayShader);
+
+    RasterShader = glCreateProgram();
+    glAttachShader(RasterShader, RasterVertex.shaderID);
+    glAttachShader(RasterShader, RasterFragment.shaderID);
+    glLinkProgram(RasterShader);
 
     // Check for linking errors
     int success;
@@ -95,88 +92,27 @@ void Application::Init() {
         std::cerr << "ERROR::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
     }
 
+    glGetProgramiv(RasterShader, GL_LINK_STATUS, &success);
+    if (!success)
+    {
+        glGetProgramInfoLog(RasterShader, 512, NULL, infoLog);
+        std::cerr << "ERROR::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+    }
+
     // Delete the shaders as it is no longer needed
-    glDeleteShader(VertexShader.shaderID);
-    glDeleteShader(FragmentShader.shaderID);
+    glDeleteShader(DisplayVertex.shaderID);
+    glDeleteShader(PathtraceFragment.shaderID);
     glDeleteShader(DisplayFragment.shaderID);
+    glDeleteShader(RasterFragment.shaderID);
+    glDeleteShader(RasterVertex.shaderID);
 
     // ----------------------------------------------------------------------------------------
 
     unsigned int timeLoc = glGetUniformLocation(PathtraceShader, "time");
 
-
-    glGenTextures(2, textures);
-    for (int i = 0; i < 2; i++) {
-        glBindTexture(GL_TEXTURE_2D, textures[i]);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, screenWidth, screenHeight, 0, GL_RGBA, GL_FLOAT, nullptr);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    }
-    // --------------------------------------------------------------------
-
-    unsigned int VBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-    //ubos instead of SSBO since were at an earlier version of opengl // JONATANS EXTRA FINA TESTKOD
-    GLuint SSBO_Primitives;
-    GLuint SSBO_BVH;
-    GLuint SSBO_Indices;
-    GLuint SSBO_PointLights;
-    GLuint SSBO_AreaLights;
-
-    std::vector<BVHNode> gpuNodes;
-    gpuNodes.reserve(bvhTree.getNodes().size());
-    for (const BVHNode& node : bvhTree.getNodes()) {
-        gpuNodes.push_back({
-            node.bBoxMin,
-            node.leftChild,
-            node.bBoxMax,
-            node.rightChild,
-            node.startTriangle,
-            node.triangleCount,
-            node.escapeIndex,0
-            });
-    }
-
-    // Allocate SSBO for spheres
-
-    std::cout << "Size: " << sizeof(Primitive) << " Bytes \n";
-
-    glGenBuffers(1, &SSBO_Primitives);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Primitives);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, currentScene.primitives.size() * sizeof(Primitive), currentScene.primitives.data(), GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, SSBO_Primitives);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-    glGenBuffers(1, &SSBO_BVH);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_BVH);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, gpuNodes.size() * sizeof(BVHNode), gpuNodes.data(), GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, SSBO_BVH);
-
-    glGenBuffers(1, &SSBO_Indices);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Indices);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, bvhTree.getIndices().size() * sizeof(int), bvhTree.getIndices().data(), GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, SSBO_Indices);
-
-    glGenBuffers(1, &SSBO_PointLights);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_PointLights);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, currentScene.pointLights.size() * sizeof(PointLight), currentScene.pointLights.data(), GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, SSBO_PointLights);
-
-    glGenBuffers(1, &SSBO_AreaLights);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_AreaLights);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, currentScene.areaLights.size() * sizeof(AreaLight), currentScene.areaLights.data(), GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, SSBO_AreaLights);
-
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    glBindVertexArray(0);
+	// Bind SSBO buffers
+	BindBuffersPathtraced();
+    
 
 
     glViewport(0, 0, screenWidth, screenHeight);
@@ -205,68 +141,15 @@ void Application::Run() {
     {
         processInput(window);
 
-        int nextTexture = 1 - currentTexture;
-
         float currentTime = glfwGetTime();
         deltaTime = currentTime - previousTime;
 
-        //std::clog << "\rFPS: " << 1 / deltaTime;
+        // Rendering code
+        //RenderPathtraced();
 
-		// Upload uniform variables to shader ---------------------------------------------------------
-        uploadUniformVec3ToShader(PathtraceShader, "cameraPosition", mainCamera.GetPosition());
-        uploadUniformVec3ToShader(PathtraceShader, "forward", mainCamera.GetForward());
-        uploadUniformVec3ToShader(PathtraceShader, "right", mainCamera.GetRight());
-        uploadUniformVec3ToShader(PathtraceShader, "up", mainCamera.GetUp());
+        RenderRasterized();
 
-        uploadUniformFloatToShader(PathtraceShader, "imagePlaneHeight", mainCamera.GetImagePlaneHeight());
-        uploadUniformFloatToShader(PathtraceShader, "imagePlaneWidth", mainCamera.GetImagePlaneWidth());
-
-        uploadUniformIntToShader(PathtraceShader, "screenWidth", screenWidth);
-        uploadUniformIntToShader(PathtraceShader, "screenHeight", screenHeight);
-        uploadUniformIntToShader(PathtraceShader, "frameCount", frameCount);
-
-        uploadUniformIntToShader(PathtraceShader, "numberOfSamples", numberOfSamples);
-        uploadUniformIntToShader(PathtraceShader, "maxBounces", maxBounces);
-
-        uploadUniformIntToShader(PathtraceShader, "NUM_OF_POINT_LIGHTS", currentScene.pointLights.size());
-        uploadUniformIntToShader(PathtraceShader, "NUM_OF_AREA_LIGHTS", currentScene.areaLights.size());
-		// ----------------------------------------------------------------------------------------------
-
-        /*
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Primitives);
-        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, (MAX_PRIMITVES) * sizeof(Primitive), primitives);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-        */
-        
-        // Pathtracing pass, Rendering to texture
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textures[nextTexture], 0);
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glUseProgram(PathtraceShader); // Pathtracing shader
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, textures[currentTexture]);
-
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);  // Unbind framebuffer to render to screen
-        // -------------------------------------------------------------------------------
-
-        // Display pass, render accumulated image to screen
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glUseProgram(DisplayShader);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, textures[nextTexture]); // Bind the accumulated result
-
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-
-        // -----------------------------------------------------
+        // ImGui UI -------------------------------------------
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
@@ -275,15 +158,93 @@ void Application::Run() {
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        // ---------------------------------------------------
 
         // Swap the buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
 
         previousTime = currentTime;
-        currentTexture = nextTexture;
         frameCount++;
     }
+}
+
+void Application::RenderRasterized()
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+
+    glClearColor(0.5, 0.5, 0.5, 1.0);
+
+    glUseProgram(RasterShader);
+
+    for (auto& obj : currentScene.objects) {
+        obj.RenderObject();
+    }
+}
+
+void Application::RenderPathtraced()
+{
+    int nextTexture = 1 - currentTexture;
+
+    // Upload uniform variables to shader ---------------------------------------------------------
+    uploadUniformVec3ToShader(PathtraceShader, "cameraPosition", mainCamera.GetPosition());
+    uploadUniformVec3ToShader(PathtraceShader, "forward", mainCamera.GetForward());
+    uploadUniformVec3ToShader(PathtraceShader, "right", mainCamera.GetRight());
+    uploadUniformVec3ToShader(PathtraceShader, "up", mainCamera.GetUp());
+
+    uploadUniformFloatToShader(PathtraceShader, "imagePlaneHeight", mainCamera.GetImagePlaneHeight());
+    uploadUniformFloatToShader(PathtraceShader, "imagePlaneWidth", mainCamera.GetImagePlaneWidth());
+
+    uploadUniformIntToShader(PathtraceShader, "screenWidth", screenWidth);
+    uploadUniformIntToShader(PathtraceShader, "screenHeight", screenHeight);
+    uploadUniformIntToShader(PathtraceShader, "frameCount", frameCount);
+
+    uploadUniformIntToShader(PathtraceShader, "numberOfSamples", numberOfSamples);
+    uploadUniformIntToShader(PathtraceShader, "maxBounces", maxBounces);
+
+    uploadUniformIntToShader(PathtraceShader, "NUM_OF_POINT_LIGHTS", currentScene.pointLights.size());
+    uploadUniformIntToShader(PathtraceShader, "NUM_OF_AREA_LIGHTS", currentScene.areaLights.size());
+    // ----------------------------------------------------------------------------------------------
+
+    /*
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Primitives);
+    glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, (MAX_PRIMITVES) * sizeof(Primitive), primitives);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    */
+
+    // Pathtracing pass, Rendering to texture
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textures[nextTexture], 0);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glUseProgram(PathtraceShader); // Pathtracing shader
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, textures[currentTexture]);
+
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);  // Unbind framebuffer to render to screen
+    // -------------------------------------------------------------------------------
+
+    // Display pass, render accumulated image to screen
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glUseProgram(DisplayShader);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, textures[nextTexture]); // Bind the accumulated result
+
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    currentTexture = nextTexture;
+    // -----------------------------------------------------
 }
 
 void Application::RenderGui(GLFWwindow* window)
@@ -372,6 +333,7 @@ void Application::RenderGui(GLFWwindow* window)
                 obj.CreateObjectFromModel(filePathName);
 				obj.SetName(fileName);
 
+				obj.BindBuffers();
             }
 
             // close
@@ -388,6 +350,101 @@ void Application::RenderGui(GLFWwindow* window)
     
     ImGui::End();
 }
+
+void Application::BindBuffersPathtraced()
+{
+    float verts[] = {
+        //bottom left Triangle
+        -1.0f, -1.0f, 0.0f,
+        1.0f, -1.0f, 0.0f,
+        -1.0f, 1.0f, 0.0f,
+        //top right Triangle
+        1.0f, -1.0f, 0.0f,
+        1.0f, 1.0f, 0.0f,
+        -1.0f, 1.0f, 0.0f
+    };
+
+    glGenTextures(2, textures);
+    for (int i = 0; i < 2; i++) {
+        glBindTexture(GL_TEXTURE_2D, textures[i]);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, screenWidth, screenHeight, 0, GL_RGBA, GL_FLOAT, nullptr);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    }
+    // --------------------------------------------------------------------
+
+    unsigned int VBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    //ubos instead of SSBO since were at an earlier version of opengl // JONATANS EXTRA FINA TESTKOD
+    GLuint SSBO_Primitives;
+    GLuint SSBO_BVH;
+    GLuint SSBO_Indices;
+    GLuint SSBO_PointLights;
+    GLuint SSBO_AreaLights;
+
+    std::vector<BVHNode> gpuNodes;
+    gpuNodes.reserve(bvhTree.getNodes().size());
+    for (const BVHNode& node : bvhTree.getNodes()) {
+        gpuNodes.push_back({
+            node.bBoxMin,
+            node.leftChild,
+            node.bBoxMax,
+            node.rightChild,
+            node.startTriangle,
+            node.triangleCount,
+            node.escapeIndex,0
+            });
+    }
+
+    // Allocate SSBO for spheres
+
+    std::cout << "Size: " << sizeof(Primitive) << " Bytes \n";
+
+    glGenBuffers(1, &SSBO_Primitives);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Primitives);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, currentScene.primitives.size() * sizeof(Primitive), currentScene.primitives.data(), GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, SSBO_Primitives);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glGenBuffers(1, &SSBO_BVH);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_BVH);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, gpuNodes.size() * sizeof(BVHNode), gpuNodes.data(), GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, SSBO_BVH);
+
+    glGenBuffers(1, &SSBO_Indices);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_Indices);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, bvhTree.getIndices().size() * sizeof(int), bvhTree.getIndices().data(), GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, SSBO_Indices);
+
+    glGenBuffers(1, &SSBO_PointLights);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_PointLights);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, currentScene.pointLights.size() * sizeof(PointLight), currentScene.pointLights.data(), GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, SSBO_PointLights);
+
+    glGenBuffers(1, &SSBO_AreaLights);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO_AreaLights);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, currentScene.areaLights.size() * sizeof(AreaLight), currentScene.areaLights.data(), GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, SSBO_AreaLights);
+
+    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+}
+
+void Application::BindBuffersRasterized()
+{
+	for (auto& obj : currentScene.objects) {
+		obj.BindBuffers();
+	}
+}
+
 void Application::mouse_callback(GLFWwindow* window, double xpos, double ypos) 
 {
     Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));

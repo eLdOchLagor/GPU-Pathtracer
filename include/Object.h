@@ -17,13 +17,16 @@ public:
 	void SetName(const std::string& name) { this->name = name; }
 	std::string GetName() { return name; }
 
+	void BindBuffers();
+	void RenderObject();
+
 	vec3 position = vec3(0.0f);
 	vec3 rotation = vec3(0.0f);
 	vec3 scale = vec3(0.0f);
 
-private:
-	// For rendering using ray tracing
-    std::vector<Primitive> primitives;
+	mat4 modelMatrix;
+
+	unsigned int VAO, VBO, NBO;
 
 	// For rendering using rasterization
 	std::vector<vec3> vertices;
@@ -31,9 +34,9 @@ private:
 	std::vector<vec3> normals;
 	// ----------------------------------
 
+private:
+	// For rendering using ray tracing
+    std::vector<Primitive> primitives;
+
 	std::string name = "New Object";
-
-	
-
-	mat4 modelMatrix;
 };

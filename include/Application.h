@@ -13,8 +13,6 @@
 #include "Camera.h"
 #include "BVHTree.h"
 
-
-
 class Application
 {
 public:
@@ -22,6 +20,12 @@ public:
 	~Application();
 	
 	void Run();
+
+	void RenderPathtraced();
+	void RenderRasterized();
+
+	void BindBuffersPathtraced();
+	void BindBuffersRasterized();
 
 	//void SetScene(Scene* scene);
 	//Scene* GetScene() const;
@@ -45,6 +49,7 @@ private:
 
 	unsigned int PathtraceShader;
 	unsigned int DisplayShader;
+	unsigned int RasterShader;
 
 	int selectedIndex = -1;
 	int frameCount = 0;

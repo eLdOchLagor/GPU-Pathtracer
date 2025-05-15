@@ -148,7 +148,7 @@ float RandomFloat(uint inputSeed){
 	return (PCGHash() / float(0xFFFFFFFFU));
 }
 // ----------------------------------------------------------------------------------------------------
-HitResult traverseBVHTree(Ray ray, vec3 rayDirInv);
+HitResult traverseBVHTree(Ray ray, vec3 rayDirInv, bool includeGlass);
 
 float triangleIntersectionTest(Ray currentRay, Primitive targetTriangle) {
 
@@ -222,7 +222,7 @@ bool isInShadow(vec3 startPoint, vec3 y){
 	Ray shadowRay = Ray(normalize(y-startPoint), startPoint, vec3(0.0));
 	float distance = length(y - startPoint);
 	vec3 rayDirectionInv = 1.0/shadowRay.direction;
-	HitResult hit = traverseBVHTree(shadowRay, rayDirectionInv);
+	HitResult hit = traverseBVHTree(shadowRay, rayDirectionInv, false);
 	if(hit.t > 0.0 && hit.t < distance){
 		return true;
 	}
@@ -274,7 +274,7 @@ float intersectAABBOther(vec3 rayOrigin, vec3 rayDirInv, vec3 minB, vec3 maxB) {
 }
 
 
-HitResult traverseBVHTree(Ray ray, vec3 rayDirInv) {
+HitResult traverseBVHTree(Ray ray, vec3 rayDirInv, bool includeGlass) {
     int nodeIndex = 0;
     float closestT = 100000;
     int closestPrimIdx = -1;
@@ -296,6 +296,7 @@ HitResult traverseBVHTree(Ray ray, vec3 rayDirInv) {
                 for (int i = 0; i < node.triangleCount; ++i) {
                     int primIndex = triangleIndices[node.startTriangle + i];
                     Primitive prim = primitives[primIndex];
+					if(prim.materialType == TRANSMISSIVE && !includeGlass){continue;}
 
                     float t = (prim.ID == 0) ? triangleIntersectionTest(ray, prim) : sphereIntersectionTest(ray, prim);
 
@@ -304,12 +305,12 @@ HitResult traverseBVHTree(Ray ray, vec3 rayDirInv) {
                         closestPrimIdx = primIndex;
                     }
                 }
-                nodeIndex = node.escapeIndex; // ➜ Go to next node
+                nodeIndex = node.escapeIndex; //Go to next node
             } else {
-                nodeIndex = node.leftChild; // ➜ Go to left child
+                nodeIndex = node.leftChild; //Go to left child
             }
         } else {
-            nodeIndex = node.escapeIndex; // ➜ Skip subtree
+            nodeIndex = node.escapeIndex; //Skip subtree
         }
     }
 
@@ -401,7 +402,7 @@ vec3 raytrace(Ray ray) {
 	
 	for (int i = 0; i < maxBounces; i++) {
 		vec3 rayDirInv = 1.0 / ray.direction;
-		HitResult hit = traverseBVHTree(ray, rayDirInv);
+		HitResult hit = traverseBVHTree(ray, rayDirInv, true);
 		
 		//vec2 hit = intersectionTest(ray);
 
@@ -503,7 +504,7 @@ vec3 raytrace(Ray ray) {
 			accumulatedColor += importance * hitSurface.color;
 			break;
 		}
-		if(transmissiveBounces > 5){
+		if(transmissiveBounces > 10){
 			break;
 		}
 	}

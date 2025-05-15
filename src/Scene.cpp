@@ -162,7 +162,7 @@ void Scene::getRoom() {
     // Initializes 24 empty Primitives in the std::vector
     primitives.resize(24);
     areaLights.resize(1);
-    pointLights.resize(0);
+    pointLights.resize(1);
     
     areaLights[0].vertex1 = vec3(-2, 4.95, 8);
     areaLights[0].vertex2 = vec3(2, 4.95, 8);
@@ -171,6 +171,7 @@ void Scene::getRoom() {
     areaLights[0].normal = vec3(0.0, -1.0, 0.0);
     areaLights[0].radiance = vec3(10.0, 10.0, 10.0);
 
+    
     
 
     vec3 e1 = vec3(0.0f);
@@ -488,10 +489,10 @@ void Scene::getRoom() {
     primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
     primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
-    primitives[i].color = vec3(0, 255, 0) / 255.0f;
+    primitives[i].color = vec3(10, 10, 10);
     primitives[i].ID = 1;
     primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 0;
+    primitives[i].materialType = 3;
     primitives[i].ior = 1.0f;
 
     i++;

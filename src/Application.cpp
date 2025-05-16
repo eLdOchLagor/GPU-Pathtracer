@@ -110,9 +110,9 @@ void Application::Init() {
 
     unsigned int timeLoc = glGetUniformLocation(PathtraceShader, "time");
 
-	// Bind SSBO buffers
+	// Bind buffers
 	BindBuffersPathtraced();
-    
+	BindBuffersRasterized();
 
 
     glViewport(0, 0, screenWidth, screenHeight);
@@ -145,9 +145,15 @@ void Application::Run() {
         deltaTime = currentTime - previousTime;
 
         // Rendering code
-        //RenderPathtraced();
-
-        RenderRasterized();
+        if (isRastered)
+        {
+            RenderRasterized();
+        }
+        else
+        {
+            RenderPathtraced();
+        }
+        
 
         // ImGui UI -------------------------------------------
         ImGui_ImplOpenGL3_NewFrame();
@@ -171,6 +177,9 @@ void Application::Run() {
 
 void Application::RenderRasterized()
 {
+	uploadMat4ToShader(RasterShader, "view", mainCamera.viewMatrix);
+    uploadMat4ToShader(RasterShader, "perspective", mainCamera.projectionMatrix);
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glEnable(GL_DEPTH_TEST);
@@ -181,6 +190,7 @@ void Application::RenderRasterized()
     glUseProgram(RasterShader);
 
     for (auto& obj : currentScene.objects) {
+        uploadMat4ToShader(RasterShader, "model", obj.modelMatrix);
         obj.RenderObject();
     }
 }
@@ -264,9 +274,20 @@ void Application::RenderGui(GLFWwindow* window)
 
     ImGui::Text("FPS: %.1f", 1.0f / deltaTime);
 
-    if (ImGui::Button("Enable Pathtracing"))
+    if (ImGui::Button("Switch rendering mode"))
     {
-        std::cout << "Switches to raytracing";
+        std::cout << "Switches rendering mode";
+
+        if (isRastered)
+        {
+            BindBuffersPathtraced();
+		}
+		else
+		{
+			BindBuffersRasterized();
+		}
+
+		isRastered = !isRastered;
     }
     if (ImGui::SliderInt("Samples/frame", &numberOfSamples, 1, 50))
     {
@@ -342,9 +363,18 @@ void Application::RenderGui(GLFWwindow* window)
 		// --------------------------------------------------------------------------------------------
         
         ImGui::Text("Transform");
-        ImGui::DragFloat3("Position", &obj.position.x, 0.01f);
-        ImGui::DragFloat3("Rotation", &obj.rotation.x, 0.5f);
-        ImGui::DragFloat3("Scale", &obj.scale.x, 0.01f);
+        if (ImGui::DragFloat3("Position", &obj.position.x, 0.01f))
+        {
+			obj.UpdateModelMatrix();
+        }
+        if (ImGui::DragFloat3("Rotation", &obj.rotation.x, 0.5f))
+        {
+            obj.UpdateModelMatrix();
+        }
+        if (ImGui::DragFloat3("Scale", &obj.scale.x, 0.01f))
+        {
+            obj.UpdateModelMatrix();
+        }
     }
 	// ----------------------------------------------------------------------------
     
@@ -353,6 +383,16 @@ void Application::RenderGui(GLFWwindow* window)
 
 void Application::BindBuffersPathtraced()
 {
+	for (auto& obj : currentScene.objects) {
+        currentScene.primitives.clear();
+
+		// Add all primitives from the object to the scene
+		currentScene.primitives.insert(currentScene.primitives.end(), obj.primitives.begin(), obj.primitives.end());
+	}
+
+    // Rebuild the bvh tree
+    bvhTree.rebuild(currentScene.primitives);
+
     float verts[] = {
         //bottom left Triangle
         -1.0f, -1.0f, 0.0f,
@@ -469,16 +509,28 @@ void Application::mouse_callback(GLFWwindow* window, double xpos, double ypos)
             app->mainCamera.pitch = -89.0f;
 
         vec3 forwardDirection = vec3(0.0f);
+
         // As with wasd movement, left and right are opposite
-        forwardDirection.z = cos(app->mainCamera.yaw * M_PI / 180.0f) * cos(app->mainCamera.pitch * M_PI / 180.0f);
-        forwardDirection.y = sin(app->mainCamera.pitch * M_PI / 180.0f);
-        forwardDirection.x = sin(app->mainCamera.yaw * M_PI / 180.0f) * cos(app->mainCamera.pitch * M_PI / 180.0f);
+        if (app->isRastered)
+        {
+            forwardDirection.z = cos(app->mainCamera.yaw * M_PI / 180.0f) * cos(app->mainCamera.pitch * M_PI / 180.0f);
+            forwardDirection.y = sin(app->mainCamera.pitch * M_PI / 180.0f);
+            forwardDirection.x = sin(app->mainCamera.yaw * M_PI / 180.0f) * cos(app->mainCamera.pitch * M_PI / 180.0f);
+        }
+        else {
+            forwardDirection.z = cos(app->mainCamera.yaw * M_PI / 180.0f) * cos(app->mainCamera.pitch * M_PI / 180.0f);
+            forwardDirection.y = sin(app->mainCamera.pitch * M_PI / 180.0f);
+            forwardDirection.x = sin(app->mainCamera.yaw * M_PI / 180.0f) * cos(app->mainCamera.pitch * M_PI / 180.0f);
+        }
 
         app->mainCamera.SetForward(forwardDirection);
 
         // Reset accumulation
-        app->frameCount = 0;
-        clearAccumulationBuffer(window);
+        if (!app->isRastered)
+        {
+            app->frameCount = 0;
+            clearAccumulationBuffer(window);
+        }
     }
 }
 
@@ -510,7 +562,11 @@ void Application::processInput(GLFWwindow* window)
         cameraMoved = true;
     }
 
-    if (cameraMoved)
+    if (cameraMoved) {
+        app->mainCamera.UpdateCameraVectors();
+    }
+
+    if (cameraMoved && !app->isRastered)
     {
         app->frameCount = 0;
         clearAccumulationBuffer(window);
@@ -558,9 +614,11 @@ void Application::scroll_callback(GLFWwindow* window, double xoffset, double yof
             return;
         }
 
-        app->frameCount = 0;
-        clearAccumulationBuffer(window);
-
+        if (!app->isRastered)
+        {
+            app->frameCount = 0;
+            clearAccumulationBuffer(window);
+        }
     }
     
 }

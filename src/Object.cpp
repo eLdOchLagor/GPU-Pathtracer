@@ -58,3 +58,12 @@ void Object::RenderObject()
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, vertices.size()); // If it does not work, make sure it is Uint
 }
+
+void Object::UpdateModelMatrix()
+{
+	mat4 translationMatrix = T(position.x, position.y, position.z);
+	mat4 rotationMatrix = Rz(rotation.z) * Ry(rotation.y) * Rx(rotation.x);
+	mat4 scaleMatrix = S(scale.x, scale.y, scale.z);
+
+	modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;;
+}

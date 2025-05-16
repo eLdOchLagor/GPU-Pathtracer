@@ -4,7 +4,7 @@
 
 
 
-BVHTree::BVHTree(const std::vector<Primitive>& primitives) : primitives(primitives){
+BVHTree::BVHTree(std::vector<Primitive>& primitives) : primitives(primitives){
         // Initialize index buffer [0, 1, ..., N-1]
         triangleIndices.resize(primitives.size());
         std::iota(triangleIndices.begin(), triangleIndices.end(), 0); //Skapar en lista med värden från 0 till triangleIndices.size().
@@ -23,6 +23,17 @@ AABB BVHTree::computeBounds(int start, int count) {
     return bounds;
 }
 
+void BVHTree::rebuild(const std::vector<Primitive>& newPrims)
+{
+    primitives = newPrims;
+
+    nodes.clear();
+
+    triangleIndices.resize(primitives.size());
+    std::iota(triangleIndices.begin(), triangleIndices.end(), 0);
+
+    buildRecursive(0, primitives.size(), 0);
+}
 
 //Funktionen bygger trädet uppifrån, dvs den startar med roten och slutar med löven.
 int BVHTree::buildRecursive(int start, int count, int depth) {

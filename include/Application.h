@@ -38,6 +38,7 @@ public:
 	static void processInput(GLFWwindow* window);
 
 	GLFWwindow* window;
+	bool isRastered = true;
 
 private:
 	int screenWidth, screenHeight;

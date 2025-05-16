@@ -16,15 +16,16 @@ public:
     void CreateObjectFromModel(const std::string& path);
 	void SetName(const std::string& name) { this->name = name; }
 	std::string GetName() { return name; }
+	void UpdateModelMatrix();
 
 	void BindBuffers();
 	void RenderObject();
 
 	vec3 position = vec3(0.0f);
 	vec3 rotation = vec3(0.0f);
-	vec3 scale = vec3(0.0f);
+	vec3 scale = vec3(1.0f);
 
-	mat4 modelMatrix;
+	mat4 modelMatrix = S(scale.x, scale.y, scale.z) * T(position.x, position.y, position.z) * Rz(rotation.z * M_PI / 180.0f) * Ry(rotation.y * M_PI / 180.0f) * Rx(rotation.x * M_PI / 180.0f);
 
 	unsigned int VAO, VBO, NBO;
 
@@ -34,9 +35,10 @@ public:
 	std::vector<vec3> normals;
 	// ----------------------------------
 
-private:
 	// For rendering using ray tracing
-    std::vector<Primitive> primitives;
+	std::vector<Primitive> primitives;
+
+private:
 
 	std::string name = "New Object";
 };

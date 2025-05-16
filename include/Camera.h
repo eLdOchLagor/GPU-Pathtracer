@@ -21,6 +21,9 @@ public:
 
 		lastX = width / 2.0f;
 	    lastY = height / 2.0f;
+
+		viewMatrix = lookAt(position, position + _forward, _trueUp);
+		projectionMatrix = perspective(_fov * M_PI / 180.0f, _aspectRatio, 0.1f, 100.0f);
 	};
 
 	vec3 GetPosition() { return position; }
@@ -45,11 +48,16 @@ public:
 	void UpdateCameraVectors() {
 		_right = normalize(cross(_forward, vec3(0.0f, 1.0f, 0.0f)));
 		_trueUp = cross(_right, _forward);
+
+		viewMatrix = lookAt(position, position + _forward, _trueUp);
 	}
 
 	void UpdateCameraPlane() {
 		_imagePlaneHeight = 2 * tan(M_PI * _fov / 180.0f / 2.0f);
 		_imagePlaneWidth = _imagePlaneHeight * _aspectRatio;
+
+		// A change in fov occurs
+		projectionMatrix = perspective(_fov * M_PI / 180.0f, _aspectRatio, 0.1f, 100.0f);
 	}
 
 	vec3 position;
@@ -60,6 +68,9 @@ public:
 	float yaw = 0.0f;
 
 	bool cameraEnabled = false;
+
+	mat4 viewMatrix;
+	mat4 projectionMatrix;
 
 private:
 	vec3 _forward;

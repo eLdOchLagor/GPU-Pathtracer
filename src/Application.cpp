@@ -280,6 +280,9 @@ void Application::RenderGui(GLFWwindow* window)
 
         if (isRastered)
         {
+            app->frameCount = 0;
+            clearAccumulationBuffer(window);
+
             BindBuffersPathtraced();
 		}
 		else
@@ -331,6 +334,25 @@ void Application::RenderGui(GLFWwindow* window)
         selectedIndex = currentScene.objects.size() - 1;
     }
 
+    // Load preset scenes ------------------------------------------------
+    ImGui::BeginDisabled(presetSceneButton1); // Disable if already pressed
+    if (ImGui::Button("Load preset scene 1") && !presetSceneButton1) {
+        presetSceneButton1 = true;
+        // Do your one-time action here
+    }
+    ImGui::EndDisabled();
+
+    ImGui::SameLine();
+
+    ImGui::BeginDisabled(presetSceneButton2); // Disable if already pressed
+    if (ImGui::Button("Load preset scene 2") && !presetSceneButton2) {
+        presetSceneButton2 = true;
+        // Do your one-time action here
+    }
+    ImGui::EndDisabled();
+	// ----------------------------------------------------------------------------
+
+
 	// If an object is selected, show its properties
     if (selectedIndex >= 0 && selectedIndex < currentScene.objects.size()) 
     {
@@ -361,7 +383,7 @@ void Application::RenderGui(GLFWwindow* window)
             ImGuiFileDialog::Instance()->Close();
         }
 		// --------------------------------------------------------------------------------------------
-        
+        ImGui::BeginDisabled(!isRastered);
         ImGui::Text("Transform");
         if (ImGui::DragFloat3("Position", &obj.position.x, 0.01f))
         {
@@ -375,6 +397,8 @@ void Application::RenderGui(GLFWwindow* window)
         {
             obj.UpdateModelMatrix();
         }
+        ImGui::EndDisabled();
+
     }
 	// ----------------------------------------------------------------------------
     
@@ -595,6 +619,9 @@ void Application::key_callback(GLFWwindow* window, int key, int scancode, int ac
 void Application::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
+
+    if (!app->mainCamera.cameraEnabled)
+        return; // Prevent camera movement when disabled
 
     if (yoffset != 0.0)
     {

@@ -52,6 +52,9 @@ private:
 	unsigned int DisplayShader;
 	unsigned int RasterShader;
 
+	bool presetSceneButton1 = false;
+	bool presetSceneButton2 = false;
+
 	int selectedIndex = -1;
 	int frameCount = 0;
 	float previousTime = 0;

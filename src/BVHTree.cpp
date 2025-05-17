@@ -28,6 +28,7 @@ void BVHTree::rebuild(const std::vector<Primitive>& newPrims)
     primitives = newPrims;
 
     nodes.clear();
+	triangleIndices.clear();
 
     triangleIndices.resize(primitives.size());
     std::iota(triangleIndices.begin(), triangleIndices.end(), 0);

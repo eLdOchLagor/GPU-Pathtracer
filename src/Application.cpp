@@ -111,7 +111,7 @@ void Application::Init() {
     unsigned int timeLoc = glGetUniformLocation(PathtraceShader, "time");
 
 	// Bind buffers
-	BindBuffersPathtraced();
+	//BindBuffersPathtraced();
 	BindBuffersRasterized();
 
 
@@ -382,10 +382,10 @@ void Application::RenderGui(GLFWwindow* window)
 }
 
 void Application::BindBuffersPathtraced()
-{
-	for (auto& obj : currentScene.objects) {
-        currentScene.primitives.clear();
+{   
+    currentScene.primitives.clear();
 
+	for (auto& obj : currentScene.objects) {
 		// Add all primitives from the object to the scene
 		currentScene.primitives.insert(currentScene.primitives.end(), obj.primitives.begin(), obj.primitives.end());
 	}
@@ -488,49 +488,40 @@ void Application::BindBuffersRasterized()
 void Application::mouse_callback(GLFWwindow* window, double xpos, double ypos) 
 {
     Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
-    
-    if (app->mainCamera.cameraEnabled)
+
+    if (!app->mainCamera.cameraEnabled)
+        return; // Prevent camera movement when disabled
+
+    float xoffset = app->mainCamera.lastX - xpos;
+    float yoffset = app->mainCamera.lastY - ypos;
+    app->mainCamera.lastX = xpos;
+    app->mainCamera.lastY = ypos;
+
+    const float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    app->mainCamera.yaw += xoffset;
+    app->mainCamera.pitch += yoffset;
+
+    if (app->mainCamera.pitch > 89.0f)
+        app->mainCamera.pitch = 89.0f;
+    if (app->mainCamera.pitch < -89.0f)
+        app->mainCamera.pitch = -89.0f;
+
+    vec3 forwardDirection = vec3(0.0f);
+
+    forwardDirection.z = cos(app->mainCamera.yaw * M_PI / 180.0f) * cos(app->mainCamera.pitch * M_PI / 180.0f);
+    forwardDirection.y = sin(app->mainCamera.pitch * M_PI / 180.0f);
+    forwardDirection.x = sin(app->mainCamera.yaw * M_PI / 180.0f) * cos(app->mainCamera.pitch * M_PI / 180.0f);
+
+    app->mainCamera.SetForward(forwardDirection);
+
+    // Reset accumulation
+    if (!app->isRastered)
     {
-        float xoffset = xpos - app->mainCamera.lastX;
-        float yoffset = app->mainCamera.lastY - ypos; // reversed since y-coordinates range from bottom to top
-        app->mainCamera.lastX = xpos;
-        app->mainCamera.lastY = ypos;
-
-        const float sensitivity = 0.1f;
-        xoffset *= sensitivity;
-        yoffset *= sensitivity;
-
-        app->mainCamera.yaw += xoffset;
-        app->mainCamera.pitch += yoffset;
-
-        if (app->mainCamera.pitch > 89.0f)
-            app->mainCamera.pitch = 89.0f;
-        if (app->mainCamera.pitch < -89.0f)
-            app->mainCamera.pitch = -89.0f;
-
-        vec3 forwardDirection = vec3(0.0f);
-
-        // As with wasd movement, left and right are opposite
-        if (app->isRastered)
-        {
-            forwardDirection.z = cos(app->mainCamera.yaw * M_PI / 180.0f) * cos(app->mainCamera.pitch * M_PI / 180.0f);
-            forwardDirection.y = sin(app->mainCamera.pitch * M_PI / 180.0f);
-            forwardDirection.x = sin(app->mainCamera.yaw * M_PI / 180.0f) * cos(app->mainCamera.pitch * M_PI / 180.0f);
-        }
-        else {
-            forwardDirection.z = cos(app->mainCamera.yaw * M_PI / 180.0f) * cos(app->mainCamera.pitch * M_PI / 180.0f);
-            forwardDirection.y = sin(app->mainCamera.pitch * M_PI / 180.0f);
-            forwardDirection.x = sin(app->mainCamera.yaw * M_PI / 180.0f) * cos(app->mainCamera.pitch * M_PI / 180.0f);
-        }
-
-        app->mainCamera.SetForward(forwardDirection);
-
-        // Reset accumulation
-        if (!app->isRastered)
-        {
-            app->frameCount = 0;
-            clearAccumulationBuffer(window);
-        }
+        app->frameCount = 0;
+        clearAccumulationBuffer(window);
     }
 }
 
@@ -538,10 +529,12 @@ void Application::processInput(GLFWwindow* window)
 {
     Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
 
+    if (!app->mainCamera.cameraEnabled)
+        return; // Prevent camera movement when disabled
+
     bool cameraMoved = false;
     float cameraSpeed = 6.0f * app->deltaTime;
 
-    // NOTE: Left and right are reversed
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
@@ -554,11 +547,11 @@ void Application::processInput(GLFWwindow* window)
         cameraMoved = true;
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        app->mainCamera.position += app->mainCamera.GetRight() * cameraSpeed;
+        app->mainCamera.position -= app->mainCamera.GetRight() * cameraSpeed;
         cameraMoved = true;
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        app->mainCamera.position -= app->mainCamera.GetRight() * cameraSpeed;
+        app->mainCamera.position += app->mainCamera.GetRight() * cameraSpeed;
         cameraMoved = true;
     }
 
@@ -583,6 +576,12 @@ void Application::key_callback(GLFWwindow* window, int key, int scancode, int ac
         {
             //Capture mouse
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+            // Sync lastX/lastY to current mouse position to prevent jump
+            double xpos, ypos;
+            glfwGetCursorPos(window, &xpos, &ypos);
+            app->mainCamera.lastX = xpos;
+            app->mainCamera.lastY = ypos;
         }
         else
         {

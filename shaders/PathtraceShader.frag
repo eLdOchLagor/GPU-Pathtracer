@@ -388,7 +388,7 @@ Ray generateCameraRay(ivec2 pixelCoord){
 	float jitterX = RandomFloat(seed) - 0.5;
 	float jitterY = RandomFloat(seed) - 0.5;
 
-	float u = -((pixelCoord.x + jitterX) / float(screenWidth) * imagePlaneWidth - imagePlaneWidth / 2.0);
+	float u = ((pixelCoord.x + jitterX) / float(screenWidth) * imagePlaneWidth - imagePlaneWidth / 2.0);
 	float v = ((pixelCoord.y + jitterY) / float(screenHeight) - 1.0) * imagePlaneHeight + imagePlaneHeight / 2.0;
 
 	vec3 direction = normalize(forward + u * right + v * up);

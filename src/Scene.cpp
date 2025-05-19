@@ -22,7 +22,7 @@ Scene::Scene(int presetID) {
     }
 }
 
-//Riktigt tuff för datorn att hantera på min sida.
+//Riktigt tuff fï¿½r datorn att hantera pï¿½ min sida.
 void Scene::getCrazyScene() {
     getRoom();
     CreateSceneFromModel("..\\models\\StanfordBunny348.obj", primitives.size());
@@ -159,371 +159,87 @@ void Scene::getSpheres() {
 
 
 void Scene::getRoom() {
-    // Initializes 24 empty Primitives in the std::vector
-    primitives.resize(24);
-    areaLights.resize(1);
-    pointLights.resize(1);
-    
-    areaLights[0].vertex1 = vec3(-2, 4.95, 8);
-    areaLights[0].vertex2 = vec3(2, 4.95, 8);
-    areaLights[0].vertex3 = vec3(2, 4.95, 11);
-    areaLights[0].vertex4 = vec3(-2, 4.95, 11);
-    areaLights[0].normal = vec3(0.0, -1.0, 0.0);
-    areaLights[0].radiance = vec3(10.0, 10.0, 10.0);
-
-    
-    
+    primitives.resize(25);
 
     vec3 e1 = vec3(0.0f);
     vec3 e2 = vec3(0.0f);
-    //vec3 e3 = vec3(0.0f);
     int i = 0;
-    //floor
-        //triangle front
 
-    primitives[i].vertex1 = vec3(0.0f, -5.0f, -3.0f);
-    primitives[i].vertex2 = vec3(6.0f, -5.0f, 0.0f);
-    primitives[i].vertex3 = vec3(-6.0f, -5.0f, 0.0f);
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
-    primitives[i].color = vec3(79, 163, 146) / 255.0f;
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 0;
-    primitives[i].ior = 1.0f;
-    i++;
-    //triangle mid right
-    primitives[i].vertex1 = vec3(6.0f, -5.0f, 0.0f);
-    primitives[i].vertex2 = vec3(6.0f, -5.0f, 10.0f);
-    primitives[i].vertex3 = vec3(-6.0f, -5.0f, 10.0f);
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
-    primitives[i].color = vec3(79, 163, 146) / 255.0f;
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 0;
-    primitives[i].ior = 1.0f;
-    i++;
-    //triangle mid left
-    primitives[i].vertex1 = vec3(6.0f, -5.0f, 0.0f);
-    primitives[i].vertex2 = vec3(-6.0f, -5.0f, 10.0f);
-    primitives[i].vertex3 = vec3(-6.0f, -5.0f, 0.0f);
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
-    primitives[i].color = vec3(79, 163, 146) / 255.0f;
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 0;
-    primitives[i].ior = 1.0f;
-    i++;
-    //triangle back
-    primitives[i].vertex1 = vec3(0.0f, -5.0f, 13.0f);
-    primitives[i].vertex2 = vec3(-6.0f, -5.0f, 10.0f);
-    primitives[i].vertex3 = vec3(6.0f, -5.0f, 10.0f);
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
-    primitives[i].color = vec3(79, 163, 146) / 255.0f;
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 0;
-    primitives[i].ior = 1.0f;
-    i++;
-    //backroom walls
-        //leftwall back
-    primitives[i].vertex1 = vec3(-6.0f, -5.0f, 10.0f);
-    primitives[i].vertex2 = vec3(0.0f, -5.0f, 13.0f);
-    primitives[i].vertex3 = vec3(0.0f, 5.0f, 13.0f);
-    e1 = primitives[i].vertex2 - primitives[i].vertex1;
-    e2 = primitives[i].vertex3 - primitives[i].vertex2;
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    primitives[i].normal = vec3(normalize(cross(e2, e1)));
-    primitives[i].color = vec3(255, 255, 255) / 255.0f;
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 1;
-    primitives[i].ior = 1.0f;
-    i++;
-    //leftwall front
-    primitives[i].vertex1 = vec3(-6.0f, -5.0f, 10.0f);
-    primitives[i].vertex2 = vec3(0.0f, 5.0f, 13.0f);
-    primitives[i].vertex3 = vec3(-6.0f, 5.0f, 10.0f);
-    e1 = primitives[i].vertex2 - primitives[i].vertex1;
-    e2 = primitives[i].vertex3 - primitives[i].vertex2;
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    primitives[i].normal = vec3(normalize(cross(e2, e1)));
-    primitives[i].color = vec3(255, 255, 255) / 255.0f;
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 1;
-    primitives[i].ior = 1.0f;
-    i++;
-    //backroom walls
-        //leftwall back
-    primitives[i].vertex1 = vec3(6.0f, -5.0f, 10.0f);
-    primitives[i].vertex2 = vec3(0.0f, 5.0f, 13.0f);
-    primitives[i].vertex3 = vec3(0.0f, -5.0f, 13.0f);
-    e1 = primitives[i].vertex2 - primitives[i].vertex1;
-    e2 = primitives[i].vertex3 - primitives[i].vertex2;
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    primitives[i].normal = vec3(normalize(cross(e2, e1)));
-    primitives[i].color = vec3(224, 204, 177) / 255.0f;
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 0;
-    primitives[i].ior = 1.0f;
-    i++;
-    //leftwall front
-    primitives[i].vertex1 = vec3(6.0f, -5.0f, 10.0f);
-    primitives[i].vertex2 = vec3(6.0f, 5.0f, 10.0f);
-    primitives[i].vertex3 = vec3(0.0f, 5.0f, 13.0f);
-    e1 = primitives[i].vertex2 - primitives[i].vertex1;
-    e2 = primitives[i].vertex3 - primitives[i].vertex2;
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    primitives[i].normal = vec3(normalize(cross(e2, e1)));
-    primitives[i].color = vec3(224, 204, 177) / 255.0f;
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 0;
-    primitives[i].ior = 1.0f;
-    i++;
-    //right walls 
-        //bottom wall
-    primitives[i].vertex1 = vec3(6.0f, -5.0f, 0.0f);
-    primitives[i].vertex2 = vec3(6.0f, 5.0f, 0.0f);
-    primitives[i].vertex3 = vec3(6.0f, -5.0f, 10.0f);
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    primitives[i].normal = vec3(-1.0f, 0.0f, 0.0f);
-    primitives[i].color = vec3(86, 77, 120) / 255.0f;
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 0;
-    primitives[i].ior = 1.0f;
-    i++;
-    //top wall
-    primitives[i].vertex1 = vec3(6.0f, -5.0f, 10.0f);
-    primitives[i].vertex2 = vec3(6.0f, 5.0f, 0.0f);
-    primitives[i].vertex3 = vec3(6.0f, 5.0f, 10.0f);
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    primitives[i].normal = vec3(-1.0f, 0.0f, 0.0f);
-    primitives[i].color = vec3(86, 77, 120) / 255.0f;
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 0;
-    primitives[i].ior = 1.0f;
-    i++;
+    // Room object
+    Object room = Object("..\\models\\room.obj");
+    objects.push_back(room);
 
-    //left walls 
-        //bottom wall
-    primitives[i].vertex1 = vec3(-6.0f, -5.0f, 0.0f);
-    primitives[i].vertex2 = vec3(-6.0f, -5.0f, 10.0f);
-    primitives[i].vertex3 = vec3(-6.0f, 5.0f, 0.0f);
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    primitives[i].normal = vec3(1.0f, 0.0f, 0.0f);
-    primitives[i].color = vec3(15, 173, 207) / 255.0f;
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 0;
-    primitives[i].ior = 1.0f;
-    i++;
-    //top wall
-    primitives[i].vertex1 = vec3(-6.0f, -5.0f, 10.0f);
-    primitives[i].vertex2 = vec3(-6.0f, 5.0f, 10.0f);
-    primitives[i].vertex3 = vec3(-6.0f, 5.0f, 0.0f);
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    primitives[i].normal = vec3(1.0f, 0.0f, 0.0f);
-    primitives[i].color = vec3(15, 173, 207) / 255.0f;
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 0;
-    primitives[i].ior = 1.0f;
-    i++;
-    //frontroom walls
-        //left bottom
-    primitives[i].vertex1 = vec3(0.0f, -5.0f, -3.0f);
-    primitives[i].vertex2 = vec3(-6.0f, -5.0f, 0.0f);
-    primitives[i].vertex3 = vec3(0.0f, 5.0f, -3.0f);
-    e1 = primitives[i].vertex2 - primitives[i].vertex1;
-    e2 = primitives[i].vertex3 - primitives[i].vertex2;
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    primitives[i].normal = vec3(normalize(cross(e2, e1)));
-    primitives[i].color = vec3(255, 99, 131) / 255.0f;
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 0;
-    primitives[i].ior = 1.0f;
-    i++;
-    //left top
-    primitives[i].vertex1 = vec3(-6.0f, -5.0f, 0.0f);
-    primitives[i].vertex2 = vec3(-6.0f, 5.0f, 0.0f);
-    primitives[i].vertex3 = vec3(0.0f, 5.0f, -3.0f);
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    e1 = primitives[i].vertex2 - primitives[i].vertex1;
-    e2 = primitives[i].vertex3 - primitives[i].vertex2;
-    primitives[i].normal = vec3(normalize(cross(e2, e1)));
-    primitives[i].color = vec3(255, 99, 131) / 255.0f;
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 0;
-    primitives[i].ior = 1.0f;
-    i++;
-    //frontroom walls
-        //right bottom
-    primitives[i].vertex1 = vec3(0.0f, -5.0f, -3.0f);
-    primitives[i].vertex2 = vec3(0.0f, 5.0f, -3.0f);
-    primitives[i].vertex3 = vec3(6.0f, -5.0f, 0.0f);
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    e1 = primitives[i].vertex2 - primitives[i].vertex1;
-    e2 = primitives[i].vertex3 - primitives[i].vertex2;
-    primitives[i].normal = vec3(normalize(cross(e2, e1)));
-    primitives[i].color = vec3(255, 255, 255) / 255.0f;
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 1;
-    primitives[i].ior = 1.0f;
-    i++;
-    //right top
-    primitives[i].vertex1 = vec3(6.0f, -5.0f, 0.0f);
-    primitives[i].vertex2 = vec3(0.0f, 5.0f, -3.0f);
-    primitives[i].vertex3 = vec3(6.0f, 5.0f, 0.0f);
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    e1 = primitives[i].vertex2 - primitives[i].vertex1;
-    e2 = primitives[i].vertex3 - primitives[i].vertex2;
-    primitives[i].normal = vec3(normalize(cross(e2, e1)));
-    primitives[i].color = vec3(255, 255, 255) / 255.0f;
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 1;
-    primitives[i].ior = 1.0f;
-    i++;
-    //roof
-        //triangle front
-    primitives[i].vertex1 = vec3(0.0f, 5.0f, -3.0f);
-    primitives[i].vertex2 = vec3(-6.0f, 5.0f, 0.0f);
-    primitives[i].vertex3 = vec3(6.0f, 5.0f, 0.0f);
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    primitives[i].normal = vec3(0.0f, -1.0f, 0.0f);
-    primitives[i].color = vec3(243, 186, 42) / 255.0f;
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 0;
-    primitives[i].ior = 1.0f;
-    i++;
-    //triangle mid right
-    primitives[i].vertex1 = vec3(6.0f, 5.0f, 0.0f);
-    primitives[i].vertex2 = vec3(-6.0f, 5.0f, 10.0f);
-    primitives[i].vertex3 = vec3(6.0f, 5.0f, 10.0f);
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    primitives[i].normal = vec3(0.0f, -1.0f, 0.0f);
-    primitives[i].color = vec3(243, 186, 42) / 255.0f;
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 0;
-    primitives[i].ior = 1.0f;
-    i++;
-    //triangle mid left
-    primitives[i].vertex1 = vec3(6.0f, 5.0f, 0.0f);
-    primitives[i].vertex2 = vec3(-6.0f, 5.0f, 0.0f);
-    primitives[i].vertex3 = vec3(-6.0f, 5.0f, 10.0f);
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    primitives[i].normal = vec3(0.0f, -1.0f, 0.0f);
-    primitives[i].color = vec3(243, 186, 42) / 255.0f;
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 0;
-    primitives[i].ior = 1.0f;
-    i++;
-    //triangle back
-    primitives[i].vertex1 = vec3(-6.0f, 5.0f, 10.0f);
-    primitives[i].vertex2 = vec3(0.0f, 5.0f, 13.0f);
-    primitives[i].vertex3 = vec3(6.0f, 5.0f, 10.0f);
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    primitives[i].normal = vec3(0.0f, -1.0f, 0.0f);
-    primitives[i].color = vec3(243, 186, 42) / 255.0f;
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 0;
-    primitives[i].ior = 1.0f;
-    i++;
+    Object tempObj = {};
 
-    
-    
     //sphere 1
-    primitives[i].vertex1 = vec3(0.0f, -3.5f, 8.0f);
-    primitives[i].vertex2 = vec3(1.5f, -5.0f, 10.0f);
-    primitives[i].vertex3 = vec3(-10.0f, -5.0f, 10.0f);
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
-    primitives[i].color = vec3(255, 255, 255) / 255.0f;
-    primitives[i].ID = 1;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 2;
-    primitives[i].ior = 1.5f;
+    Primitive temp = {};
+    temp.vertex1 = vec3(0.0f, -3.5f, 8.0f);
+    temp.vertex2 = vec3(1.5f, -5.0f, 10.0f);
+    temp.vertex3 = vec3(-10.0f, -5.0f, 10.0f);
+    temp.edge1 = temp.vertex2 - temp.vertex1;
+    temp.edge2 = temp.vertex3 - temp.vertex1;
+    temp.normal = vec3(0.0f, 1.0f, 0.0f);
+    temp.color = vec3(255, 255, 255) / 255.0f;
+    temp.ID = 1;
+    temp.smoothness = 0.0f;
+    temp.materialType = 2;
+    temp.ior = 1.5f;
 
-    i++;
-    
+    tempObj.primitives.push_back(temp);
+    objects.push_back(tempObj);
+    tempObj = {};
+    temp = {};
+
     //Sphere 2
-    primitives[i].vertex1 = vec3(-1.0f, -0.5f, 8.0f);
-    primitives[i].vertex2 = vec3(1.5f, -5.0f, 10.0f);
-    primitives[i].vertex3 = vec3(-10.0f, -5.0f, 10.0f);
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
-    primitives[i].color = vec3(10, 10, 10);
-    primitives[i].ID = 1;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 3;
-    primitives[i].ior = 1.0f;
+    temp.vertex1 = vec3(-1.0f, -0.5f, 8.0f);
+    temp.vertex2 = vec3(1.5f, -5.0f, 10.0f);
+    temp.vertex3 = vec3(-10.0f, -5.0f, 10.0f);
+    temp.edge1 = temp.vertex2 - temp.vertex1;
+    temp.edge2 = temp.vertex3 - temp.vertex1;
+    temp.normal = vec3(0.0f, 1.0f, 0.0f);
+    temp.color = vec3(10, 10, 10);
+    temp.ID = 1;
+    temp.smoothness = 0.0f;
+    temp.materialType = 3;
+    temp.ior = 1.0f;
 
-    i++;
-    
+    tempObj.primitives.push_back(temp);
+    objects.push_back(tempObj);
+    tempObj = {};
+    temp = {};
+
     //Light1 side1
-    primitives[i].vertex1 = vec3(-2, 4.95, 8);
-    primitives[i].vertex2 = vec3(2, 4.95, 8);
-    primitives[i].vertex3 = vec3(2, 4.95, 11);
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    primitives[i].normal = vec3(0.0f, -1.0f, 0.0f);
-    primitives[i].color = vec3(1.0, 1.0, 1.0);
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 3;
-    primitives[i].ior = 1.0f;
+    temp.vertex1 = vec3(-2, 4.95, 8);
+    temp.vertex2 = vec3(2, 4.95, 8);
+    temp.vertex3 = vec3(2, 4.95, 11);
+    temp.edge1 = temp.vertex2 - temp.vertex1;
+    temp.edge2 = temp.vertex3 - temp.vertex1;
+    temp.normal = vec3(0.0f, -1.0f, 0.0f);
+    temp.color = vec3(1.0, 1.0, 1.0);
+    temp.ID = 0;
+    temp.smoothness = 0.0f;
+    temp.materialType = 3;
+    temp.ior = 1.0f;
 
-    i++;
+    tempObj.primitives.push_back(temp);
+    objects.push_back(tempObj);
+    tempObj = {};
+    temp = {};
+
     //Light1 side2
-    primitives[i].vertex1 = vec3(2, 4.95, 11);
-    primitives[i].vertex2 = vec3(-2, 4.95, 11);
-    primitives[i].vertex3 = vec3(-2, 4.95, 8);
-    primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
-    primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
-    primitives[i].normal = vec3(0.0f, -1.0f, 0.0f);
-    primitives[i].color = vec3(1.0,1.0,1.0);
-    primitives[i].ID = 0;
-    primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 3;
-    primitives[i].ior = 1.0f;  
+    temp.vertex1 = vec3(2, 4.95, 11);
+    temp.vertex2 = vec3(-2, 4.95, 11);
+    temp.vertex3 = vec3(-2, 4.95, 8);
+    temp.edge1 = temp.vertex2 - temp.vertex1;
+    temp.edge2 = temp.vertex3 - temp.vertex1;
+    temp.normal = vec3(0.0f, -1.0f, 0.0f);
+    temp.color = vec3(1.0, 1.0, 1.0);
+    temp.ID = 0;
+    temp.smoothness = 0.0f;
+    temp.materialType = 3;
+    temp.ior = 1.0f;
 
-    i++;
+    tempObj.primitives.push_back(temp);
+    objects.push_back(tempObj);
 }
 

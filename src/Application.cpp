@@ -338,7 +338,7 @@ void Application::RenderGui(GLFWwindow* window)
     ImGui::BeginDisabled(presetSceneButton1); // Disable if already pressed
     if (ImGui::Button("Load preset scene 1") && !presetSceneButton1) {
         presetSceneButton1 = true;
-        // Do your one-time action here
+        
     }
     ImGui::EndDisabled();
 
@@ -347,7 +347,7 @@ void Application::RenderGui(GLFWwindow* window)
     ImGui::BeginDisabled(presetSceneButton2); // Disable if already pressed
     if (ImGui::Button("Load preset scene 2") && !presetSceneButton2) {
         presetSceneButton2 = true;
-        // Do your one-time action here
+        
     }
     ImGui::EndDisabled();
 	// ----------------------------------------------------------------------------

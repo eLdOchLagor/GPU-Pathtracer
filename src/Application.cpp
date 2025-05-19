@@ -407,7 +407,9 @@ void Application::RenderGui(GLFWwindow* window)
 
 void Application::BindBuffersPathtraced()
 {   
-    currentScene.primitives.clear();
+    // Uncomment to be able to load object through UI
+    
+    // currentScene.primitives.clear();
 
 	for (auto& obj : currentScene.objects) {
 		// Add all primitives from the object to the scene

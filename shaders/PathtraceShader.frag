@@ -417,7 +417,7 @@ vec3 raytrace(Ray ray) {
 
 		// Compute surface normal
 		vec3 normal = (hitSurface.ID == 1)
-			? normalize(ray.startPoint - hitSurface.vertex1) // Sphere normal
+			? -normalize(hitSurface.vertex1 - ray.endPoint) // Sphere normal
 			: hitSurface.normal;
 		
 		// Mirror surface

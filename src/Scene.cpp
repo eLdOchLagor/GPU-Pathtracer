@@ -93,7 +93,7 @@ void Scene::getSpheres() {
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -107,7 +107,7 @@ void Scene::getSpheres() {
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -121,7 +121,7 @@ void Scene::getSpheres() {
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
     primitives[i].ID = 1;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -135,7 +135,7 @@ void Scene::getSpheres() {
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
     primitives[i].ID = 1;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -148,7 +148,7 @@ void Scene::getSpheres() {
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
     primitives[i].ID = 1;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -162,7 +162,7 @@ void Scene::getRoom() {
     // Initializes 24 empty Primitives in the std::vector
     primitives.resize(24);
     areaLights.resize(1);
-    pointLights.resize(1);
+    //pointLights.resize(1);
     
     areaLights[0].vertex1 = vec3(-2, 4.95, 8);
     areaLights[0].vertex2 = vec3(2, 4.95, 8);
@@ -189,7 +189,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -202,7 +202,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -215,7 +215,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -228,7 +228,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(79, 163, 146) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -244,7 +244,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(normalize(cross(e2, e1)));
     primitives[i].color = vec3(255, 255, 255) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 1;
     primitives[i].ior = 1.0f;
     i++;
@@ -259,7 +259,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(normalize(cross(e2, e1)));
     primitives[i].color = vec3(255, 255, 255) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 1;
     primitives[i].ior = 1.0f;
     i++;
@@ -275,7 +275,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(normalize(cross(e2, e1)));
     primitives[i].color = vec3(224, 204, 177) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -290,7 +290,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(normalize(cross(e2, e1)));
     primitives[i].color = vec3(224, 204, 177) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -304,7 +304,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(-1.0f, 0.0f, 0.0f);
     primitives[i].color = vec3(86, 77, 120) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -317,7 +317,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(-1.0f, 0.0f, 0.0f);
     primitives[i].color = vec3(86, 77, 120) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -332,7 +332,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(1.0f, 0.0f, 0.0f);
     primitives[i].color = vec3(15, 173, 207) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -345,7 +345,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(1.0f, 0.0f, 0.0f);
     primitives[i].color = vec3(15, 173, 207) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -361,7 +361,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(normalize(cross(e2, e1)));
     primitives[i].color = vec3(255, 99, 131) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -376,7 +376,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(normalize(cross(e2, e1)));
     primitives[i].color = vec3(255, 99, 131) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -392,7 +392,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(normalize(cross(e2, e1)));
     primitives[i].color = vec3(255, 255, 255) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 1;
     primitives[i].ior = 1.0f;
     i++;
@@ -407,7 +407,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(normalize(cross(e2, e1)));
     primitives[i].color = vec3(255, 255, 255) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 1;
     primitives[i].ior = 1.0f;
     i++;
@@ -421,7 +421,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(0.0f, -1.0f, 0.0f);
     primitives[i].color = vec3(243, 186, 42) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -434,7 +434,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(0.0f, -1.0f, 0.0f);
     primitives[i].color = vec3(243, 186, 42) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -447,7 +447,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(0.0f, -1.0f, 0.0f);
     primitives[i].color = vec3(243, 186, 42) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -460,7 +460,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(0.0f, -1.0f, 0.0f);
     primitives[i].color = vec3(243, 186, 42) / 255.0f;
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
@@ -476,23 +476,23 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
     primitives[i].color = vec3(255, 255, 255) / 255.0f;
     primitives[i].ID = 1;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 2;
     primitives[i].ior = 1.5f;
 
     i++;
     
     //Sphere 2
-    primitives[i].vertex1 = vec3(-1.0f, -0.5f, 8.0f);
+    primitives[i].vertex1 = vec3(-3.0f, -2.5f, 8.0f);
     primitives[i].vertex2 = vec3(1.5f, -5.0f, 10.0f);
     primitives[i].vertex3 = vec3(-10.0f, -5.0f, 10.0f);
     primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
     primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
-    primitives[i].color = vec3(10, 10, 10);
+    primitives[i].color = vec3(30, 230, 120)/255.f;
     primitives[i].ID = 1;
-    primitives[i].smoothness = 1.0f;
-    primitives[i].materialType = 3;
+    primitives[i].smoothness = 0.0f;
+    primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
 
     i++;
@@ -506,7 +506,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(0.0f, -1.0f, 0.0f);
     primitives[i].color = vec3(1.0, 1.0, 1.0);
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 3;
     primitives[i].ior = 1.0f;
 
@@ -520,7 +520,7 @@ void Scene::getRoom() {
     primitives[i].normal = vec3(0.0f, -1.0f, 0.0f);
     primitives[i].color = vec3(1.0,1.0,1.0);
     primitives[i].ID = 0;
-    primitives[i].smoothness = 1.0f;
+    primitives[i].smoothness = 0.0f;
     primitives[i].materialType = 3;
     primitives[i].ior = 1.0f;  
 

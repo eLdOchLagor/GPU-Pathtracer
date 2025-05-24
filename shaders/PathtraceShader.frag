@@ -437,24 +437,23 @@ vec3 raytrace(Ray ray) {
 			accumulatedColor += importance * directIllumination;
 			importance *= hitSurface.color;
 			
-			// Diffuse reflection
-			float randomValue1 = RandomFloat(seed);
-			float randomValue2 = RandomFloat(seed);
 			
-			float randInclination = acos(sqrt(1.0 - randomValue1));
-			float randAzimuth = 2.0 * M_PI * randomValue2;
-			float rr = randAzimuth / hitSurface.smoothness;
-			if (rr <= 2.0 * M_PI && i != maxBounces - 1) {
+			float randChoice = RandomFloat(seed);
+			
+			if (randChoice < hitSurface.smoothness) {
+				// Reflect
+				ray.direction = reflect(ray.direction, normal);
+				
+			} else {
+				// Diffuse reflection
+				float randomValue1 = RandomFloat(seed);
+				float randomValue2 = RandomFloat(seed);
 				float randInclination = acos(sqrt(1.0 - randomValue1));
 				float randAzimuth = 2.0 * M_PI * randomValue2;
+				
 				ray = diffuseReflection(ray, hitSurface, randAzimuth, randInclination);
-			} else {
-				break;
 			}
 			
-			
-
-			ray.startPoint = ray.endPoint + 0.001 * ray.direction;
 		}
 
 		// Transmissive surface

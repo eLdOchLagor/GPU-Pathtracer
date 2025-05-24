@@ -7,7 +7,7 @@
 
 int main() {
     
-	Application app(800, 600, "TSBK07 - Raytracer");
+	Application app(800*2, 1000, "TSBK07 - Raytracer");
 	app.Run();
 
     return 0;

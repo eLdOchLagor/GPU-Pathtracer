@@ -85,7 +85,7 @@ int BVHTree::buildRecursive(int start, int count, int depth) {
 
     float minCentroid = centroidBounds.min[splitAxis];
     float maxCentroid = centroidBounds.max[splitAxis];
-    float scale = NUM_BINS / (maxCentroid - minCentroid + 1e-5f); // Avoid div-by-zero
+    float scale = NUM_BINS / (maxCentroid - minCentroid + 1e-5f); // Undvik div-by-zero
 
     for (int i = start; i < start + count; ++i) {
         const Primitive& p = primitives[triangleIndices[i]];
@@ -101,7 +101,7 @@ int BVHTree::buildRecursive(int start, int count, int depth) {
     AABB rightBounds[NUM_BINS - 1];
     int rightCounts[NUM_BINS - 1];
 
-    // Left to right
+    // Vänster till Höger
     AABB curBounds;
     int curCount = 0;
     for (int i = 0; i < NUM_BINS - 1; ++i) {
@@ -111,7 +111,7 @@ int BVHTree::buildRecursive(int start, int count, int depth) {
         leftCounts[i] = curCount;
     }
 
-    // Right to left
+    // Höger to Vänster
     curBounds = {};
     curCount = 0;
     for (int i = NUM_BINS - 1; i > 0; --i) {
@@ -156,7 +156,7 @@ int BVHTree::buildRecursive(int start, int count, int depth) {
         nodes[nodeIndex].triangleCount = count;
         nodes[nodeIndex].leftChild = -1;
         nodes[nodeIndex].rightChild = -1;
-        nodes[nodeIndex].escapeIndex = nodeIndex + 1; // next node in pre-order
+        nodes[nodeIndex].escapeIndex = nodeIndex + 1; // Nästa nod i pre-order
         return nodeIndex;
     }
 
@@ -172,20 +172,20 @@ int BVHTree::buildRecursive(int start, int count, int depth) {
     nodes[nodeIndex].startTriangle = -1;
     nodes[nodeIndex].triangleCount = 0;
 
-    // After building left subtree, set its escape to point to right subtree
+    // Vänster nods escapenod är den högra noden i subträdet.
     nodes[leftChild].escapeIndex = rightChild;
 
 
     nodes[nodeIndex].escapeIndex = nodes.size(); // Next in list
 
-    // Right child's escape is this node's escape (assigned by parent)
+    // Högra nodens escapenod är denhära nodens escapenod.
     nodes[rightChild].escapeIndex = nodes[nodeIndex].escapeIndex;
 
     
     
     return nodeIndex;
 }
-
+//Crude test so that we can see that the tree is built correctly.
 void BVHTree::traverseTree() {
 	// Traverse the BVH tree and perform operations on each node
 	for (const auto& node : nodes) {

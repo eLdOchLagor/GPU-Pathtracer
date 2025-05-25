@@ -46,16 +46,20 @@ struct Ray{
 
 struct Primitive{
 	vec3 vertex1;
+	int ID; // 0 == Triangle, 1 == Sphere
 	vec3 vertex2;
+	float smoothness; //Odds that the ray would bounce off of the surface.
 	vec3 vertex3;
+	int materialType;
 	vec3 color;
+	float ior;
 	vec3 normal;
 	vec3 edge1;
     vec3 edge2;
-	int ID; // 0 == Triangle, 1 == Sphere
-	float smoothness; //Odds that the ray would bounce off of the surface.
-	int materialType;
-	float ior;
+	
+	
+	
+	
 };
 
 layout(std430, binding = 0) buffer PrimitiveBuffer{
@@ -275,13 +279,15 @@ vec3 calculateDirectIllumination(vec3 dir, vec3 hitPoint, vec3 normal, vec3 surf
 		
 
 		if (!isInShadow(hitPoint + 0.0001*normal, y)){
-			float cosx = dot(normal, normalize(di));
-			float cosy = dot(-areaLights[i].normal, normalize(di));
+			vec3 dirNorm = normalize(di);
+			float cosx = dot(normal, dirNorm);
+			float cosy = dot(-areaLights[i].normal, dirNorm);
 
 			// Make sure that surfaces facing away from the lightsource dont give negative values, these values give wrong result
 			cosx = max(0.0, cosx);
 			cosy = max(0.0, cosy);
-			float scalar_radiance = (cosx * cosy) / (length(di) * length(di));
+			float dist = length(di);
+			float scalar_radiance = (cosx * cosy) / (dist*dist);
 			float A = length(e1) * length(e2);
 
 			radiance += vec3(areaLights[i].radiance * scalar_radiance * A/M_PI) * surfaceColor;

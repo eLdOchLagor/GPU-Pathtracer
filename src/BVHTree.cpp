@@ -146,32 +146,68 @@ int BVHTree::buildRecursive(int start, int count, int depth) {
     float bestCost = std::numeric_limits<float>::max();
     int bestSplit = -1;
     float parentArea = surfaceArea(bounds);
+    //float parentVolume = volume(bounds);
 
     for (int i = 0; i < NUM_BINS - 1; ++i) {
-        float cost = 1.0f + (
+        float Ct = 0.5f;
+        float Ci = 1.0f;
+
+        float parentVolume = volume(bounds);
+        float leftVolume = volume(leftBounds[i]);
+        float rightVolume = volume(rightBounds[i]);
+
+        /*float cost = Ct + Ci * (
+            (leftVolume / parentVolume) * leftCounts[i] +
+            (rightVolume / parentVolume) * rightCounts[i]
+           );*/
+        float cost = Ct + (Ci * (
             leftCounts[i] * surfaceArea(leftBounds[i]) +
             rightCounts[i] * surfaceArea(rightBounds[i])
-            ) / parentArea;
+            )) / parentArea;
+        float imbalance = std::abs(leftCounts[i] - rightCounts[i]) / float(leftCounts[i] + rightCounts[i]);
 
-        if (cost < bestCost) {
+        if (cost < bestCost && imbalance < 0.9f) {
             bestCost = cost;
             bestSplit = i;
         }
     }
+    int mid;
+    if (bestCost > 1.0f) {
+        // Fallback: median split
+        int midIndex = start + count / 2;
 
-    float splitPos = minCentroid + (bestSplit + 1) / float(NUM_BINS) * (maxCentroid - minCentroid);
+        std::nth_element(
+            triangleIndices.begin() + start,
+            triangleIndices.begin() + midIndex,
+            triangleIndices.begin() + start + count,
+            [&](int a, int b) {
+                vec3 centroidA = (primitives[a].vertex1 + primitives[a].vertex2 + primitives[a].vertex3) / 3.0f;
+                vec3 centroidB = (primitives[b].vertex1 + primitives[b].vertex2 + primitives[b].vertex3) / 3.0f;
+                return centroidA[splitAxis] < centroidB[splitAxis];
+            }
+        );
 
-    auto midIter = std::partition(
-        triangleIndices.begin() + start,
-        triangleIndices.begin() + start + count,
-        [&](int idx) {
-            const Primitive& p = primitives[idx];
-            vec3 centroid = (p.vertex1 + p.vertex2 + p.vertex3) / 3.0f;
-            return centroid[splitAxis] < splitPos;
-        }
-    );
+        mid = midIndex;
+    }
+    else {
+        float binWidth = (maxCentroid - minCentroid) / float(NUM_BINS);
+        float splitPos = minCentroid + binWidth * (bestSplit + 1);
 
-    int mid = midIter - triangleIndices.begin();
+        auto midIter = std::partition(
+            triangleIndices.begin() + start,
+            triangleIndices.begin() + start + count,
+            [&](int idx) {
+                const Primitive& p = primitives[idx];
+                vec3 centroid = (p.vertex1 + p.vertex2 + p.vertex3) / 3.0f;
+                return centroid[splitAxis] < splitPos;
+            }
+        );
+        mid = midIter - triangleIndices.begin();
+    }
+
+   
+
+   
 
     if (mid == start || mid == start + count) {
         nodes[nodeIndex].startTriangle = start;
@@ -209,8 +245,6 @@ int BVHTree::buildRecursive(int start, int count, int depth) {
 
     // Högra nodens escapenod är denhära nodens escapenod.
     nodes[rightChild].escapeIndex = nodes[nodeIndex].escapeIndex;
-
-    
     
     return nodeIndex;
 }

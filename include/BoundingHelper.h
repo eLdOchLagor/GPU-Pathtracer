@@ -10,17 +10,21 @@ inline AABB computeAABB(const Primitive& tri) {
 	AABB aabb;
 	vec3 max;
 	vec3 min;
+	float eps = 1e-4f;
 	if (tri.ID == 0) {
 		max = vec3::max(vec3::max(tri.vertex1, tri.vertex2), tri.vertex3);
 		min = vec3::min(vec3::min(tri.vertex1, tri.vertex2), tri.vertex3);
 		if (max.x == min.x) {
-			max.x += 0.01;
+			max.x += eps;
+			min.x -= eps;
 		}
 		if (max.y == min.y) {
-			max.y += 0.01;
+			max.y += eps;
+			min.y -= eps;
 		}
 		if (max.z == min.z) {
-			max.z += 0.01;
+			max.z += eps;
+			min.z -= eps;
 		}
 	}
 	else if (tri.ID == 1) {
@@ -55,6 +59,11 @@ inline AABB mergeAABB(const AABB& a, const AABB& b) {
 inline float surfaceArea(const AABB& aabb) {
 	vec3 extents = aabb.max - aabb.min;
 	return 2.0f * (extents.x * extents.y + extents.x * extents.z + extents.y * extents.z);
+}
+
+inline float volume(const AABB& aabb) {
+	vec3 extents = aabb.max - aabb.min;
+	return extents.x * extents.y * extents.z;
 }
 
 inline vec3 centerOfAABB(const AABB& aabb) {

@@ -25,7 +25,7 @@ Scene::Scene(int presetID) {
 //Riktigt tuff för datorn att hantera på min sida.
 void Scene::getCrazyScene() {
     getRoom();
-    CreateSceneFromModel("..\\models\\StanfordBunny348.obj", primitives.size());
+    CreateSceneFromModel("..\\models\\Bunny70K.obj", primitives.size()-1);
 }
 
 void Scene::CreateSceneFromModel(const std::string& path,int index = 0) {
@@ -71,14 +71,19 @@ void Scene::CreateSceneFromModel(const std::string& path,int index = 0) {
 
 void Scene::getSpheres() {
     primitives.resize(5);
-    areaLights.resize(0);
-    pointLights.resize(1);
+    areaLights.resize(1);
+    //pointLights.resize(1);
 
-    
+    areaLights[0].vertex1 = vec3(-2, 4.99, 8);
+    areaLights[0].vertex2 = vec3(2, 4.99, 8);
+    areaLights[0].vertex3 = vec3(2, 4.99, 11);
+    areaLights[0].vertex4 = vec3(-2, 4.99, 11);
+    areaLights[0].normal = vec3(0.0, -1.0, 0.0);
+    areaLights[0].radiance = vec3(10.0, 10.0, 10.0);
     
 
-    pointLights[0].position = vec3(5.5, 0.0, 6.0);
-    pointLights[0].radiance = vec3(1.0, 1.0, 1.0)/5.f;
+    //pointLights[0].position = vec3(5.5, 0.0, 6.0);
+    //pointLights[0].radiance = vec3(1.0, 1.0, 1.0)/5.f;
     int i = 0;
     primitives[i].vertex1 = vec3(-10.0f, -5.0f, 10.0f);
     primitives[i].vertex2 = vec3(-10.0f, -5.0f, -10.0f);
@@ -510,11 +515,11 @@ void Scene::getRoom() {
     primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;
     primitives[i].edge2 = primitives[i].vertex3 - primitives[i].vertex1;
     primitives[i].normal = vec3(0.0f, 1.0f, 0.0f);
-    primitives[i].color = vec3(30, 230, 120)/255.f;
+    primitives[i].color = vec3(255, 255, 255)/255.f;
     primitives[i].ID = 1;
     primitives[i].smoothness = 0.0f;
     primitives[i].bounceOdds = 0.8f;
-    primitives[i].materialType = 0;
+    primitives[i].materialType = 1;
     primitives[i].ior = 1.0f;
 
     i++;

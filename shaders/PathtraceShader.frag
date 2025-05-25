@@ -360,10 +360,11 @@ vec3 raytrace(Ray ray) {
 			? -normalize(hitSurface.vertex1 - ray.endPoint) // Sphere normal
 			: hitSurface.normal;
 		
+		
 		// Mirror surface
 		if (hitSurface.materialType == MIRROR) {
 			ray.direction = normalize(reflect(ray.direction, normal));
-			ray.startPoint = ray.endPoint;
+			ray.startPoint = hitSurface.ID == 1 ? ray.endPoint + normal*1e-4 : ray.endPoint;
 			i--;
 			continue;
 		}

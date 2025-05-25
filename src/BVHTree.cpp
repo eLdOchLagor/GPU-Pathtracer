@@ -10,6 +10,12 @@ BVHTree::BVHTree(std::vector<Primitive>& primitives) : primitives(primitives){
         std::iota(triangleIndices.begin(), triangleIndices.end(), 0); //Skapar en lista med värden från 0 till triangleIndices.size().
         largestDepth = 0;
         smallestDepth = 1000;
+        if (primitives.size() < 50) {
+            maxPrimitives = 12;
+        }
+        else {
+            maxPrimitives = 2;
+        }
         buildRecursive(0, primitives.size(), 0); //startar byggandet av trädet.
         //std::cout << this->nodes.size(); //Bara för debugging
 		//traverseTree(); //Traversera trädet för att se att det är korrekt byggt.
@@ -53,7 +59,7 @@ int BVHTree::buildRecursive(int start, int count, int depth) {
     nodes.push_back(node);
 
     //Om det är en lövnod så skapar vi en korrekt lövnod (inga children så vi sätter dem till -1).
-    if (count <= 2) {
+    if (count <= maxPrimitives) {
         nodes[nodeIndex].startTriangle = start;
         nodes[nodeIndex].triangleCount = count;
         nodes[nodeIndex].leftChild = -1;
@@ -197,27 +203,6 @@ int BVHTree::buildRecursive(int start, int count, int depth) {
         );
         mid = midIter - triangleIndices.begin();
     }
-
-   
-
-   
-
-    if (mid == start || mid == start + count) {
-        nodes[nodeIndex].startTriangle = start;
-        nodes[nodeIndex].triangleCount = count;
-        nodes[nodeIndex].leftChild = -1;
-        nodes[nodeIndex].rightChild = -1;
-        nodes[nodeIndex].escapeIndex = nodeIndex + 1; // Nästa nod i pre-order
-        if (depth < smallestDepth) {
-            smallestDepth = depth;
-        }
-        if (depth > largestDepth) {
-            largestDepth = depth;
-        }
-        return nodeIndex;
-
-    }
-
 
     //Gör recursion med children
     int leftChild = buildRecursive(start, mid - start, depth + 1);

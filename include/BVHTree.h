@@ -31,6 +31,7 @@ public:
 private:
 	int largestDepth;
 	int smallestDepth;
+	int maxPrimitives;
 	std::vector<Primitive> primitives; //Trianglarna
 	std::vector<int> triangleIndices; //Denna listan hittar trianglarna relaterat till noderna i trädet.
 	std::vector<BVHNode> nodes; //Noderna med children å AABB

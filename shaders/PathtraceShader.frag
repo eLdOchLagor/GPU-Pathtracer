@@ -191,28 +191,26 @@ bool isInShadow(vec3 startPoint, vec3 y){
 	float distance = length(y - startPoint);
 	vec3 rayDirectionInv = 1.0/shadowRay.direction;
 	HitResult hit = traverseBVHTree(shadowRay, rayDirectionInv, false);
-	if(hit.t > 0.0 && hit.t < distance){
-		return true;
-	}
-	return false;
+	return hit.t > 0.0 && hit.t < distance;
+	
 }
 
-float intersectAABBOther(vec3 rayOrigin, vec3 rayDirInv, vec3 minB, vec3 maxB) {
+float intersectAABB(vec3 rayOrigin, vec3 rayDirInv, vec3 minB, vec3 maxB) {
     vec3 tMin = (minB - rayOrigin) * rayDirInv;
     vec3 tMax = (maxB - rayOrigin) * rayDirInv;
     vec3 t1 = min(tMin, tMax);
     vec3 t2 = max(tMin, tMax);
     float tNear = max(max(t1.x, t1.y), t1.z);
     float tFar = min(min(t2.x, t2.y), t2.z);
-	bool didHit = tFar > tNear && tFar > 0;
-	return didHit ? tNear : 100000;
+	return (tFar >= max(tNear,0.0)) ? tNear : 1e30;
+
     
 }
 
 
 HitResult traverseBVHTree(Ray ray, vec3 rayDirInv, bool includeGlass) {
     int nodeIndex = 0;
-    float closestT = 100000;
+    float closestT = 1e30;
     int closestPrimIdx = -1;
 
     
@@ -226,7 +224,7 @@ HitResult traverseBVHTree(Ray ray, vec3 rayDirInv, bool includeGlass) {
 		
         BVHNode node = nodes[nodeIndex];
 
-        if (intersectAABBOther(ray.startPoint, rayDirInv, node.bBoxMin, node.bBoxMax) < closestT) {
+        if (intersectAABB(ray.startPoint, rayDirInv, node.bBoxMin, node.bBoxMax) < closestT) {
             if (node.triangleCount > 0) {
                 // Leaf node
                 for (int i = 0; i < node.triangleCount; ++i) {
@@ -376,7 +374,8 @@ vec3 raytrace(Ray ray) {
 			
 			if (randChoice < hitSurface.smoothness) {
 				// Reflect
-				ray.direction = reflect(ray.direction, normal);
+				ray.direction = normalize(reflect(ray.direction, normal));
+				ray.startPoint = ray.endPoint;
 				
 			} else {
 				// Diffuse reflection

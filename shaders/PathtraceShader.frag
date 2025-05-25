@@ -129,35 +129,32 @@ float triangleIntersectionTest(Ray currentRay, Primitive targetTriangle) {
 
 		// If negative, then the surface is visible for the ray
 		
-		if (dot(d, targetTriangle.normal) < 0.0)
-		{
-			
-			vec3 c1 = targetTriangle.edge1;
-			vec3 c2 = targetTriangle.edge2;
-
-			vec3 P = cross(d, c2);
-			float det = dot(c1, P);
-			
-			vec3 T = s - targetTriangle.vertex1;
-			float u = dot(T, P) / det;
-			if (u < 0 || u > 1) {
-				return -1.0;
-			}
-
-			vec3 Q = cross(T, c1);
-			float v = dot(d, Q) / det;
-			if (v < 0 || v > 1-u) {
-				return -1.0;
-			}
-			float t = dot(c2, Q) / det;
-			if (t < 0) {
-				return -1.0;
-			}
-			return t;
-			
-
+		if (dot(d, targetTriangle.normal) > 0.0){
+			return -1.0;
 		}
-		return -1.0;
+			
+		vec3 c1 = targetTriangle.edge1;
+		vec3 c2 = targetTriangle.edge2;
+
+		vec3 P = cross(d, c2);
+		float det = dot(c1, P);
+			
+		vec3 T = s - targetTriangle.vertex1;
+		float u = dot(T, P) / det;
+		if (u < 0 || u > 1) {
+			return -1.0;
+		}
+
+		vec3 Q = cross(T, c1);
+		float v = dot(d, Q) / det;
+		if (v < 0 || v > 1-u) {
+			return -1.0;
+		}
+		float t = dot(c2, Q) / det;
+		if (t < 0) {
+			return -1.0;
+		}
+		return t;
 	}
 
 float sphereIntersectionTest(Ray currentRay, Primitive targetSphere) {
@@ -167,8 +164,10 @@ float sphereIntersectionTest(Ray currentRay, Primitive targetSphere) {
 
 		float arg = c2 * c2 - 4.0 * c1 * c3;
 
-		if (arg >= 0.0)
-		{
+		if (arg < 0.0){
+			return -1.0;
+		}
+		else{
 			float t1 = (-c2 + sqrt(arg)) / (2.0 * c1);
 			float t2 = (-c2 - sqrt(arg)) / (2.0 * c1);
 			
@@ -186,8 +185,6 @@ float sphereIntersectionTest(Ray currentRay, Primitive targetSphere) {
 
 			return t;
 		}
-		
-		return -1.0;
 }
 
 bool isInShadow(vec3 startPoint, vec3 y){
@@ -391,6 +388,7 @@ vec3 raytrace(Ray ray) {
 				
 				ray = diffuseReflection(ray, hitSurface, randAzimuth, randInclination);
 			}
+			continue;
 			
 		}
 
@@ -437,6 +435,7 @@ vec3 raytrace(Ray ray) {
 			ray.startPoint = ray.endPoint + 0.001 * ray.direction;
 			importance *= hitSurface.color;
 			i--;
+			continue;
 		}
 		if(hitSurface.materialType == LIGHT){
 			accumulatedColor += importance * hitSurface.color;

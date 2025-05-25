@@ -44,19 +44,6 @@ struct Ray{
 	vec3 endPoint;
 };
 
-struct Sphere{
-	vec3 spherePOS;
-	float sphereRadius;
-};
-
-struct Triangle{
-	vec3 vertex1;
-	vec3 vertex2;
-	vec3 vertex3;
-	vec3 triangleNormal;
-	vec3 triangleColor;
-};
-
 struct Primitive{
 	vec3 vertex1;
 	vec3 vertex2;
@@ -112,22 +99,7 @@ uniform int screenHeight;
 uniform int NUM_OF_POINT_LIGHTS;
 uniform int NUM_OF_AREA_LIGHTS;
 
-
-
 in vec3 pos;
-
-// Temporarily hardcoded light --------------------------------------------------------------------
-struct Light
-{
-	vec3 vertex1;
-	vec3 vertex2;
-	vec3 vertex3;
-	vec3 vertex4;
-	vec3 normal;
-	vec3 radiance;
-};
-
-Light mainLight = Light(vec3(-2, 4.99, 8), vec3(2, 4.99, 8), vec3(2, 4.99, 11), vec3(-2, 4.99, 11), vec3(0.0, -1.0, 0.0), vec3(10.0, 10.0, 10.0));
 
 // --------------------------------------------------------------------------------------------------
 
@@ -227,38 +199,6 @@ bool isInShadow(vec3 startPoint, vec3 y){
 		return true;
 	}
 	return false;
-}
-
-//Returns the closest distance hit. First value of returned vec2 is the distance, second value is the index of the object int the primitives array.
-vec2 intersectionTest(Ray currentRay){
-	float closestDistance = -1.0;
-	int closestIndex = -1;
-	for(int i = 0; i < primitives.length(); i++){
-		float t = -1.0;
-		if(primitives[i].ID == 0){
-			t = triangleIntersectionTest(currentRay , primitives[i]);
-		}
-		else if(primitives[i].ID == 1){
-			 t = sphereIntersectionTest(currentRay, primitives[i]);
-		}
-		if((t < closestDistance || closestDistance < 0.0) && t > 0.0){
-			closestDistance = t;
-			closestIndex = i;
-		}
-	}
-
-	return vec2(closestDistance, closestIndex);
-}
-
-bool intersectAABB(vec3 rayOrigin, vec3 rayDirInv, vec3 minB, vec3 maxB) {
-    vec3 tMin = (minB - rayOrigin) * rayDirInv;
-    vec3 tMax = (maxB - rayOrigin) * rayDirInv;
-    vec3 t1 = min(tMin, tMax);
-    vec3 t2 = max(tMin, tMax);
-    float tNear = max(max(t1.x, t1.y), t1.z);
-    float tFar = min(min(t2.x, t2.y), t2.z);
-	
-    return tFar >= max(tNear, 0.0);
 }
 
 float intersectAABBOther(vec3 rayOrigin, vec3 rayDirInv, vec3 minB, vec3 maxB) {
@@ -403,8 +343,6 @@ vec3 raytrace(Ray ray) {
 	for (int i = 0; i < maxBounces; i++) {
 		vec3 rayDirInv = 1.0 / ray.direction;
 		HitResult hit = traverseBVHTree(ray, rayDirInv, true);
-		
-		//vec2 hit = intersectionTest(ray);
 
 		if (hit.index == -1) {
 			accumulatedColor += importance * vec3(0.2); // Background

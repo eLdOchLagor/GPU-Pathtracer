@@ -393,7 +393,7 @@ void Scene::getRoom() {
     primitives[i].color = vec3(255, 255, 255) / 255.0f;
     primitives[i].ID = 0;
     primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 1;
+    primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
     //right top
@@ -408,7 +408,7 @@ void Scene::getRoom() {
     primitives[i].color = vec3(255, 255, 255) / 255.0f;
     primitives[i].ID = 0;
     primitives[i].smoothness = 0.0f;
-    primitives[i].materialType = 1;
+    primitives[i].materialType = 0;
     primitives[i].ior = 1.0f;
     i++;
     //roof

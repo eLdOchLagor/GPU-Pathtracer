@@ -54,12 +54,9 @@ struct Primitive{
 	vec3 color;
 	float ior;
 	vec3 normal;
+	float bounceOdds;
 	vec3 edge1;
     vec3 edge2;
-	
-	
-	
-	
 };
 
 layout(std430, binding = 0) buffer PrimitiveBuffer{
@@ -128,7 +125,7 @@ HitResult traverseBVHTree(Ray ray, vec3 rayDirInv, bool includeGlass);
 
 float triangleIntersectionTest(Ray currentRay, Primitive targetTriangle) {
 
-	vec3 d = normalize(currentRay.direction);
+	vec3 d = currentRay.direction;
 	vec3 s = currentRay.startPoint;
 
 	// If negative, then the surface is visible for the ray
@@ -274,11 +271,12 @@ vec3 calculateDirectIllumination(vec3 dir, vec3 hitPoint, vec3 normal, vec3 surf
 		float t = RandomFloat(seed);
 
 		vec3 y = areaLights[i].vertex1 + s * e1 + t * e2;
-		vec3 di = y - hitPoint;
+		
 
 		
 
 		if (!isInShadow(hitPoint + 0.0001*normal, y)){
+			vec3 di = y - hitPoint;
 			vec3 dirNorm = normalize(di);
 			float cosx = dot(normal, dirNorm);
 			float cosy = dot(-areaLights[i].normal, dirNorm);
@@ -341,6 +339,10 @@ vec3 raytrace(Ray ray) {
 	vec3 importance = vec3(1.0); // Keeps track of ray contribution
 	
 	for (int i = 0; i < maxBounces; i++) {
+		//if importance contribution is low then we exit early
+		if (importance.r < 0.01 && importance.g < 0.01 && importance.b < 0.01) {
+			break;
+		}
 		vec3 rayDirInv = 1.0 / ray.direction;
 		HitResult hit = traverseBVHTree(ray, rayDirInv, true);
 
@@ -366,7 +368,7 @@ vec3 raytrace(Ray ray) {
 			continue;
 		}
 
-		// Diffuse surface
+		// Glossy surface
 		if (hitSurface.materialType == GLOSSY) {
 			vec3 directIllumination = calculateDirectIllumination(
 				ray.direction, ray.endPoint, normal, hitSurface.color
@@ -382,16 +384,20 @@ vec3 raytrace(Ray ray) {
 				// Reflect
 				ray.direction = normalize(reflect(ray.direction, normal));
 				ray.startPoint = ray.endPoint;
-				
-			} else {
-				// Diffuse reflection
-				float randomValue1 = RandomFloat(seed);
-				float randomValue2 = RandomFloat(seed);
-				float randInclination = acos(sqrt(1.0 - randomValue1));
-				float randAzimuth = 2.0 * M_PI * randomValue2;
-				
-				ray = diffuseReflection(ray, hitSurface, randAzimuth, randInclination);
+				continue;
 			}
+
+			// Diffuse reflection
+			float randomValue1 = RandomFloat(seed);
+			float randAzimuth = 2.0 * M_PI * randomValue1;
+			float rr = randAzimuth / (hitSurface.bounceOdds);
+			if (!(rr <= 2.0 * M_PI && i != maxBounces - 1)) {
+				break;
+			}
+			float randomValue2 = RandomFloat(seed);
+			float randInclination = acos(sqrt(1.0 - randomValue2));
+			ray = diffuseReflection(ray, hitSurface, randAzimuth, randInclination);
+
 			continue;
 			
 		}

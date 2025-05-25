@@ -10,7 +10,8 @@ struct Primitive {
     int materialType; // 0 = diffuse, 1 = mirror, 2 = glass
     vec3 color;
     float ior; // Index of refraction
-    alignas(16) vec3 normal;
+    vec3 normal;
+    float bounceOdds;
     alignas(16) vec3 edge1;
     alignas(16) vec3 edge2;
    

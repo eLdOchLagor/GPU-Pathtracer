@@ -61,10 +61,6 @@ inline float surfaceArea(const AABB& aabb) {
 	return 2.0f * (extents.x * extents.y + extents.x * extents.z + extents.y * extents.z);
 }
 
-inline float volume(const AABB& aabb) {
-	vec3 extents = aabb.max - aabb.min;
-	return extents.x * extents.y * extents.z;
-}
 
 inline vec3 centerOfAABB(const AABB& aabb) {
 	return 0.5f * (aabb.min + aabb.max);

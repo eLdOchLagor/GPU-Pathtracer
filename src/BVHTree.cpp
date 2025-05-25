@@ -30,7 +30,8 @@ void BVHTree::rebuild(const std::vector<Primitive>& newPrims)
 
     nodes.clear();
 	triangleIndices.clear();
-
+    largestDepth = 0;
+    smallestDepth = 1000;
     triangleIndices.resize(primitives.size());
     std::iota(triangleIndices.begin(), triangleIndices.end(), 0);
 
@@ -52,7 +53,7 @@ int BVHTree::buildRecursive(int start, int count, int depth) {
     nodes.push_back(node);
 
     //Om det är en lövnod så skapar vi en korrekt lövnod (inga children så vi sätter dem till -1).
-    if (count <= 4) {
+    if (count <= 2) {
         nodes[nodeIndex].startTriangle = start;
         nodes[nodeIndex].triangleCount = count;
         nodes[nodeIndex].leftChild = -1;
@@ -152,14 +153,6 @@ int BVHTree::buildRecursive(int start, int count, int depth) {
         float Ct = 0.5f;
         float Ci = 1.0f;
 
-        float parentVolume = volume(bounds);
-        float leftVolume = volume(leftBounds[i]);
-        float rightVolume = volume(rightBounds[i]);
-
-        /*float cost = Ct + Ci * (
-            (leftVolume / parentVolume) * leftCounts[i] +
-            (rightVolume / parentVolume) * rightCounts[i]
-           );*/
         float cost = Ct + (Ci * (
             leftCounts[i] * surfaceArea(leftBounds[i]) +
             rightCounts[i] * surfaceArea(rightBounds[i])
@@ -251,11 +244,10 @@ int BVHTree::buildRecursive(int start, int count, int depth) {
 //Crude test so that we can see that the tree is built correctly.
 void BVHTree::traverseTree() {
 	// Traverse the BVH tree and perform operations on each node
-    int largestDepth = 0;
-    int smallestDepth = 10000;
+
 	for (const auto& node : nodes) {
 		// Perform operations on the node
-		/*std::cout << "Node AABB: " << node.bBoxMin.x << ", " << node.bBoxMin.y << ", " << node.bBoxMin.z << " to "
+		std::cout << "Node AABB: " << node.bBoxMin.x << ", " << node.bBoxMin.y << ", " << node.bBoxMin.z << " to "
 			<< node.bBoxMax.x << ", " << node.bBoxMax.y << ", " << node.bBoxMax.z << std::endl;
         if (node.rightChild == -1 && node.leftChild == -1) {
             for (int i = node.startTriangle; i < node.startTriangle + node.triangleCount; i++) {
@@ -264,7 +256,7 @@ void BVHTree::traverseTree() {
                     <<temp.vertex2.x << ", " << temp.vertex2.y << ", " << temp.vertex2.z << ", vertex3: " 
                    <<temp.vertex3.x << ", " << temp.vertex3.y << ", " << temp.vertex3.z << std::endl;
         } }
-        */
+        
         
 	}
 }

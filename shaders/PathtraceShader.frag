@@ -124,67 +124,66 @@ HitResult traverseBVHTree(Ray ray, vec3 rayDirInv, bool includeGlass);
 
 float triangleIntersectionTest(Ray currentRay, Primitive targetTriangle) {
 
-		vec3 d = normalize(currentRay.direction);
-		vec3 s = currentRay.startPoint;
+	vec3 d = normalize(currentRay.direction);
+	vec3 s = currentRay.startPoint;
 
-		// If negative, then the surface is visible for the ray
-		
-		if (dot(d, targetTriangle.normal) > 0.0){
-			return -1.0;
-		}
+	// If negative, then the surface is visible for the ray
+	
+	if (dot(d, targetTriangle.normal) >= 0.0){
+		return -1.0;
+	}
 			
-		vec3 c1 = targetTriangle.edge1;
-		vec3 c2 = targetTriangle.edge2;
+	vec3 c1 = targetTriangle.edge1;
+	vec3 c2 = targetTriangle.edge2;
 
-		vec3 P = cross(d, c2);
-		float det = dot(c1, P);
+	vec3 P = cross(d, c2);
+	float det = dot(c1, P);
 			
-		vec3 T = s - targetTriangle.vertex1;
-		float u = dot(T, P) / det;
-		if (u < 0 || u > 1) {
-			return -1.0;
-		}
-
-		vec3 Q = cross(T, c1);
-		float v = dot(d, Q) / det;
-		if (v < 0 || v > 1-u) {
-			return -1.0;
-		}
-		float t = dot(c2, Q) / det;
-		if (t < 0) {
-			return -1.0;
-		}
-		return t;
+	vec3 T = s - targetTriangle.vertex1;
+	float u = dot(T, P) / det;
+	if (u < 0 || u > 1) {
+		return -1.0;
 	}
 
+	vec3 Q = cross(T, c1);
+	float v = dot(d, Q) / det;
+	if (v < 0 || v > 1-u) {
+		return -1.0;
+	}
+	float t = dot(c2, Q) / det;
+	if (t < 0) {
+		return -1.0;
+	}
+	return t;
+}
+
 float sphereIntersectionTest(Ray currentRay, Primitive targetSphere) {
-		float c1 = dot(currentRay.direction,currentRay.direction);
-		float c2 = 2.0 * dot(currentRay.direction, currentRay.startPoint - targetSphere.vertex1);
-		float c3 = dot(currentRay.startPoint - targetSphere.vertex1, currentRay.startPoint - targetSphere.vertex1) - targetSphere.vertex2.x * targetSphere.vertex2.x;
+	float c1 = dot(currentRay.direction,currentRay.direction);
+	float c2 = 2.0 * dot(currentRay.direction, currentRay.startPoint - targetSphere.vertex1);
+	float c3 = dot(currentRay.startPoint - targetSphere.vertex1, currentRay.startPoint - targetSphere.vertex1) - targetSphere.vertex2.x * targetSphere.vertex2.x;
 
-		float arg = c2 * c2 - 4.0 * c1 * c3;
+	float arg = c2 * c2 - 4.0 * c1 * c3;
 
-		if (arg < 0.0){
-			return -1.0;
-		}
-		else{
-			float t1 = (-c2 + sqrt(arg)) / (2.0 * c1);
-			float t2 = (-c2 - sqrt(arg)) / (2.0 * c1);
-			
-			float t = -1.0;
-			if (t1 > 0 && t2 > 0) {
-				t = min(t1, t2);
-			}
-			else if (t1 > 0) {
-				t = t1;
-			}
+	if (arg <= 0.0){
+		return -1.0;
+	}
 	
-			else if (t2 > 0) {
-				t = t2;
-			}
+	float t1 = (-c2 + sqrt(arg)) / (2.0 * c1);
+	float t2 = (-c2 - sqrt(arg)) / (2.0 * c1);
+		
+	float t = -1.0;
+	if (t1 > 0 && t2 > 0) {
+		t = min(t1, t2);
+	}
+	else if (t1 > 0) {
+		t = t1;
+	}
+	
+	else if (t2 > 0) {
+		t = t2;
+	}
+	return t;
 
-			return t;
-		}
 }
 
 bool isInShadow(vec3 startPoint, vec3 y){
@@ -435,6 +434,9 @@ vec3 raytrace(Ray ray) {
 			ray.startPoint = ray.endPoint + 0.001 * ray.direction;
 			importance *= hitSurface.color;
 			i--;
+			if(transmissiveBounces > 10){
+				break;
+			}
 			continue;
 		}
 		if(hitSurface.materialType == LIGHT){

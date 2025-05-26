@@ -25,7 +25,7 @@ Scene::Scene(int presetID) {
 //Riktigt tuff för datorn att hantera på min sida.
 void Scene::getCrazyScene() {
     getRoom();
-    CreateSceneFromModel("..\\models\\Bunny70K.obj", primitives.size()-1);
+    CreateSceneFromModel("..\\models\\Bunny70K_Translated.obj", primitives.size()-1);
 }
 
 void Scene::CreateSceneFromModel(const std::string& path,int index = 0) {
@@ -493,7 +493,7 @@ void Scene::getRoom() {
     
     
     //sphere 1
-    primitives[i].vertex1 = vec3(0.0f, -3.5f, 8.0f);
+    primitives[i].vertex1 = vec3(2.0f, -3.5f, 8.0f);
     primitives[i].vertex2 = vec3(1.5f, -5.0f, 10.0f);
     primitives[i].vertex3 = vec3(-10.0f, -5.0f, 10.0f);
     primitives[i].edge1 = primitives[i].vertex2 - primitives[i].vertex1;

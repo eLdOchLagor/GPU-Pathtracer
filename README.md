@@ -2,6 +2,8 @@
 
 A GPU pathtracer written in C++ and GLSL, made as a project for the TSBK07 course at Linköping University. It started as a port of an earlier CPU pathtracer, then grew from there.
 
+![pathtracerball](https://github.com/user-attachments/assets/495bab91-87b8-433c-9b44-9b469c45762d)
+
 The rendering runs entirely in a fragment shader — one invocation per pixel, accumulating samples across frames until the image converges.
 
 ---
@@ -38,6 +40,12 @@ Five built-in scenes selectable from the UI:
 - **4** — Room with the high-poly bunny
 
 OBJ files can also be loaded at runtime through the file dialog.
+
+![pathTracerRoom](https://github.com/user-attachments/assets/a61d9043-54a0-4238-9ec1-d014a40ef30d)
+
+<video src="https://github.com/user-attachments/assets/1e8c703e-250e-4980-9335-b60284f3279b" controls></video>
+<video src="https://github.com/user-attachments/assets/19042fa3-b973-4a4a-a95e-7138c82dcb7c" controls></video>
+<video src="https://github.com/user-attachments/assets/cf8e3317-69c6-48e7-bb9b-0ebe5353fe8e" controls></video>
 
 ---
 
